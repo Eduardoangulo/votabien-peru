@@ -254,74 +254,81 @@ export default function PartidosSection({
     );
   };
 
-  const TooltipContent = ({ group }: { group: ParliamentaryGroup }) => (
-    <div className="bg-card border-2 border-primary/50 rounded-xl shadow-2xl p-4 backdrop-blur-sm w-[88vw]  md:w-auto md:min-w-[280px]">
-      <div className="flex items-center gap-3 mb-3">
-        <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0"
-          style={{ backgroundColor: group.color }}
-        >
-          <Building2 className="w-5 h-5 text-white" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-bold text-sm text-card-foreground leading-tight">
-            {group.name}
+  const TooltipContent = ({ group }: { group: ParliamentaryGroup }) => {
+    const gridCols =
+      group.composition.length === 1 ? "grid-cols-1" : "grid-cols-2";
+
+    return (
+      <div className="bg-card border-2 border-primary/50 rounded-xl shadow-2xl p-4 backdrop-blur-sm w-[88vw] md:w-auto">
+        <div className="flex items-center gap-3 mb-3">
+          <div
+            className="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0"
+            style={{ backgroundColor: group.color }}
+          >
+            <Building2 className="w-5 h-5 text-white" />
           </div>
-          <div className="text-xs text-muted-foreground font-medium">
-            Grupo Parlamentario
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-sm text-card-foreground leading-tight">
+              {group.name}
+            </div>
+            <div className="text-xs text-muted-foreground font-medium">
+              Grupo Parlamentario
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col items-end gap-1 flex-shrink-0">
-          <div className="bg-primary/10 rounded-lg px-3 py-1">
-            <div className="text-[10px] text-muted-foreground">Escaños</div>
-            <div className="font-bold text-lg text-primary">{group.seats}</div>
-          </div>
-          <div className="bg-muted rounded-lg px-3 py-1">
-            <div className="text-[10px] text-muted-foreground">% Poder</div>
-            <div className="font-bold text-lg text-foreground">
-              {((group.seats / totalSeats) * 100).toFixed(1)}%
+          <div className="flex flex-row md:flex-col items-end gap-1 flex-shrink-0">
+            <div className="bg-primary/10 rounded-lg px-3 py-1">
+              <div className="text-[10px] text-muted-foreground">Escaños</div>
+              <div className="font-bold text-lg text-primary">
+                {group.seats}
+              </div>
+            </div>
+            <div className="bg-muted rounded-lg px-3 py-1">
+              <div className="text-[10px] text-muted-foreground">% Poder</div>
+              <div className="font-bold text-lg text-foreground">
+                {((group.seats / totalSeats) * 100).toFixed(1)}%
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {group.composition.length > 0 && (
-        <div className="pt-2 border-t border-border">
-          <div className="text-xs text-muted-foreground mb-2 font-semibold">
-            Composición:
+        {group.composition.length > 0 && (
+          <div className="pt-2 border-t border-border">
+            <div className="text-xs text-muted-foreground mb-2 font-semibold">
+              Composición:
+            </div>
+            <div className={`grid ${gridCols} gap-2`}>
+              {group.composition.map((comp, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-2 text-xs bg-muted/30 rounded-lg p-2 transition-colors hover:bg-muted/50"
+                >
+                  {comp.partyLogoUrl ? (
+                    <Image
+                      src={comp.partyLogoUrl}
+                      alt={comp.partyName}
+                      width={24}
+                      height={24}
+                      className="w-6 h-6 object-contain flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded bg-muted flex items-center justify-center flex-shrink-0">
+                      <Building2 className="w-3 h-3 text-muted-foreground" />
+                    </div>
+                  )}
+                  <span className="flex-1 text-card-foreground font-medium">
+                    {comp.partyName}
+                  </span>
+                  <span className="font-bold flex-shrink-0 text-primary">
+                    {comp.count}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            {group.composition.map((comp, idx) => (
-              <div
-                key={idx}
-                className="flex items-center gap-2 text-xs bg-muted/30 rounded-lg p-2"
-              >
-                {comp.partyLogoUrl ? (
-                  <Image
-                    src={comp.partyLogoUrl}
-                    alt={comp.partyName}
-                    width={24}
-                    height={24}
-                    className="w-6 h-6 object-contain flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-6 h-6 rounded bg-muted flex items-center justify-center flex-shrink-0">
-                    <Building2 className="w-3 h-3 text-muted-foreground" />
-                  </div>
-                )}
-                <span className="flex-1 text-card-foreground font-medium">
-                  {comp.partyName}
-                </span>
-                <span className="font-bold flex-shrink-0 text-primary">
-                  {comp.count}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
+  };
   return (
     <section className="bg-gradient-to-b from-muted/30 pb-10 md:pb-16 to-background overflow-hidden">
       <div className="container mx-auto px-3 sm:px-4">
@@ -498,24 +505,58 @@ export default function PartidosSection({
 
               {/* Leyenda */}
               <div className="lg:w-80 lg:flex-shrink-0 mt-4 lg:mt-0">
-                <h3 className="text-xs md:text-sm font-semibold text-card-foreground mb-3 text-center lg:text-left uppercase tracking-wide">
+                <h3 className="text-xs md:text-sm font-semibold text-card-foreground mb-2 text-center lg:text-left uppercase tracking-wide">
                   Grupos Parlamentarios
                 </h3>
-
-                {/* Layout horizontal en mobile */}
+                <p className="text-center text-xs text-accent-foreground">
+                  Selecciona un grupo parlamentario
+                </p>
+                {/* Layout: Carousel en mobile, Grid con scroll lock en desktop */}
                 <div
                   className="
+                    /* Mobile: Carousel horizontal con snap */
                     flex md:grid 
                     md:grid-cols-1 
-                    gap-2 md:space-y-2 
+                    gap-2 md:gap-2 md:space-y-0
+                    
+                    /* Mobile: Scroll horizontal suave */
                     overflow-x-auto md:overflow-x-hidden 
+                    snap-x snap-mandatory md:snap-none
+                    
+                    /* Desktop: Scroll vertical con lock */
                     md:overflow-y-auto
+                    md:overscroll-contain
+                    
+                    /* Estilos generales */
                     pb-2 md:pb-0
                     md:max-h-[500px]
+                    
+                    /* Scrollbar personalizado */
+                    scrollbar-thin
+                    scrollbar-track-transparent
+                    scrollbar-thumb-primary/30
+                    hover:scrollbar-thumb-primary/50
                   "
                   style={{
                     scrollbarWidth: "thin",
-                    scrollbarColor: "hsl(var(--primary)) hsl(var(--muted))",
+                    scrollbarColor: "hsl(var(--primary) / 0.3) transparent",
+                  }}
+                  onWheel={(e) => {
+                    if (window.innerWidth >= 768) {
+                      const element = e.currentTarget;
+                      const isAtTop = element.scrollTop === 0;
+                      const isAtBottom =
+                        element.scrollHeight - element.scrollTop ===
+                        element.clientHeight;
+
+                      if (
+                        (isAtTop && e.deltaY < 0) ||
+                        (isAtBottom && e.deltaY > 0)
+                      ) {
+                      } else {
+                        e.stopPropagation();
+                      }
+                    }
                   }}
                 >
                   {parliamentaryGroups.map((group, idx) => {
@@ -534,10 +575,14 @@ export default function PartidosSection({
                           isMobile && handleLegendClick(group.name)
                         }
                         className={`
-                          flex items-center gap-2 md:gap-3 p-2 rounded-lg border-2 transition-all duration-300 flex-shrink-0 md:flex-shrink
+                          flex items-center gap-2 md:gap-3 p-2 rounded-lg border-2 transition-all duration-300 
+                          snap-center md:snap-align-none
+                          min-w-[280px] md:min-w-0
+                          flex-shrink-0 md:flex-shrink
+                          
                           ${
                             isActive
-                              ? "border-primary shadow-lg bg-primary/10"
+                              ? "border-primary shadow-lg bg-primary/10 scale-[1.02]"
                               : "border-border hover:border-primary/50 bg-card"
                           }
                         `}
@@ -575,7 +620,7 @@ export default function PartidosSection({
                   })}
 
                   {vacantSeats > 0 && (
-                    <div className="flex items-center gap-2 md:gap-3 p-2 rounded-lg border-2 border-dashed border-border bg-muted/50 flex-shrink-0 md:flex-shrink">
+                    <div className="flex items-center gap-2 md:gap-3 p-2 rounded-lg border-2 border-dashed border-border bg-muted/50 snap-center md:snap-align-none min-w-[280px] md:min-w-0 flex-shrink-0 md:flex-shrink">
                       <div className="w-8 h-8 rounded-md bg-muted-foreground/50 flex-shrink-0 flex items-center justify-center">
                         <Users className="w-4 h-4 text-background" />
                       </div>
@@ -596,6 +641,15 @@ export default function PartidosSection({
                   )}
                 </div>
 
+                <div className="md:hidden flex justify-center gap-1 mt-2">
+                  {parliamentaryGroups.map((_, idx) => (
+                    <div
+                      key={idx}
+                      className="w-1.5 h-1.5 rounded-full bg-primary/30 transition-all"
+                    />
+                  ))}
+                </div>
+
                 {/* Tooltip móvil */}
                 {isMobile && selectedGroupMobile && (
                   <div className="mt-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -613,7 +667,7 @@ export default function PartidosSection({
           </div>
         </div>
 
-        {/* PARTE 2: LA BATALLA DE 2026 */}
+        {/* PARTE 2: PARTIDOS */}
         <div className="relative">
           <div className="flex items-center gap-4 mb-8 md:mb-12">
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />

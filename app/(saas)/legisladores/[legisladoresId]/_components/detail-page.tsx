@@ -17,7 +17,7 @@ import {
   Award,
   BookOpen,
   Microscope,
-  Home,
+  Landmark,
 } from "lucide-react";
 import { SlSocialFacebook, SlSocialTwitter } from "react-icons/sl";
 import { PiTiktokLogo } from "react-icons/pi";
@@ -34,14 +34,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { Button } from "@/components/ui/button";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { PreviousCase, PersonDetail, Bill } from "@/interfaces/politics";
 import { formatFechaJsonable } from "@/lib/utils/date";
 import { NoDataMessage } from "@/components/no-data-message";
@@ -126,25 +118,7 @@ export default function DetailLegislador({
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="container mx-auto p-4">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">
-                <Home className="size-5" />
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/legisladores">Legisladores</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{persona.fullname}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
+      <div className="container mx-auto py-4">
         {/* ===== HERO SECTION ===== */}
         <section className="bg-card rounded-xl shadow-sm border border-slate-200/80 overflow-hidden mt-4">
           <div className="bg-gradient-to-r from-primary to-primary/90 p-4 text-primary-foreground relative">
@@ -172,15 +146,23 @@ export default function DetailLegislador({
                 )}
 
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-3 text-primary-foreground mt-4">
-                  {periodoActivo?.current_party ? (
-                    <div className="inline-flex items-center gap-2 font-medium">
-                      <Briefcase className="size-4" />
-                      <span>{periodoActivo.current_party.name}</span>
-                    </div>
-                  ) : (
-                    <div className="inline-flex items-center gap-2 font-medium text-foreground/70">
-                      <Briefcase className="size-4" />
-                      <span>No agrupados</span>
+                  {periodoActivo?.original_party &&
+                    periodoActivo.original_party.logo_url && (
+                      <div className="inline-flex items-center gap-2 font-medium">
+                        <Image
+                          src={periodoActivo.original_party.logo_url}
+                          alt={periodoActivo.original_party.name}
+                          width={24}
+                          height={24}
+                          className="rounded-sm"
+                        />
+                        <span>{periodoActivo.original_party.name}</span>
+                      </div>
+                    )}
+                  {periodoActivo?.parliamentary_group && (
+                    <div className="inline-flex items-center gap-2">
+                      <Landmark className="size-4" />
+                      <span>{periodoActivo.parliamentary_group}</span>
                     </div>
                   )}
                   {periodoActivo?.electoral_district && (
@@ -220,103 +202,6 @@ export default function DetailLegislador({
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* --- COLUMNA PRINCIPAL --- */}
           <div className="lg:col-span-2 space-y-4">
-            {/* Biografía */}
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="size-5" />
-                  Trayectoria y Biografía
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {persona.detailed_biography &&
-                persona.detailed_biography.length > 0 ? (
-                  <div className="relative space-y-6">
-                    {/* Timeline line */}
-                    <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary/50 via-primary/30 to-transparent" />
-
-                    {persona.detailed_biography
-                      .sort(
-                        (a, b) =>
-                          new Date(a.date).getTime() -
-                          new Date(b.date).getTime(),
-                      )
-                      .map((item, index) => (
-                        <div key={index} className="relative pl-8 group">
-                          {/* Timeline dot */}
-                          <div className="absolute left-0 top-2 w-4 h-4 bg-background border-2 border-primary rounded-full shadow-sm transition-transform group-hover:scale-125 group-hover:shadow-md" />
-
-                          <div className="flex flex-col gap-2 pb-6 border-b border-slate-100 dark:border-slate-800 last:border-0 last:pb-0">
-                            {/* Header */}
-                            <div className="flex flex-wrap items-start gap-2">
-                              <h4 className="font-semibold text-base leading-tight flex-1 min-w-0">
-                                {item.title}
-                              </h4>
-                              <div className="flex flex-wrap items-center gap-1.5">
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs capitalize font-normal"
-                                >
-                                  {item.type}
-                                </Badge>
-                                {item.relevance && (
-                                  <Badge
-                                    variant={
-                                      item.relevance === "Alta"
-                                        ? "destructive"
-                                        : item.relevance === "Media"
-                                          ? "default"
-                                          : "secondary"
-                                    }
-                                    className="text-xs font-medium"
-                                  >
-                                    {item.relevance}
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Description */}
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                              {item.description}
-                            </p>
-
-                            {/* Footer metadata */}
-                            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                              <div className="flex items-center gap-1.5">
-                                <Calendar className="w-3.5 h-3.5" />
-                                <time dateTime={item.date}>
-                                  {formatFechaJsonable(item.date)}
-                                </time>
-                              </div>
-
-                              {item.source && item.source_url && (
-                                <>
-                                  <span className="text-slate-300 dark:text-slate-600">
-                                    •
-                                  </span>
-                                  <Link
-                                    href={item.source_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 hover:underline text-primary transition-colors underline-offset-2"
-                                    aria-label={`source: ${item.source}`}
-                                  >
-                                    <span>{item.source}</span>
-                                  </Link>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                ) : (
-                  <NoDataMessage text="No hay información detallada de la biografía." />
-                )}
-              </CardContent>
-            </Card>
-
             {/* Formación Académica */}
             {tieneEducacion && (
               <Card className="shadow-sm">
@@ -408,6 +293,98 @@ export default function DetailLegislador({
                 </CardContent>
               </Card>
             )}
+            {/* Biografía */}
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="size-5" />
+                  Trayectoria y Biografía
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {persona.detailed_biography ? (
+                  <div className="relative space-y-6">
+                    {/* Timeline line */}
+                    <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary/50 via-primary/30 to-transparent" />
+
+                    {persona.detailed_biography
+                      .sort(
+                        (a, b) =>
+                          new Date(a.date).getTime() -
+                          new Date(b.date).getTime(),
+                      )
+                      .map((item, index) => (
+                        <div key={index} className="relative pl-8 group">
+                          <div className="absolute left-0 top-2 w-4 h-4 bg-background border-2 border-primary rounded-full shadow-sm transition-transform group-hover:scale-125 group-hover:shadow-md" />
+
+                          <div className="flex flex-col gap-2 pb-6 border-b border-slate-100 dark:border-slate-800 last:border-0 last:pb-0">
+                            <div className="flex flex-wrap items-start gap-2">
+                              <h4 className="font-semibold text-base leading-tight flex-1 min-w-0">
+                                {item.title}
+                              </h4>
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs capitalize font-normal"
+                                >
+                                  {item.type}
+                                </Badge>
+                                {item.relevance && (
+                                  <Badge
+                                    variant={
+                                      item.relevance === "Alta"
+                                        ? "destructive"
+                                        : item.relevance === "Media"
+                                          ? "default"
+                                          : "secondary"
+                                    }
+                                    className="text-xs font-medium"
+                                  >
+                                    {item.relevance}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {item.description}
+                            </p>
+
+                            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1.5">
+                                <Calendar className="w-3.5 h-3.5" />
+                                <time dateTime={item.date}>
+                                  {formatFechaJsonable(item.date)}
+                                </time>
+                              </div>
+
+                              {item.source && item.source_url && (
+                                <>
+                                  <span className="text-slate-300 dark:text-slate-600">
+                                    •
+                                  </span>
+                                  <Link
+                                    href={item.source_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 hover:underline text-primary transition-colors underline-offset-2"
+                                    aria-label={`source: ${item.source}`}
+                                  >
+                                    <span>{item.source}</span>
+                                    <ExternalLink className="w-3 h-3 opacity-70 inline-block" />
+                                  </Link>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  <NoDataMessage text="No hay información detallada de la biografía." />
+                )}
+              </CardContent>
+            </Card>
 
             {/* PreviousCases */}
             {persona.previous_cases && persona.previous_cases.length > 0 ? (
@@ -415,7 +392,7 @@ export default function DetailLegislador({
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-orange-800">
                     <AlertTriangle className="size-5" />
-                    PreviousCases Registrados
+                    Antecedentes Registrados
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-5">
@@ -460,13 +437,39 @@ export default function DetailLegislador({
                               </Badge>
                             )}
                           </div>
+
                           <p className="text-sm text-orange-800 dark:text-orange-200 mb-1">
                             {antecedente.description}
                           </p>
+
                           {antecedente.date && (
-                            <span className="text-xs text-orange-600 dark:text-orange-400">
+                            <span className="block text-xs text-orange-600 dark:text-orange-400">
                               Fecha: {formatFechaJsonable(antecedente.date)}
                             </span>
+                          )}
+
+                          {(antecedente.source || antecedente.source_url) && (
+                            <div className="mt-1 text-xs text-orange-700 dark:text-orange-300">
+                              {antecedente.source_url ? (
+                                <a
+                                  href={antecedente.source_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 underline hover:text-orange-900 dark:hover:text-orange-100"
+                                >
+                                  {antecedente.source}
+                                  <ExternalLink className="w-3 h-3 inline-block opacity-70" />
+                                </a>
+                              ) : (
+                                <span>{antecedente.source}</span>
+                              )}
+                              {antecedente.source_type && (
+                                <span className="text-muted-foreground">
+                                  {" "}
+                                  ({antecedente.source_type})
+                                </span>
+                              )}
+                            </div>
                           )}
                         </div>
                       ))}
@@ -477,87 +480,6 @@ export default function DetailLegislador({
             ) : (
               <NoDataMessage text="No se registran antecedentes." />
             )}
-
-            {/* Historial Legislativo */}
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <History className="size-5" />
-                  Historial Legislativo
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {periodosOrdenados.length > 0 ? (
-                  <div
-                    className={`grid gap-4 ${
-                      periodosOrdenados.length === 1
-                        ? "grid-cols-1"
-                        : "grid-cols-1 md:grid-cols-2"
-                    }`}
-                  >
-                    {periodosOrdenados.map((periodo) => (
-                      <div
-                        key={periodo.id}
-                        className={`p-3 border rounded-lg transition-all hover:shadow-md ${
-                          periodo.active
-                            ? "bg-green-50 border-green-200"
-                            : "bg-slate-50 border-slate-200"
-                        }`}
-                      >
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <h4 className="font-semibold text-sm">
-                              {periodo.chamber}
-                            </h4>
-                            <Badge
-                              variant={periodo.active ? "success" : "secondary"}
-                            >
-                              {periodo.active ? "Actual" : "Finalizado"}
-                            </Badge>
-                          </div>
-
-                          <div className="flex items-center justify-between gap-3 text-xs text-foreground/70">
-                            <div className="flex items-center gap-1.5">
-                              <Calendar className="size-3 flex-shrink-0" />
-                              <span>
-                                {new Date(periodo.start_date).getFullYear()} -{" "}
-                                {new Date(periodo.end_date).getFullYear()}
-                              </span>
-                            </div>
-                            {periodo.electoral_district && (
-                              <div className="flex items-center gap-1.5">
-                                <MapPin className="size-3 flex-shrink-0" />
-                                <span className="truncate">
-                                  {periodo.electoral_district.name}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-1.5 text-xs text-foreground/70">
-                            <Briefcase className="size-3 flex-shrink-0" />
-                            <span className="truncate">
-                              {periodo.current_party?.name || "No agrupados"}
-                            </span>
-                          </div>
-
-                          {periodo.institutional_email && (
-                            <div className="flex items-center gap-1.5 text-xs text-foreground/70 pt-1">
-                              <Mail className="size-3 flex-shrink-0" />
-                              <span className="truncate">
-                                {periodo.institutional_email}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <NoDataMessage text="No hay historial legislativo registrado." />
-                )}
-              </CardContent>
-            </Card>
 
             {/* Proyectos de Ley */}
             {periodoActivo?.bills && (
@@ -769,6 +691,86 @@ export default function DetailLegislador({
                     })}
                   </span>
                 </div>
+              </CardContent>
+            </Card>
+            {/* Historial Legislativo */}
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="size-5" />
+                  Historial Legislativo
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {periodosOrdenados.length > 0 ? (
+                  <div
+                    className={`grid gap-4 ${
+                      periodosOrdenados.length === 1
+                        ? "grid-cols-1"
+                        : "grid-cols-1 md:grid-cols-2"
+                    }`}
+                  >
+                    {periodosOrdenados.map((periodo) => (
+                      <div
+                        key={periodo.id}
+                        className={`p-3 border rounded-lg transition-all hover:shadow-md ${
+                          periodo.active
+                            ? "bg-green-50 border-green-200"
+                            : "bg-slate-50 border-slate-200"
+                        }`}
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="font-semibold text-sm">
+                              {periodo.chamber}
+                            </h4>
+                            <Badge
+                              variant={periodo.active ? "success" : "secondary"}
+                            >
+                              {periodo.active ? "Actual" : "Finalizado"}
+                            </Badge>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-3 text-xs text-foreground/70">
+                            <div className="flex items-center gap-1.5">
+                              <Calendar className="size-3 flex-shrink-0" />
+                              <span>
+                                {new Date(periodo.start_date).getFullYear()} -{" "}
+                                {new Date(periodo.end_date).getFullYear()}
+                              </span>
+                            </div>
+                            {periodo.electoral_district && (
+                              <div className="flex items-center gap-1.5">
+                                <MapPin className="size-3 flex-shrink-0" />
+                                <span className="truncate">
+                                  {periodo.electoral_district.name}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-1.5 text-xs text-foreground/70">
+                            <Briefcase className="size-3 flex-shrink-0" />
+                            <span className="truncate">
+                              {periodo.current_party?.name || "No agrupados"}
+                            </span>
+                          </div>
+
+                          {periodo.institutional_email && (
+                            <div className="flex items-center gap-1.5 text-xs text-foreground/70 pt-1">
+                              <Mail className="size-3 flex-shrink-0" />
+                              <span className="truncate">
+                                {periodo.institutional_email}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <NoDataMessage text="No hay historial legislativo registrado." />
+                )}
               </CardContent>
             </Card>
           </div>

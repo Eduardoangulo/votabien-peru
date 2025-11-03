@@ -1,5 +1,4 @@
 import { publicApi } from "@/lib/public-api";
-import Footer from "@/components/landing/footer";
 import ErrorLanding from "@/components/landing/error-landing";
 import {
   PoliticalPartyDetail,
@@ -109,9 +108,6 @@ export default async function VotaBienPage() {
           partidosPreview={partidosPreview}
           totalPartidos={partidos.length}
         />
-
-        {/* Call to Action */}
-        <Footer />
       </div>
     );
   } catch (error) {

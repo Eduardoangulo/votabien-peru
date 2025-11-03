@@ -1,20 +1,18 @@
 import { publicApi } from "@/lib/public-api";
 import CandidatosList from "@/components/politics/candidatos-list";
-import { Calendar, Timer } from "lucide-react";
 import {
   CandidateDetail,
   ElectoralDistrict,
-  PoliticalPartyBase,
   ElectoralProcess,
 } from "@/interfaces/politics";
 import Link from "next/link";
+import StickyElectoralBanner from "@/components/sticky-banner";
 
 interface PageProps {
   searchParams: {
     search?: string;
-    partidos?: string | string[];
-    distritos?: string | string[];
-    tipo?: string;
+    type?: string;
+    districts?: string | string[];
   };
 }
 
@@ -22,22 +20,13 @@ const CandidatosPage = async ({ searchParams }: PageProps) => {
   const params = await searchParams;
   const limit = 30;
 
-  const apiParams = {
-    es_legislador_activo: true,
-    tipo: params.tipo && params.tipo !== "all" ? params.tipo : undefined,
-    search: params.search || undefined,
-    partidos:
-      params.partidos && params.partidos !== "all"
-        ? params.partidos
-        : undefined,
-    distritos:
-      params.distritos && params.distritos !== "all"
-        ? params.distritos
-        : undefined,
+  const currentParams = {
+    search: params.search || "",
+    type: params.type || "all",
+    districts: params.districts || [],
     skip: 0,
-    limit: limit,
+    limit,
   };
-
   try {
     const procesosActivos = (await publicApi.getProcesosElectorales(
       true,
@@ -83,10 +72,19 @@ const CandidatosPage = async ({ searchParams }: PageProps) => {
     }
 
     const procesoActivo = procesosActivos[0];
-
-    const [candidaturas, partidos, distritos] = await Promise.all([
+    const apiParams = {
+      search: params.search || undefined,
+      electoral_process_id: procesoActivo.id,
+      type: params.type && params.type !== "all" ? params.type : undefined,
+      districts:
+        params.districts && params.districts !== "all"
+          ? params.districts
+          : undefined,
+      skip: 0,
+      limit: limit,
+    };
+    const [candidaturas, distritos] = await Promise.all([
       publicApi.getCandidaturas(apiParams) as Promise<CandidateDetail[]>,
-      publicApi.getPartidos(true) as Promise<PoliticalPartyBase[]>,
       publicApi.getDistritos() as Promise<ElectoralDistrict[]>,
     ]);
 
@@ -104,47 +102,18 @@ const CandidatosPage = async ({ searchParams }: PageProps) => {
     );
     return (
       <div className="min-h-screen bg-background">
-        {/* Header con información del proceso */}
-        <section className="bg-gradient-to-r from-primary via-primary/95 to-primary/90 text-primary-foreground py-12 md:py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-                {procesoActivo.name}
-              </h1>
+        <StickyElectoralBanner
+          processName={procesoActivo.name}
+          electionDate={fechaFormateada}
+          daysRemaining={diasRestantes}
+        />
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 text-sm md:text-base">
-                <div className="inline-flex items-center gap-2 bg-primary-foreground/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-primary-foreground/20">
-                  <Calendar className="size-5" />
-                  <span className="font-medium">{fechaFormateada}</span>
-                </div>
-
-                {diasRestantes > 0 && (
-                  <div className="inline-flex items-center gap-2 bg-warning backdrop-blur-sm rounded-lg px-4 py-2 border border-warning/30">
-                    <Timer className="size-5" />
-                    <span className="font-bold">
-                      {diasRestantes}{" "}
-                      {diasRestantes === 1 ? "día" : "días restantes"}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Lista de candidatos con filtros */}
-        <section className="container mx-auto px-4 py-8 md:py-12">
+        <section className="container mx-auto p-4">
           <CandidatosList
             candidaturas={candidaturas}
-            partidos={partidos}
             distritos={distritos}
             procesoId={procesoActivo.id}
-            currentFilters={{
-              search: params.search || "",
-              partidos: params.partidos || "all",
-              distritos: params.distritos || "all",
-              tipo: params.tipo || "all",
-            }}
+            currentFilters={currentParams}
           />
         </section>
       </div>

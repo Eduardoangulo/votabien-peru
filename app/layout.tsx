@@ -1,9 +1,10 @@
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-provider";
 import { serverGetUser } from "@/lib/auth-actions";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,13 +28,18 @@ export default async function RootLayout({
   const result = await serverGetUser();
   const initialUser = result.user || null;
   return (
-    <html lang="en">
+    <html lang="es" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider initialUser={initialUser}>
-            {children}
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider initialUser={initialUser}>{children}</AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

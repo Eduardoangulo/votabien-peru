@@ -88,11 +88,11 @@ export function ComparadorContent({
   });
 
   // Animaciones suaves sin zoom para evitar desplazamiento
-  const photoBlur = useTransform(
-    scrollYProgress,
-    isLandscapeMobile ? [0, 0.1, 1] : [0, 0.4, 1],
-    [0, 2, 2],
-  );
+  // const photoBlur = useTransform(
+  //   scrollYProgress,
+  //   isLandscapeMobile ? [0, 0.1, 1] : [0, 0.4, 1],
+  //   [0, 2, 2],
+  // );
   // Overlay más dramático
   const overlayOpacity = useTransform(
     scrollYProgress,
@@ -212,7 +212,7 @@ export function ComparadorContent({
 
   return (
     <section className="relative py-12 md:py-20 overflow-hidden bg-gradient-to-b from-background via-muted/50 to-background">
-      {/* Elementos decorativos sutiles continuando el hero */}
+      {/* decorativos*/}
       <div className="absolute inset-0 -z-10 pointer-events-none">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] dark:opacity-100 opacity-30" />
         <div className="absolute top-20 left-10 w-72 h-72 md:w-96 md:h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-slow" />
@@ -221,7 +221,6 @@ export function ComparadorContent({
         <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background to-transparent" />
       </div>
 
-      {/* Header centrado con container */}
       <div className="container mx-auto px-4 mb-12 md:mb-16">
         <motion.div
           className="text-center relative"
@@ -229,7 +228,6 @@ export function ComparadorContent({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          {/* Glow sutil detrás del título */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent blur-3xl -z-10" />
 
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-black text-foreground mb-4 leading-tight">
@@ -244,7 +242,10 @@ export function ComparadorContent({
 
       {/* Comparador */}
       <div className="w-full mb-6 md:mb-8 md:container md:mx-auto md:px-4">
-        <div ref={containerRef} className="relative min-h-[80vh]">
+        <div
+          ref={containerRef}
+          className="relative min-h-screen md:min-h-[80vh]"
+        >
           <AnimatePresence mode="wait">
             <motion.div
               initial={{ opacity: 0 }}
@@ -253,14 +254,14 @@ export function ComparadorContent({
               transition={{ duration: 0.5 }}
               className="sticky top-0 h-screen overflow-hidden"
             >
-              {/* Split Screen Container - Edge to edge en mobile, rounded en desktop */}
+              {/* Split Screen Container */}
               <div className="relative h-full w-full md:rounded-2xl overflow-hidden shadow-2xl">
                 <LegisladorSide
                   legislador={legisladorA}
                   stats={statsA}
                   side="left"
                   color={colorA}
-                  photoBlur={photoBlur}
+                  // photoBlur={photoBlur}
                   overlayOpacity={overlayOpacity}
                   nameOpacity={nameOpacity}
                   nameY={nameY}
@@ -278,7 +279,7 @@ export function ComparadorContent({
                   stats={statsB}
                   side="right"
                   color={colorB}
-                  photoBlur={photoBlur}
+                  // photoBlur={photoBlur}
                   overlayOpacity={overlayOpacity}
                   nameOpacity={nameOpacity}
                   nameY={nameY}
@@ -290,6 +291,7 @@ export function ComparadorContent({
                   statsY={statsY}
                   statsScale={statsScale}
                 />
+
                 <div className="md:hidden">
                   <ComparisonStats
                     statsA={statsA}
@@ -301,13 +303,15 @@ export function ComparadorContent({
                     statsScale={statsScale}
                   />
                 </div>
+
                 <VSBadge colorA={colorA} colorB={colorB} />
+
                 <Button
                   onClick={onShuffleClick}
                   disabled={isAnimating}
                   size="lg"
                   variant="outline"
-                  className="group absolute top-3/8 sm:top-2/3 left-1/2 -translate-x-1/2 overflow-hidden bg-card/80 backdrop-blur-sm border-2 border-border hover:border-primary/50 hover:bg-accent text-foreground transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="group absolute top-[40%] sm:top-2/3 left-1/2 -translate-x-1/2 overflow-hidden bg-card/80 backdrop-blur-sm border-2 border-border hover:border-primary/50 hover:bg-accent text-foreground transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-50"
                 >
                   <Shuffle
                     className={`w-4 h-4 transition-transform duration-300 ${
@@ -322,7 +326,6 @@ export function ComparadorContent({
         </div>
       </div>
 
-      {/* CTAs */}
       <div className="container mx-auto px-4">
         <motion.div
           className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center flex-wrap"
@@ -365,7 +368,7 @@ interface LegisladorSideProps {
   stats: ReturnType<typeof calcularStats>;
   side: "left" | "right";
   color: string;
-  photoBlur: MotionValue<number>;
+  // photoBlur: MotionValue<number>;
   overlayOpacity: MotionValue<number>;
   nameOpacity: MotionValue<number>;
   nameY: MotionValue<number>;
@@ -383,7 +386,7 @@ function LegisladorSide({
   stats,
   side,
   color,
-  photoBlur,
+  // photoBlur,
   overlayOpacity,
   nameOpacity,
   nameY,
@@ -396,18 +399,93 @@ function LegisladorSide({
   statsScale,
 }: LegisladorSideProps) {
   const isLeft = side === "left";
-
+  const isMobilePortrait = useMediaQuery(
+    "(max-width: 768px) and (min-height: 600px)",
+  );
   return (
     <div
-      className={`absolute top-0 ${isLeft ? "left-0" : "right-0"} w-1/2 h-full`}
+      className={`absolute top-0 ${isLeft ? "left-0" : "right-0"} w-1/2 h-full overflow-hidden`}
     >
-      {/* Foto de fondo - blur */}
-      <motion.div
-        className="absolute inset-0 overflow-hidden"
-        style={{
-          filter: `blur(${photoBlur}px)`,
-        }}
-      >
+      {/* === MOBILE: blur extendido === */}
+      <div className="md:hidden absolute inset-0">
+        {/* CAPA 1: Fondo difuminado que ocupa TODO el espacio */}
+        {legislador.image_url ? (
+          <>
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `url(${legislador.image_url})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                filter: "blur(50px) brightness(0.5)",
+                transform: "scale(1.1)",
+              }}
+            />
+            {/* Overlay de color del partido */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(
+                  to bottom,
+                  ${color}08 0%,
+                  ${color}20 30%,
+                  ${color}50 60%,
+                  ${color}80 85%,
+                  ${color}95 100%
+                )`,
+              }}
+            />
+          </>
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(135deg, ${color}40, ${color}10)`,
+            }}
+          >
+            <Users className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 text-white/10" />
+          </div>
+        )}
+
+        {/* CAPA 2: Imagen REAL sin recorte */}
+        {legislador.image_url && (
+          <div className="absolute top-0 left-0 right-0 w-full h-[60%]">
+            <Image
+              src={legislador.image_url}
+              alt={`${legislador.name} ${legislador.lastname}`}
+              fill
+              priority
+              sizes="50vw"
+              className="object-cover object-top"
+              style={{
+                maskImage:
+                  "linear-gradient(to bottom, black 50%, transparent 95%)",
+                WebkitMaskImage:
+                  "linear-gradient(to bottom, black 50%, transparent 95%)",
+              }}
+            />
+          </div>
+        )}
+
+        {/* CAPA 3: Gradiente oscuro final*/}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(
+              to bottom,
+              transparent 0%,
+              transparent 40%,
+              rgba(0,0,0,0.2) 55%,
+              rgba(0,0,0,0.5) 70%,
+              rgba(0,0,0,0.75) 85%,
+              rgba(0,0,0,0.90) 100%
+            )`,
+          }}
+        />
+      </div>
+
+      {/* === DESKTOP: blur animado === */}
+      <motion.div className="hidden md:block absolute inset-0 overflow-hidden">
         {legislador.image_url ? (
           <Image
             src={legislador.image_url}
@@ -415,7 +493,7 @@ function LegisladorSide({
             fill
             priority
             sizes="50vw"
-            className="object-cover object-[center_20%] md:object-top scale-110 md:scale-100"
+            className="object-cover object-top"
           />
         ) : (
           <div
@@ -428,7 +506,7 @@ function LegisladorSide({
           </div>
         )}
 
-        {/* GRADIENT VERTICAL SIMÉTRICO - suave */}
+        {/* Gradientes desktop */}
         <div
           className="absolute inset-0"
           style={{
@@ -446,9 +524,9 @@ function LegisladorSide({
         />
       </motion.div>
 
-      {/* OVERLAY NEGRO SIMÉTRICO - suave y uniforme */}
+      {/* Overlay negro (solo desktop) */}
       <motion.div
-        className="absolute inset-0"
+        className="hidden md:block absolute inset-0"
         style={{
           opacity: overlayOpacity,
           background: `linear-gradient(
@@ -463,9 +541,9 @@ function LegisladorSide({
         }}
       />
 
-      {/* Vignette radial para profundidad */}
+      {/* Vignette radial (solo desktop) */}
       <div
-        className="absolute inset-0 pointer-events-none"
+        className="hidden md:block absolute inset-0 pointer-events-none"
         style={{
           background: `radial-gradient(
             ellipse at center,
@@ -475,94 +553,145 @@ function LegisladorSide({
         }}
       />
 
-      {/* Animaciones */}
-      <div className="absolute inset-0 flex flex-col justify-end p-4 md:px-12">
+      {/* mobile */}
+      <div className="relative md:absolute inset-0 h-full flex flex-col justify-end md:p-4 md:px-12 md:pb-4">
         <div className="flex-1" />
-        {/* Info del legislador - Animación progresiva por capas */}
-        <div className={`mb-2 ${isLeft ? "text-left" : "text-right"}`}>
-          {/* CAPA 1: Nombres - Aparecen primero con ESCALA */}
-          <motion.div
-            style={{
-              opacity: nameOpacity,
-              y: nameY,
-              scale: nameScale,
-            }}
-          >
-            <h3
-              className="text-2xl md:text-4xl lg:text-5xl font-black text-white mb-1 leading-tight uppercase tracking-tight 
-             drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
-            >
+
+        <div
+          className={`px-3 md:px-8 md:mb-2 ${isLeft ? "text-left" : "text-right"}`}
+          style={{
+            position: "absolute",
+            bottom: isMobilePortrait ? "18%" : "25%",
+            left: isLeft ? "12px" : "auto",
+            right: isLeft ? "auto" : "12px",
+            maxWidth: isMobilePortrait
+              ? "calc(90% - 12px)"
+              : "calc(70% - 12px)",
+            zIndex: 20,
+          }}
+        >
+          <div className="md:hidden">
+            <h3 className="text-2xl font-black text-white mb-0.5 leading-tight uppercase tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
               {legislador.lastname}
             </h3>
-
-            <p
-              className="text-lg md:text-2xl lg:text-3xl font-bold text-white/95 mb-3 
-             drop-shadow-[0_2px_3px_rgba(0,0,0,0.8)]"
-            >
+            <p className="text-md font-bold text-white/95 mb-1.5 drop-shadow-[0_2px_3px_rgba(0,0,0,0.8)]">
               {legislador.name}
             </p>
-          </motion.div>
 
-          {/* CAPA 2: Badges - Aparecen después con ESCALA */}
-          <motion.div
-            className="flex flex-col gap-2 mb-3"
-            style={{
-              opacity: badgeOpacity,
-              y: badgeY,
-              scale: badgeScale,
-            }}
-          >
-            {/* Partido actual o "No agrupados" */}
-            <Badge
-              className={`!whitespace-normal px-3 py-1.5 md:px-4 md:py-2 rounded-full backdrop-blur-xl border shadow-2xl text-white font-bold text-xs md:text-sm leading-tight text-center max-w-[220px] ${
-                legislador.active_period.original_party
-                  ? "border-white/30"
-                  : "border-gray-400/30 bg-gray-500/70 text-white/90"
-              } ${isLeft ? "self-start" : "self-end"}`}
-              style={
-                legislador.active_period.original_party
-                  ? { backgroundColor: `${color}F0` }
-                  : undefined
-              }
+            <div className="flex flex-col gap-1 mb-1.5">
+              <Badge
+                className={`!whitespace-normal px-2 py-0.5 rounded-full backdrop-blur-xl border shadow-2xl text-white font-bold leading-tight text-center max-w-[140px] ${
+                  legislador.active_period.original_party
+                    ? "border-white/30"
+                    : "border-gray-400/30 bg-gray-500/70 text-white/90"
+                } ${isLeft ? "self-start" : "self-end"}`}
+                style={
+                  legislador.active_period.original_party
+                    ? { backgroundColor: `${color}F0` }
+                    : undefined
+                }
+              >
+                <span className="break-words hyphens-auto" lang="es">
+                  {legislador.active_period.original_party
+                    ? legislador.active_period.original_party.name
+                    : "No agrupados"}
+                </span>
+              </Badge>
+
+              {legislador.active_period.parliamentary_group &&
+                legislador.active_period.original_party?.name !==
+                  legislador.active_period.parliamentary_group && (
+                  <Badge
+                    variant="secondary"
+                    className={`!whitespace-normal px-1.5 py-0.5 rounded-full bg-black/30 backdrop-blur-xl border border-white/20 text-white/90 leading-tight text-center max-w-[140px] ${
+                      isLeft ? "self-start" : "self-end"
+                    }`}
+                  >
+                    <span className="break-words hyphens-auto" lang="es">
+                      Bancada: {legislador.active_period.parliamentary_group}
+                    </span>
+                  </Badge>
+                )}
+            </div>
+
+            <p className=" text-white/80 font-medium drop-shadow-md">
+              {legislador.active_period.electoral_district.name}
+            </p>
+          </div>
+
+          {/* Desktop version con animaciones */}
+          <div className="hidden md:block">
+            <motion.div
+              style={{
+                opacity: nameOpacity,
+                y: nameY,
+                scale: nameScale,
+              }}
             >
-              <span className="break-words hyphens-auto" lang="es">
-                {legislador.active_period.original_party
-                  ? legislador.active_period.original_party.name
-                  : "No agrupados"}
-              </span>
-            </Badge>
+              <h3 className="text-4xl lg:text-5xl font-black text-white mb-1 leading-tight uppercase tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                {legislador.lastname}
+              </h3>
+              <p className="text-2xl lg:text-3xl font-bold text-white/95 mb-3 drop-shadow-[0_2px_3px_rgba(0,0,0,0.8)]">
+                {legislador.name}
+              </p>
+            </motion.div>
 
-            {/* Bancada */}
-            {legislador.active_period.parliamentary_group &&
-              legislador.active_period.original_party?.name !==
-                legislador.active_period.parliamentary_group && (
-                <Badge
-                  variant="secondary"
-                  className={`!whitespace-normal px-3 py-1 rounded-full bg-black/30 backdrop-blur-xl border border-white/20 text-white/90 text-[10px] md:text-xs leading-tight text-center max-w-[220px] ${
-                    isLeft ? "self-start" : "self-end"
-                  }`}
-                >
-                  <span className="break-words hyphens-auto" lang="es">
-                    Bancada: {legislador.active_period.parliamentary_group}
-                  </span>
-                </Badge>
-              )}
-          </motion.div>
+            <motion.div
+              className="flex flex-col gap-2 mb-3"
+              style={{
+                opacity: badgeOpacity,
+                y: badgeY,
+                scale: badgeScale,
+              }}
+            >
+              <Badge
+                className={`!whitespace-normal px-4 py-2 rounded-full backdrop-blur-xl border shadow-2xl text-white font-bold text-sm leading-tight text-center max-w-[220px] ${
+                  legislador.active_period.original_party
+                    ? "border-white/30"
+                    : "border-gray-400/30 bg-gray-500/70 text-white/90"
+                } ${isLeft ? "self-start" : "self-end"}`}
+                style={
+                  legislador.active_period.original_party
+                    ? { backgroundColor: `${color}F0` }
+                    : undefined
+                }
+              >
+                <span className="break-words hyphens-auto" lang="es">
+                  {legislador.active_period.original_party
+                    ? legislador.active_period.original_party.name
+                    : "No agrupados"}
+                </span>
+              </Badge>
 
-          {/* Distrito - También aparece con los badges */}
-          <motion.p
-            className="text-sm md:text-base text-white/90 font-medium drop-shadow-md"
-            style={{
-              opacity: badgeOpacity,
-              y: badgeY,
-            }}
-          >
-            {legislador.active_period.electoral_district.name}
-          </motion.p>
-          <div className="h-28 md:h-0" />
+              {legislador.active_period.parliamentary_group &&
+                legislador.active_period.original_party?.name !==
+                  legislador.active_period.parliamentary_group && (
+                  <Badge
+                    variant="secondary"
+                    className={`!whitespace-normal px-3 py-1 rounded-full bg-black/30 backdrop-blur-xl border border-white/20 text-white/90 text-sm leading-tight text-center max-w-[220px] ${
+                      isLeft ? "self-start" : "self-end"
+                    }`}
+                  >
+                    <span className="break-words hyphens-auto" lang="es">
+                      Bancada: {legislador.active_period.parliamentary_group}
+                    </span>
+                  </Badge>
+                )}
+            </motion.div>
+
+            <motion.p
+              className="text-base text-white/90 font-medium drop-shadow-md"
+              style={{
+                opacity: badgeOpacity,
+                y: badgeY,
+              }}
+            >
+              {legislador.active_period.electoral_district.name}
+            </motion.p>
+          </div>
         </div>
 
-        {/* CAPA 3: Stats - solo Desktop */}
+        {/* Stats - solo Desktop */}
         <motion.div
           className="hidden md:block space-y-2 md:space-y-3 backdrop-blur-xl bg-black/20 rounded-2xl p-3 md:p-4 border border-white/10"
           style={{
@@ -573,7 +702,7 @@ function LegisladorSide({
         >
           <StatBar
             icon={<TrendingUp className="w-3 h-3 md:w-4 md:h-4" />}
-            label="Attendance"
+            label="Asistencia"
             value={stats.asistencia.porcentaje}
             total={stats.asistencia.total}
             color={color}
@@ -640,7 +769,6 @@ function StatBar({
 
   return (
     <div className="flex flex-col gap-1">
-      {/* Label y valor */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -745,7 +873,7 @@ function ComparisonStats({
   const items = [
     {
       icon: <TrendingUp className="w-3.5 h-3.5 text-white/90" />,
-      label: "Attendance",
+      label: "Asistencia",
       valueA: `${statsA.asistencia.porcentaje ?? "—"}%`,
       valueB: `${statsB.asistencia.porcentaje ?? "—"}%`,
     },
@@ -776,7 +904,6 @@ function ComparisonStats({
       <div className="grid grid-cols-3 gap-2 text-center">
         {items.map((item, idx) => (
           <React.Fragment key={idx}>
-            {/* Columna izquierda (A) */}
             <div
               className="flex flex-col items-center justify-center"
               style={{ color: colorA }}
@@ -788,7 +915,6 @@ function ComparisonStats({
               </span>
             </div>
 
-            {/* Columna central (etiqueta + icono) */}
             <div className="flex flex-col items-center justify-center gap-0.5">
               <div className="flex items-center gap-1">
                 {item.icon}
@@ -798,7 +924,6 @@ function ComparisonStats({
               </div>
             </div>
 
-            {/* Columna derecha (B) */}
             <div
               className="flex flex-col items-center justify-center"
               style={{ color: colorB }}
@@ -821,7 +946,6 @@ function ComparisonStats({
     </motion.div>
   );
 }
-
 // VS Badge central
 function VSBadge({ colorA, colorB }: { colorA: string; colorB: string }) {
   return (
@@ -839,7 +963,6 @@ function VSBadge({ colorA, colorB }: { colorA: string; colorB: string }) {
         className="relative"
       >
         <div className="w-16 h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 relative">
-          {/* Animated rings */}
           <motion.div
             className="absolute inset-0 rounded-full border-2 border-white/40"
             animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0, 0.4] }}
@@ -851,7 +974,6 @@ function VSBadge({ colorA, colorB }: { colorA: string; colorB: string }) {
             transition={{ duration: 2, repeat: Infinity, delay: 1 }}
           />
 
-          {/* Badge principal */}
           <div
             className="relative w-full h-full rounded-full flex items-center justify-center shadow-2xl border-4 border-white/20"
             style={{
@@ -864,7 +986,6 @@ function VSBadge({ colorA, colorB }: { colorA: string; colorB: string }) {
             </span>
           </div>
 
-          {/* Outer glow */}
           <div
             className="absolute -inset-6 rounded-full blur-2xl -z-10 opacity-50"
             style={{

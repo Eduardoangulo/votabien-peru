@@ -15,23 +15,18 @@ import CandidatoDialog from "@/components/politics/candidato-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  CandidacyType,
   CandidateDetail,
   ElectoralDistrict,
-  PoliticalPartyBase,
+  FiltersCandidates,
 } from "@/interfaces/politics";
 import { cn } from "@/lib/utils";
 
 interface CandidatosListProps {
   candidaturas: CandidateDetail[];
-  partidos: PoliticalPartyBase[];
   distritos: ElectoralDistrict[];
   procesoId: string;
-  currentFilters: {
-    search: string;
-    partidos: string | string[];
-    distritos: string | string[];
-    tipo: string;
-  };
+  currentFilters: FiltersCandidates;
   infiniteScroll?: boolean;
 }
 
@@ -55,7 +50,6 @@ const LegisladorSkeleton = () => (
 
 const CandidatosList = ({
   candidaturas: initialCandidaturas,
-  partidos,
   distritos,
   procesoId,
   currentFilters,
@@ -70,39 +64,28 @@ const CandidatosList = ({
   // Carga Scroll
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialCandidaturas.length >= 10);
-  const [currentSkip, setCurrentSkip] = useState(initialCandidaturas.length); // 🔥 CLAVE: Comenzar desde la cantidad ya cargada
+  const [currentSkip, setCurrentSkip] = useState(initialCandidaturas.length);
   const observerTarget = useRef<HTMLDivElement>(null);
 
   const buildQueryString = useCallback(() => {
     const params = new URLSearchParams();
-    params.append("proceso_id", procesoId);
-    if (currentFilters.tipo && currentFilters.tipo !== "all") {
-      params.append("tipo", currentFilters.tipo);
+    params.append("electoral_process_id", procesoId);
+    if (currentFilters.type && currentFilters.type !== "all") {
+      params.append("type", currentFilters.type);
     }
 
     if (currentFilters.search) {
       params.append("search", currentFilters.search);
     }
 
-    if (currentFilters.partidos && currentFilters.partidos !== "all") {
-      const partidosArray =
-        typeof currentFilters.partidos === "string"
-          ? currentFilters.partidos.split(",")
-          : currentFilters.partidos;
-
-      partidosArray.forEach((p) => {
-        if (p && p !== "all") params.append("partidos", p.trim());
-      });
-    }
-
-    if (currentFilters.distritos && currentFilters.distritos !== "all") {
+    if (currentFilters.districts && currentFilters.districts !== "all") {
       const distritosArray =
-        typeof currentFilters.distritos === "string"
-          ? currentFilters.distritos.split(",")
-          : currentFilters.distritos;
+        typeof currentFilters.districts === "string"
+          ? currentFilters.districts.split(",")
+          : currentFilters.districts;
 
       distritosArray.forEach((d) => {
-        if (d && d !== "all") params.append("distritos", d.trim());
+        if (d && d !== "all") params.append("districts", d.trim());
       });
     }
 
@@ -174,10 +157,9 @@ const CandidatosList = ({
     setHasMore(initialCandidaturas.length >= 10);
   }, [
     initialCandidaturas,
-    currentFilters.tipo,
+    currentFilters.type,
     currentFilters.search,
-    currentFilters.partidos,
-    currentFilters.distritos,
+    currentFilters.districts,
   ]);
 
   const filterFields: FilterField[] = [
@@ -186,23 +168,23 @@ const CandidatosList = ({
       label: "Buscar",
       type: "search",
       placeholder: "Buscar candidato...",
-      searchPlaceholder: "Nombre, DNI o profesión",
+      searchPlaceholder: "Nombre o DNI",
       defaultValue: "",
     },
     {
-      id: "partidos",
-      label: "Partido Político",
-      type: "multi-select",
-      placeholder: "Partido",
-      options: [
-        ...partidos.map((p) => ({
-          value: p.name,
-          label: p.name,
+      id: "type",
+      label: "Tipo",
+      type: "select",
+      placeholder: "Tipo",
+      options: Object.entries(CandidacyType)
+        .filter(([, label]) => label !== CandidacyType.CONGRESISTA)
+        .map(([keyframes, label]) => ({
+          value: keyframes.toLowerCase(),
+          label,
         })),
-      ],
     },
     {
-      id: "distritos",
+      id: "districts",
       label: "Distrito Electoral",
       type: "multi-select",
       placeholder: "Distrito",
@@ -213,23 +195,12 @@ const CandidatosList = ({
         })),
       ],
     },
-    {
-      id: "tipo",
-      label: "Tipo",
-      type: "select",
-      placeholder: "Tipo",
-      options: [
-        { value: "presidente", label: "Presidente" },
-        { value: "senador", label: "Senador" },
-        { value: "diputado", label: "Diputado" },
-      ],
-    },
   ];
+
   const defaultFilters = {
     search: "",
-    partidos: [],
-    distritos: [],
-    tipo: "",
+    type: "",
+    districts: [],
   };
 
   const handleOpenDialog = (candidato: CandidateDetail) => {
@@ -238,30 +209,17 @@ const CandidatosList = ({
   };
 
   return (
-    <div className="space-y-4 md:space-y-6">
-      {/* Header con contador y filtros */}
+    <div className="py-10">
       {infiniteScroll && (
-        <div className="flex flex-col items-left gap-3 md:gap-4">
-          <div>
-            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-1">
-              Candidatos
-            </h2>
-            <p className="text-sm md:text-base text-muted-foreground">
-              {candidatos.length}{" "}
-              {candidatos.length === 1 ? "candidato" : "candidatos"} encontrados
-            </p>
-          </div>
-          <FilterPanel
-            fields={filterFields}
-            currentFilters={currentFilters}
-            onApplyFilters={() => {}}
-            baseUrl="/candidatos"
-            defaultFilters={defaultFilters}
-          />
-        </div>
+        <FilterPanel
+          fields={filterFields}
+          currentFilters={currentFilters}
+          onApplyFilters={() => {}}
+          baseUrl="/candidatos"
+          defaultFilters={defaultFilters}
+        />
       )}
 
-      {/* Grid de candidatos o mensaje vacío */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4">
         {candidatos.length === 0 ? (
           <div className="col-span-full text-center py-12 md:py-16 px-4">
@@ -365,7 +323,6 @@ const CandidatosList = ({
                 )}
               </CardContent>
 
-              {/* Footer siempre abajo */}
               <CardFooter className="border-t">
                 <div className="flex items-center justify-end w-full">
                   <span className="inline-flex items-center text-primary group-hover:text-primary/80 font-medium text-[10px] md:text-xs transition-colors">
@@ -396,7 +353,6 @@ const CandidatosList = ({
           )}
         </>
       )}
-      {/* Dialog de candidato */}
       {selectedCandidato && (
         <CandidatoDialog
           candidato={selectedCandidato}

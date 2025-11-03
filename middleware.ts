@@ -64,6 +64,7 @@ const ROUTE_CONFIG = {
     "/api/health",
     "/api/public",
     "/api/legisladores",
+    "/api/candidatos",
   ],
   defaultProtectedRoute: "/",
   loginRoute: "/auth/login",

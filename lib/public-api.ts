@@ -1,23 +1,11 @@
 import {
-  CandidacyStatus,
   ChamberType,
-  CandidacyType,
   FiltersPerson,
+  FiltersCandidates,
 } from "@/interfaces/politics";
 import { API_BASE_URL } from "./config";
 
 // ============= INTERFACES DE PARAMETROS =============
-
-export interface GetCandidaturasParams {
-  proceso_id?: string;
-  tipo?: CandidacyType | string;
-  partidos?: string[] | string; // 👈 Lista de nombres de partidos
-  distritos?: string[] | string; // 👈 Lista de nombres de distritos
-  estado?: CandidacyStatus;
-  search?: string;
-  skip?: number;
-  limit?: number;
-}
 
 /**
  * Cliente API para endpoints públicos (sin autenticación)
@@ -149,7 +137,7 @@ class PublicApiClient {
   /**
    * Obtener lista de candidaturas con filtros
    */
-  async getCandidaturas(params?: GetCandidaturasParams) {
+  async getCandidaturas(params?: FiltersCandidates) {
     const query = this.buildQueryParams(params as Record<string, unknown>);
     return this.get(`/api/v1/politics/candidaturas${query}`);
   }
@@ -226,11 +214,11 @@ export const useLegisladoresActuales = (
  * Hook para obtener candidatos de las elecciones 2026
  */
 export const useCandidatos2026 = (
-  procesoElectoralId: string,
-  params?: Omit<GetCandidaturasParams, "proceso_id">,
+  electoral_process_id: string,
+  params?: Omit<FiltersCandidates, "proceso_id">,
 ) => {
   return publicApi.getCandidaturas({
     ...params,
-    proceso_id: procesoElectoralId,
+    electoral_process_id: electoral_process_id,
   });
 };

@@ -18,6 +18,7 @@ import {
   FileText,
 } from "lucide-react";
 import Link from "next/link";
+
 export default function AboutPage() {
   const [activeTab, setActiveTab] = useState<"mission" | "features" | "values">(
     "mission",
@@ -121,7 +122,7 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 py-16 md:py-24 relative">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-              Sobre <span className="text-primary">VotaBienPerú</span>
+              Sobre <span className="text-[var(--brand)]">VotaBienPerú</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
@@ -151,13 +152,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Stats Section */}
       <section className="py-12 bg-card border-y border-border">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, idx) => (
               <div key={idx} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                <div
+                  className={`text-3xl md:text-4xl font-bold mb-2 ${idx === 0 ? "text-[var(--brand)]" : "text-primary"}`}
+                >
                   {stat.number}
                 </div>
                 <div className="text-sm md:text-base font-semibold text-foreground">
@@ -172,14 +174,13 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Story Section */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="bg-card rounded-2xl shadow-2xl p-8 md:p-12 border border-border">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
-                  <Target className="w-6 h-6 text-primary-foreground" />
+                <div className="w-12 h-12 bg-[var(--brand)] rounded-xl flex items-center justify-center">
+                  <Target className="w-6 h-6 text-white" />
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground">
                   Nuestro Origen
@@ -189,7 +190,7 @@ export default function AboutPage() {
               <div className="prose prose-lg max-w-none space-y-6 text-muted-foreground">
                 <p className="text-lg leading-relaxed">
                   VotaBienPerú nació de una{" "}
-                  <span className="font-semibold text-primary">
+                  <span className="font-semibold text-[var(--brand)]">
                     necesidad ciudadana real
                   </span>
                   : conocer de forma simple y rápida quiénes son las personas
@@ -206,7 +207,7 @@ export default function AboutPage() {
                   neutral.
                 </p>
 
-                <div className="bg-primary/10 rounded-xl p-6 border-l-4 border-primary">
+                <div className="bg-primary/10 rounded-xl p-6 border-l-4 border-[var(--brand)]">
                   <p className="text-lg leading-relaxed font-medium text-foreground mb-0">
                     Creemos que una democracia informada es una democracia más
                     fuerte. Por eso, ponemos el poder de la información en manos
@@ -219,7 +220,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Mission/Vision Tabs */}
       <section className="py-16 md:py-24 bg-muted/50">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
@@ -356,7 +356,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Features Grid */}
       <section id="features" className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -392,7 +391,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Open Source Section */}
       <section className="py-16 md:py-24 bg-gradient-to-br from-primary/95 to-primary text-primary-foreground">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -449,7 +447,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-8 md:p-12 shadow-2xl">
