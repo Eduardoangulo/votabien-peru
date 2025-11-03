@@ -99,27 +99,28 @@ function processSeatsForHemiciclo(
     });
 
     if (mainParty) {
-      const composition = Array.from(groupData.parties.values())
-        .map((p) => ({
-          partyId: p.party.id,
-          partyName: p.party.name,
-          partyLogoUrl: p.party.logo_url,
-          partyAcronym: p.party.acronym,
-          count: p.count,
-        }))
-        .sort((a, b) => b.count - a.count);
+      const composition = Array.from(groupData.parties.values()).map((p) => ({
+        partyId: p.party.id,
+        partyName: p.party.name,
+        partyLogoUrl: p.party.logo_url,
+        partyAcronym: p.party.acronym,
+        count: p.count,
+      }));
 
       parliamentaryGroups.push({
         name: groupName,
         seats: groupData.seats,
-        color: (mainParty as PoliticalPartyBase).color_hex || "#94a3b8",
+        color:
+          groupName === "No Agrupados"
+            ? "#94a3b8" // gris fijo
+            : (mainParty as PoliticalPartyBase).color_hex,
         mainPartyId: (mainParty as PoliticalPartyBase).id,
         composition,
       });
     }
   });
 
-  return parliamentaryGroups.sort((a, b) => b.seats - a.seats);
+  return parliamentaryGroups;
 }
 
 export default function PartidosSection({
@@ -184,10 +185,6 @@ export default function PartidosSection({
 
   const bubbles = useMemo<Bubble[]>(() => {
     const result: Bubble[] = [];
-    const sortedSeats = [...seatsData].sort((a, b) => {
-      if (a.row !== b.row) return a.row - b.row;
-      return a.number_seat - b.number_seat;
-    });
 
     const positions: Array<{
       x: number;
@@ -196,7 +193,7 @@ export default function PartidosSection({
       row: number;
     }> = [];
 
-    svgConfig.rows.forEach((row, rowIndex) => {
+    [...svgConfig.rows].reverse().forEach((row, rowIndex) => {
       const angleStep = 180 / (row.count - 1);
       for (let i = 0; i < row.count; i++) {
         const angle = i * angleStep;
@@ -213,7 +210,7 @@ export default function PartidosSection({
       }
     });
 
-    sortedSeats.forEach((seat, idx) => {
+    seatsData.forEach((seat, idx) => {
       if (idx >= positions.length) return;
 
       const pos = positions[idx];

@@ -93,6 +93,10 @@ export default async function VotaBienPage() {
     const partidosSinEscaños = partidos.filter((p) => p.total_seats === 0);
 
     const partidosPreview = getRandomItems(partidosSinEscaños, 6);
+    const seatsData = seats.sort((a, b) => {
+      if (a.row !== b.row) return a.row - b.row;
+      return a.number_seat - b.number_seat;
+    });
     return (
       <div className="min-h-screen">
         {/* Hero Dual Split */}
@@ -103,7 +107,7 @@ export default async function VotaBienPage() {
 
         {/* Partidos Políticos */}
         <PartidosSection
-          seatsData={seats}
+          seatsData={seatsData}
           partidosConEscaños={partidosConEscaños}
           partidosPreview={partidosPreview}
           totalPartidos={partidos.length}
