@@ -28,6 +28,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { PartyHistory, PoliticalPartyDetail } from "@/interfaces/politics";
 import Image from "next/image";
+import { getTextColor, needsOverlay } from "@/lib/utils/color-utils";
+import { cn } from "@/lib/utils";
 
 export default function PartidoDialog({
   partido,
@@ -38,7 +40,9 @@ export default function PartidoDialog({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const partidoColor = partido.color_hex || "oklch(0.45 0.15 260)";
+  const partidoColor = partido.color_hex;
+  const hasOverlay = needsOverlay(partidoColor);
+  const textColor = getTextColor(partidoColor);
 
   const formatNumber = (num: number | null | undefined) => {
     if (!num) return "No disponible";
@@ -56,12 +60,18 @@ export default function PartidoDialog({
         <CredenzaHeader>
           <CredenzaTitle>
             <div
-              className="p-2 rounded-md flex justify-center"
+              className={cn(
+                "p-2 rounded-md flex justify-center relative",
+                textColor,
+              )}
               style={{
                 background: `linear-gradient(135deg, ${partidoColor} 0%, ${partidoColor}dd 100%)`,
               }}
             >
-              <div className="flex items-center gap-4">
+              {hasOverlay && (
+                <div className="absolute inset-0 bg-gradient-to-br from-black/30 to-black/10 z-[1]" />
+              )}
+              <div className="flex items-center gap-4 relative z-[2]">
                 {/* Logo */}
                 {partido.logo_url ? (
                   <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-xl flex items-center justify-center shadow-md ring-1 ring-border overflow-hidden flex-shrink-0">
@@ -81,19 +91,19 @@ export default function PartidoDialog({
 
                 {/* Título y metadata */}
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-tight">
+                  <h2 className="text-xl sm:text-2xl font-bold mb-2 leading-tight">
                     {partido.name}
                   </h2>
 
                   <div className="flex flex-wrap items-center gap-2">
                     {partido.acronym && (
-                      <Badge className="bg-background/30 text-info-foreground border-0 font-bold text-sm">
+                      <Badge className="bg-background/30 border-0 font-bold text-sm">
                         {partido.acronym}
                       </Badge>
                     )}
 
                     {partido.active ? (
-                      <Badge className="bg-success/70 text-success-foreground border-success/30">
+                      <Badge className="bg-success/70 border-success/30">
                         <CheckCircle2 className="w-3 h-3 mr-1" />
                         Activo
                       </Badge>
@@ -102,7 +112,9 @@ export default function PartidoDialog({
                     )}
 
                     {partido.ideology && (
-                      <Badge className="bg-background/30 text-white border-0">
+                      <Badge
+                        className={cn("bg-background/30 border-0", textColor)}
+                      >
                         {partido.ideology}
                       </Badge>
                     )}
