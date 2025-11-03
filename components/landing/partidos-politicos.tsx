@@ -508,7 +508,7 @@ export default function PartidosSection({
                 <h3 className="text-xs md:text-sm font-semibold text-card-foreground mb-2 text-center lg:text-left uppercase tracking-wide">
                   Grupos Parlamentarios
                 </h3>
-                <p className="text-center text-xs text-accent-foreground">
+                <p className="text-center md:text-left text-xs text-muted-foreground mb-2">
                   Selecciona un grupo parlamentario
                 </p>
                 {/* Layout: Carousel en mobile, Grid con scroll lock en desktop */}

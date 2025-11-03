@@ -120,17 +120,17 @@ export default function DetailLegislador({
     <div className="bg-background min-h-screen">
       <div className="container mx-auto py-4">
         {/* ===== HERO SECTION ===== */}
-        <section className="bg-card rounded-xl shadow-sm border border-slate-200/80 overflow-hidden mt-4">
+        <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden mt-4">
           <div className="bg-gradient-to-r from-primary to-primary/90 p-4 text-primary-foreground relative">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5"></div>
 
             <div className="relative flex flex-col md:flex-row items-center gap-8">
-              <div className="relative w-40 h-40 flex-shrink-0 rounded-full overflow-hidden border-4 border-white/20">
+              <div className="relative w-40 h-40 flex-shrink-0 rounded-full overflow-hidden border-4 border-primary-foreground/20">
                 <Image
                   src={persona.image_url || "/images/default-avatar.svg"}
                   alt={`Foto de ${persona.fullname}`}
                   fill
-                  className="object-cover"
+                  className="object-cover object-top"
                 />
               </div>
 
@@ -215,14 +215,14 @@ export default function DetailLegislador({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {persona.technical_education &&
                       persona.technical_education !== "No" && (
-                        <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg">
+                        <div className="p-3 bg-info/10 border border-info/30 rounded-lg">
                           <div className="flex items-center gap-2 mb-1.5">
-                            <BookOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                            <span className="text-xs font-semibold text-blue-900 dark:text-blue-300 uppercase tracking-wide">
+                            <BookOpen className="w-4 h-4 text-info" />
+                            <span className="text-xs font-semibold text-info-foreground uppercase tracking-wide">
                               Educación Técnica
                             </span>
                           </div>
-                          <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                          <p className="text-sm font-medium text-foreground">
                             {persona.technical_education}
                           </p>
                         </div>
@@ -230,14 +230,14 @@ export default function DetailLegislador({
 
                     {persona.university_education &&
                       persona.university_education !== "No" && (
-                        <div className="p-3 bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900 rounded-lg">
+                        <div className="p-3 bg-primary/10 border border-primary/30 rounded-lg">
                           <div className="flex items-center gap-2 mb-1.5">
-                            <GraduationCap className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                            <span className="text-xs font-semibold text-purple-900 dark:text-purple-300 uppercase tracking-wide">
+                            <GraduationCap className="w-4 h-4 text-primary" />
+                            <span className="text-xs font-semibold text-primary uppercase tracking-wide">
                               Educación Universitaria
                             </span>
                           </div>
-                          <p className="text-sm font-medium text-purple-900 dark:text-purple-100">
+                          <p className="text-sm font-medium text-foreground">
                             {persona.university_education === "Si"
                               ? "Concluida"
                               : persona.university_education}
@@ -247,14 +247,14 @@ export default function DetailLegislador({
 
                     {persona.academic_degree &&
                       persona.academic_degree !== "No" && (
-                        <div className="p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900 rounded-lg">
+                        <div className="p-3 bg-success/10 border border-success/30 rounded-lg">
                           <div className="flex items-center gap-2 mb-1.5">
-                            <Award className="w-4 h-4 text-green-600 dark:text-green-400" />
-                            <span className="text-xs font-semibold text-green-900 dark:text-green-300 uppercase tracking-wide">
+                            <Award className="w-4 h-4 text-success" />
+                            <span className="text-xs font-semibold text-success uppercase tracking-wide">
                               Grado Académico
                             </span>
                           </div>
-                          <p className="text-sm font-medium text-green-900 dark:text-green-100">
+                          <p className="text-sm font-medium text-foreground">
                             {persona.academic_degree}
                           </p>
                         </div>
@@ -262,14 +262,14 @@ export default function DetailLegislador({
 
                     {persona.professional_title &&
                       persona.professional_title !== "No" && (
-                        <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg">
+                        <div className="p-3 bg-warning/10 border border-warning/30 rounded-lg">
                           <div className="flex items-center gap-2 mb-1.5">
-                            <Award className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                            <span className="text-xs font-semibold text-amber-900 dark:text-amber-300 uppercase tracking-wide">
+                            <Award className="w-4 h-4 text-warning" />
+                            <span className="text-xs font-semibold text-warning-foreground uppercase tracking-wide">
                               Título Profesional
                             </span>
                           </div>
-                          <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
+                          <p className="text-sm font-medium text-foreground">
                             {persona.professional_title}
                           </p>
                         </div>
@@ -277,14 +277,14 @@ export default function DetailLegislador({
 
                     {persona.postgraduate_education &&
                       persona.postgraduate_education !== "No" && (
-                        <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900 rounded-lg md:col-span-2">
+                        <div className="p-3 bg-accent border border-border rounded-lg md:col-span-2">
                           <div className="flex items-center gap-2 mb-1.5">
-                            <Microscope className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                            <span className="text-xs font-semibold text-indigo-900 dark:text-indigo-300 uppercase tracking-wide">
+                            <Microscope className="w-4 h-4 text-accent-foreground" />
+                            <span className="text-xs font-semibold text-accent-foreground uppercase tracking-wide">
                               Estudios de Postgrado
                             </span>
                           </div>
-                          <p className="text-sm font-medium text-indigo-900 dark:text-indigo-100">
+                          <p className="text-sm font-medium text-foreground">
                             {persona.postgraduate_education}
                           </p>
                         </div>
@@ -293,6 +293,7 @@ export default function DetailLegislador({
                 </CardContent>
               </Card>
             )}
+
             {/* Biografía */}
             <Card className="shadow-sm">
               <CardHeader>
@@ -317,7 +318,7 @@ export default function DetailLegislador({
                         <div key={index} className="relative pl-8 group">
                           <div className="absolute left-0 top-2 w-4 h-4 bg-background border-2 border-primary rounded-full shadow-sm transition-transform group-hover:scale-125 group-hover:shadow-md" />
 
-                          <div className="flex flex-col gap-2 pb-6 border-b border-slate-100 dark:border-slate-800 last:border-0 last:pb-0">
+                          <div className="flex flex-col gap-2 pb-6 border-b border-border last:border-0 last:pb-0">
                             <div className="flex flex-wrap items-start gap-2">
                               <h4 className="font-semibold text-base leading-tight flex-1 min-w-0">
                                 {item.title}
@@ -360,7 +361,7 @@ export default function DetailLegislador({
 
                               {item.source && item.source_url && (
                                 <>
-                                  <span className="text-slate-300 dark:text-slate-600">
+                                  <span className="text-muted-foreground/40">
                                     •
                                   </span>
                                   <Link
@@ -387,99 +388,104 @@ export default function DetailLegislador({
             </Card>
 
             {/* PreviousCases */}
-            {persona.previous_cases && persona.previous_cases.length > 0 ? (
-              <Card className="shadow-sm border-orange-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-orange-800">
-                    <AlertTriangle className="size-5" />
-                    Antecedentes Registrados
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-5">
-                  {Object.entries(
-                    persona.previous_cases.reduce<
-                      Record<string, PreviousCase[]>
-                    >((acc, ant) => {
-                      const tipo = ant.type || "Otros";
-                      if (!acc[tipo]) acc[tipo] = [];
-                      acc[tipo].push(ant);
-                      return acc;
-                    }, {}),
-                  ).map(([tipo, lista]) => (
-                    <div key={tipo} className="space-y-2">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline" className="text-xs capitalize">
-                          {tipo}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {lista.length}{" "}
-                          {lista.length === 1 ? "registro" : "registros"}
-                        </span>
-                      </div>
+            <Card className="shadow-sm border-warning/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-warning">
+                  <AlertTriangle className="size-5" />
+                  Antecedentes Registrados
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                {persona.previous_cases && persona.previous_cases.length > 0 ? (
+                  <div className="relative space-y-6">
+                    {Object.entries(
+                      persona.previous_cases.reduce<
+                        Record<string, PreviousCase[]>
+                      >((acc, ant) => {
+                        const tipo = ant.type || "Otros";
+                        if (!acc[tipo]) acc[tipo] = [];
+                        acc[tipo].push(ant);
+                        return acc;
+                      }, {}),
+                    ).map(([tipo, lista]) => (
+                      <div key={tipo} className="space-y-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge
+                            variant="outline"
+                            className="text-xs capitalize"
+                          >
+                            {tipo}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {lista.length}{" "}
+                            {lista.length === 1 ? "registro" : "registros"}
+                          </span>
+                        </div>
 
-                      {lista.map((antecedente, i) => (
-                        <div
-                          key={i}
-                          className="p-3 bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900 rounded-lg"
-                        >
-                          <div className="flex items-start justify-between gap-2 mb-2">
-                            <span className="text-xs font-semibold text-orange-900 dark:text-orange-300 uppercase">
-                              {antecedente.title || antecedente.type}
-                            </span>
-                            {antecedente.status && (
-                              <Badge
-                                variant={getPreviousCasesBadgeColor(
-                                  antecedente.status,
-                                )}
-                                className="text-xs"
-                              >
-                                {antecedente.status}
-                              </Badge>
-                            )}
-                          </div>
-
-                          <p className="text-sm text-orange-800 dark:text-orange-200 mb-1">
-                            {antecedente.description}
-                          </p>
-
-                          {antecedente.date && (
-                            <span className="block text-xs text-orange-600 dark:text-orange-400">
-                              Fecha: {formatFechaJsonable(antecedente.date)}
-                            </span>
-                          )}
-
-                          {(antecedente.source || antecedente.source_url) && (
-                            <div className="mt-1 text-xs text-orange-700 dark:text-orange-300">
-                              {antecedente.source_url ? (
-                                <a
-                                  href={antecedente.source_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 underline hover:text-orange-900 dark:hover:text-orange-100"
+                        {lista.map((antecedente, i) => (
+                          <div
+                            key={i}
+                            className="p-3 bg-warning/10 border border-warning/30 rounded-lg"
+                          >
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <span className="text-xs font-semibold text-warning-foreground uppercase">
+                                {antecedente.title || antecedente.type}
+                              </span>
+                              {antecedente.status && (
+                                <Badge
+                                  variant={getPreviousCasesBadgeColor(
+                                    antecedente.status,
+                                  )}
+                                  className="text-xs"
                                 >
-                                  {antecedente.source}
-                                  <ExternalLink className="w-3 h-3 inline-block opacity-70" />
-                                </a>
-                              ) : (
-                                <span>{antecedente.source}</span>
-                              )}
-                              {antecedente.source_type && (
-                                <span className="text-muted-foreground">
-                                  {" "}
-                                  ({antecedente.source_type})
-                                </span>
+                                  {antecedente.status}
+                                </Badge>
                               )}
                             </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            ) : (
-              <NoDataMessage text="No se registran antecedentes." />
-            )}
+
+                            <p className="text-sm text-foreground mb-1">
+                              {antecedente.description}
+                            </p>
+
+                            {antecedente.date && (
+                              <span className="block text-xs text-muted-foreground">
+                                Fecha: {formatFechaJsonable(antecedente.date)}
+                              </span>
+                            )}
+
+                            {(antecedente.source || antecedente.source_url) && (
+                              <div className="mt-1 text-xs text-muted-foreground">
+                                {antecedente.source_url ? (
+                                  <a
+                                    href={antecedente.source_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 underline hover:text-foreground"
+                                  >
+                                    {antecedente.source}
+                                    <ExternalLink className="w-3 h-3 inline-block opacity-70" />
+                                  </a>
+                                ) : (
+                                  <span>{antecedente.source}</span>
+                                )}
+                                {antecedente.source_type && (
+                                  <span className="text-muted-foreground/70">
+                                    {" "}
+                                    ({antecedente.source_type})
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <NoDataMessage text="No se registran antecedentes." />
+                )}
+              </CardContent>
+            </Card>
 
             {/* Proyectos de Ley */}
             {periodoActivo?.bills && (
@@ -498,7 +504,7 @@ export default function DetailLegislador({
                           <div key={proyecto.id}>
                             <Link
                               href={`/proyectos/${proyecto.id}`}
-                              className="block p-4 -m-4 rounded-lg hover:bg-slate-100/80 transition-colors duration-200"
+                              className="block p-4 -m-4 rounded-lg hover:bg-muted transition-colors duration-200"
                             >
                               <FieldTitle className="text-base hover:text-primary">
                                 {proyecto.title}
@@ -591,7 +597,7 @@ export default function DetailLegislador({
                             }
                           >
                             {isCopied("email") ? (
-                              <Check className="w-4 h-4 text-green-600" />
+                              <Check className="w-4 h-4 text-success" />
                             ) : (
                               <Copy className="w-4 h-4" />
                             )}
@@ -619,7 +625,7 @@ export default function DetailLegislador({
                         href={persona.facebook_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-3 text-sm text-blue-600 hover:underline p-2 -m-2 rounded-md hover:bg-blue-50 transition-colors"
+                        className="flex items-center gap-3 text-sm text-info hover:underline p-2 -m-2 rounded-md hover:bg-info/10 transition-colors"
                       >
                         <SlSocialFacebook className="size-4" />
                         <span>Facebook</span>
@@ -631,7 +637,7 @@ export default function DetailLegislador({
                         href={persona.twitter_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-3 text-sm text-sky-600 hover:underline p-2 -m-2 rounded-md hover:bg-sky-50 transition-colors"
+                        className="flex items-center gap-3 text-sm text-info hover:underline p-2 -m-2 rounded-md hover:bg-info/10 transition-colors"
                       >
                         <SlSocialTwitter className="size-4" />
                         <span>Twitter / X</span>
@@ -643,7 +649,7 @@ export default function DetailLegislador({
                         href={persona.tiktok_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-3 text-sm text-gray-900 hover:text-[#69C9D0] p-2 -m-2 rounded-md hover:bg-gray-100 transition-colors"
+                        className="flex items-center gap-3 text-sm text-foreground hover:text-primary p-2 -m-2 rounded-md hover:bg-muted transition-colors"
                       >
                         <PiTiktokLogo className="size-4" />
                         <span>Tiktok</span>
@@ -693,6 +699,7 @@ export default function DetailLegislador({
                 </div>
               </CardContent>
             </Card>
+
             {/* Historial Legislativo */}
             <Card className="shadow-sm">
               <CardHeader>
@@ -715,8 +722,8 @@ export default function DetailLegislador({
                         key={periodo.id}
                         className={`p-3 border rounded-lg transition-all hover:shadow-md ${
                           periodo.active
-                            ? "bg-green-50 border-green-200"
-                            : "bg-slate-50 border-slate-200"
+                            ? "bg-success/10 border-success/30"
+                            : "bg-muted border-border"
                         }`}
                       >
                         <div className="space-y-2">

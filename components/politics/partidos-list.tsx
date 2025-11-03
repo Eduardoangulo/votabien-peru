@@ -6,42 +6,11 @@ import PartidoDialog from "./partido-dialog";
 import { PoliticalPartyDetail } from "@/interfaces/politics";
 import Image from "next/image";
 import { Card, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { getTextColor, needsOverlay } from "@/lib/utils/color-utils";
 
 interface PartidosListProps {
   partidos: PoliticalPartyDetail[];
 }
-
-const getLuminance = (color: string): number => {
-  let r = 0,
-    g = 0,
-    b = 0;
-
-  if (color.startsWith("#")) {
-    const hex = color.replace("#", "");
-    r = parseInt(hex.substr(0, 2), 16);
-    g = parseInt(hex.substr(2, 2), 16);
-    b = parseInt(hex.substr(4, 2), 16);
-  } else if (color.startsWith("oklch") || color.startsWith("rgb")) {
-    return 0.3;
-  }
-
-  // Luminosidad relativa
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance;
-};
-
-// Determinar si necesitamos texto oscuro o claro
-const getTextColor = (backgroundColor: string): string => {
-  const luminance = getLuminance(backgroundColor);
-  // Si la luminosidad es alta (> 0.6), usar texto oscuro
-  return luminance > 0.6 ? "text-gray-900" : "text-white";
-};
-
-// Overlay si el color es muy claro
-const needsOverlay = (backgroundColor: string): boolean => {
-  const luminance = getLuminance(backgroundColor);
-  return luminance > 0.7;
-};
 
 const PartidosList = ({ partidos }: PartidosListProps) => {
   const [selectedPartido, setSelectedPartido] =

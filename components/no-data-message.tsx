@@ -7,8 +7,8 @@ export const NoDataMessage = ({
   text: string;
   icon?: React.ElementType;
 }) => (
-  <div className="flex items-center gap-3 text-sm text-slate-500 p-4 bg-slate-50 rounded-lg">
-    <Icon className="size-4 text-slate-400" />
+  <div className="flex items-center gap-3 text-sm text-muted-foreground p-4 bg-muted rounded-lg border border-border">
+    <Icon className="size-4 text-muted-foreground/60" />
     <span>{text}</span>
   </div>
 );
