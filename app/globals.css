@@ -50,103 +50,115 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
+
+  /* ----- Color de Marca (Logo) ----- */
+  --color-brand: var(--brand);
 }
 
 @layer base {
   :root {
-    --radius: 0.625rem; /* 10px */
-
-    /* ---------------------------------------------- */
-    /* Paleta de Colores - Light Mode                 */
-    /* ---------------------------------------------- */
+    --radius: 0.5rem;
+    --brand: oklch(0.623 0.257 28.8);
 
     /* ----- Superficies y Fondos ----- */
-    --background: oklch(0.98 0.006 240); /* Casi blanco, un toque frío */
-    --foreground: oklch(0.15 0.01 240); /* Negro suave */
+    --background: oklch(0.99 0.002 240); /* Blanco cálido, casi neutro */
+    --foreground: oklch(0.2 0.01 240); /* Negro suave, legible */
 
-    --card: oklch(1 0 0); /* Blanco puro para las tarjetas */
-    --card-foreground: oklch(0.15 0.01 240);
+    --card: oklch(1 0 0); /* Blanco puro para tarjetas */
+    --card-foreground: oklch(0.2 0.01 240);
 
     --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.15 0.01 240);
+    --popover-foreground: oklch(0.2 0.01 240);
 
-    --muted: oklch(0.96 0.008 240); /* Fondo sutil para elementos secundarios */
-    --muted-foreground: oklch(0.45 0.01 240); /* Texto atenuado */
+    --muted: oklch(0.96 0.005 240); /* Fondo sutil */
+    --muted-foreground: oklch(0.5 0.01 240); /* Texto secundario */
 
-    --accent: oklch(0.94 0.01 240); /* Para hover sutil en listas */
-    --accent-foreground: oklch(0.1 0.01 240);
+    --accent: oklch(0.93 0.008 20); /* Cálido sutil para highlights */
+    --accent-foreground: oklch(0.2 0.01 240);
 
-    /* ----- Colores Interactivos ----- */
-    --primary: oklch(0.45 0.15 260); /* Azul/Violeta principal */
-    --primary-foreground: oklch(
-      0.98 0.006 240
-    ); /* Texto claro para el botón principal */
+    /* ----- Colores Interactivos (INSTITUCIONALES) ----- */
+    --primary: oklch(0.4 0.12 250); /* Azul institucional - Confianza */
+    --primary-foreground: oklch(0.99 0.002 240); /* Texto claro */
 
-    --secondary: oklch(0.92 0.01 240); /* Botón secundario */
-    --secondary-foreground: oklch(0.2 0.01 240);
+    --secondary: oklch(0.92 0.008 240); /* Neutro para botones secundarios */
+    --secondary-foreground: oklch(0.25 0.01 240);
 
     /* ----- Bordes y Divisores ----- */
-    --border: oklch(0.92 0.014 240);
-    --input: oklch(0.92 0.014 240);
-    --ring: oklch(
-      0.45 0.15 260 / 0.8
-    ); /* Anillo de foco, basado en el primario */
+    --border: oklch(0.9 0.005 240); /* Sutil pero visible */
+    --input: oklch(0.9 0.005 240);
+    --ring: oklch(0.4 0.12 250 / 0.5); /* Anillo de foco basado en primary */
 
-    /* ----- Colores de Estado ----- */
-    --destructive: oklch(0.6 0.22 25); /* Rojo */
-    --destructive-foreground: oklch(0.98 0.006 240);
-    --success: oklch(0.6 0.18 150); /* Verde */
-    --success-foreground: oklch(0.98 0.006 240);
-    --warning: oklch(0.75 0.15 80); /* Amarillo/Naranja */
-    --warning-foreground: oklch(0.25 0.02 80);
-    --info: oklch(0.6 0.15 230); /* Azul informativo */
-    --info-foreground: oklch(0.98 0.006 240);
+    /* ----- Colores de Estado (Para métricas y datos) ----- */
+    --destructive: oklch(0.55 0.22 25); /* Rojo para acciones destructivas */
+    --destructive-foreground: oklch(0.99 0.002 240);
+
+    --success: oklch(0.55 0.15 145); /* Verde para asistencias/aprobaciones */
+    --success-foreground: oklch(0.99 0.002 240);
+
+    --warning: oklch(0.7 0.15 70); /* Amarillo/Naranja para alertas */
+    --warning-foreground: oklch(0.2 0.02 70);
+
+    --info: oklch(0.5 0.12 240); /* Azul para información neutral */
+    --info-foreground: oklch(0.99 0.002 240);
+
+    /* ----- Colores para Charts (Gráficos de datos legislativos) ----- */
+    --chart-1: oklch(0.5 0.15 250); /* Azul principal */
+    --chart-2: oklch(0.55 0.15 145); /* Verde */
+    --chart-3: oklch(0.65 0.15 70); /* Amarillo */
+    --chart-4: oklch(0.5 0.18 20); /* Rojo mate */
+    --chart-5: oklch(0.5 0.12 280); /* Morado */
   }
 
   .dark {
-    /* ---------------------------------------------- */
-    /* Paleta de Colores - Dark Mode                  */
-    /* ---------------------------------------------- */
+    --brand: oklch(0.623 0.257 28.8);
 
     /* ----- Superficies y Fondos ----- */
-    --background: oklch(0.1 0.01 240); /* Azul muy oscuro */
-    --foreground: oklch(0.95 0.005 240); /* Blanco roto */
+    --background: oklch(0.15 0.01 240); /* Azul muy oscuro, profesional */
+    --foreground: oklch(0.95 0.003 240); /* Blanco roto */
 
-    --card: oklch(0.15 0.015 240); /* Un poco más claro que el fondo */
-    --card-foreground: oklch(0.95 0.005 240);
+    --card: oklch(0.23 0.012 240); /* Tarjetas ligeramente elevadas */
+    --card-foreground: oklch(0.95 0.003 240);
 
-    --popover: oklch(0.12 0.012 240);
-    --popover-foreground: oklch(0.95 0.005 240);
+    --popover: oklch(0.16 0.01 240);
+    --popover-foreground: oklch(0.95 0.003 240);
 
-    --muted: oklch(0.2 0.02 240);
-    --muted-foreground: oklch(0.65 0.01 240);
+    --muted: oklch(0.22 0.015 240);
+    --muted-foreground: oklch(0.65 0.008 240);
 
-    --accent: oklch(0.22 0.022 240);
-    --accent-foreground: oklch(0.98 0.003 240);
+    --accent: oklch(0.25 0.02 20); /* Cálido sutil */
+    --accent-foreground: oklch(0.95 0.003 240);
 
     /* ----- Colores Interactivos ----- */
-    --primary: oklch(
-      0.6 0.18 260
-    ); /* Azul/Violeta más brillante para dark mode */
-    --primary-foreground: oklch(0.1 0.01 240);
+    --primary: oklch(0.55 0.15 250); /* Azul más brillante para dark */
+    --primary-foreground: oklch(0.15 0.01 240);
 
-    --secondary: oklch(0.25 0.02 240);
-    --secondary-foreground: oklch(0.95 0.005 240);
+    --secondary: oklch(0.25 0.015 240);
+    --secondary-foreground: oklch(0.95 0.003 240);
 
     /* ----- Bordes y Divisores ----- */
-    --border: oklch(0.25 0.02 240);
-    --input: oklch(0.25 0.02 240);
-    --ring: oklch(0.6 0.18 260 / 0.8);
+    --border: oklch(0.28 0.018 240);
+    --input: oklch(0.28 0.018 240);
+    --ring: oklch(0.55 0.15 250 / 0.5);
 
     /* ----- Colores de Estado ----- */
-    --destructive: oklch(0.65 0.2 25);
-    --destructive-foreground: oklch(0.95 0.005 240);
-    --success: oklch(0.65 0.18 150);
-    --success-foreground: oklch(0.1 0.01 150);
-    --warning: oklch(0.8 0.15 80);
-    --warning-foreground: oklch(0.2 0.02 80);
-    --info: oklch(0.65 0.15 230);
-    --info-foreground: oklch(0.1 0.01 230);
+    --destructive: oklch(0.6 0.2 25);
+    --destructive-foreground: oklch(0.95 0.003 240);
+
+    --success: oklch(0.6 0.15 145);
+    --success-foreground: oklch(0.15 0.01 145);
+
+    --warning: oklch(0.75 0.15 70);
+    --warning-foreground: oklch(0.2 0.02 70);
+
+    --info: oklch(0.6 0.13 240);
+    --info-foreground: oklch(0.15 0.01 240);
+
+    /* ----- Colores para Charts ----- */
+    --chart-1: oklch(0.6 0.15 250);
+    --chart-2: oklch(0.6 0.15 145);
+    --chart-3: oklch(0.7 0.15 70);
+    --chart-4: oklch(0.55 0.18 20);
+    --chart-5: oklch(0.6 0.13 280);
   }
 }
 
@@ -158,6 +170,53 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ---------------------------------------------- */
+/* GUÍA DE USO DE COLORES                         */
+/* ---------------------------------------------- */
+
+/*
+BRAND COLOR (#E31A20):
+- Usar SOLO en: Logo, navbar brand, footer
+- NO usar en botones comunes
+- Usar con moderación en elementos destacados específicos
+
+PRIMARY (Azul Institucional):
+- Botones principales: "Ver perfil", "Comparar", "Buscar"
+- Links principales
+- Elementos interactivos importantes
+- CTAs positivos
+
+SECONDARY (Neutro):
+- Botones secundarios: "Cancelar", "Volver"
+- Elementos de navegación
+- Backgrounds sutiles
+
+DESTRUCTIVE (Rojo):
+- "Eliminar comparación"
+- "Remover de lista"
+- Acciones irreversibles
+- DIFERENTE al brand color
+
+SUCCESS (Verde):
+- Indicadores de asistencia alta
+- Leyes aprobadas
+- Métricas positivas
+
+WARNING (Amarillo/Naranja):
+- Asistencia media
+- Alertas informativas
+- Datos que requieren atención
+
+INFO (Azul neutral):
+- Tooltips
+- Mensajes informativos
+- Datos neutrales
+
+CHARTS:
+- Usar para visualizaciones de datos legislativos
+- Mantener consistencia en gráficos similares
+*/
 
 @keyframes pulse-slow {
   0%,

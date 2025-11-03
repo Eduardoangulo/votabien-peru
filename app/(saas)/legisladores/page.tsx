@@ -53,7 +53,7 @@ export default async function LegisladoresPage({ searchParams }: PageProps) {
         publicApi.getParliamentaryGroups() as Promise<string[]>,
       ]);
     return (
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto p-4">
         {/* Admin Actions */}
         {isAdmin && (
           <AdminActions
@@ -78,14 +78,12 @@ export default async function LegisladoresPage({ searchParams }: PageProps) {
         )}
 
         {/* Resultados */}
-        <div className="py-4">
-          <LegisladoresList
-            legisladores={initialLegisladores}
-            bancadas={parliamentaryGroups}
-            distritos={distritos}
-            currentFilters={currentParams}
-          />
-        </div>
+        <LegisladoresList
+          legisladores={initialLegisladores}
+          bancadas={parliamentaryGroups}
+          distritos={distritos}
+          currentFilters={currentParams}
+        />
       </div>
     );
   } catch (error) {

@@ -246,11 +246,14 @@ export interface FiltersPerson {
 }
 
 export interface FiltersCandidates {
-  type?: CandidacyType;
-  parties?: string[];
-  districts?: string[];
-  status?: CandidacyStatus;
+  electoral_process_id?: string;
+  type?: CandidacyType | string;
+  districts?: string[] | string;
+  // estado?: CandidacyStatus;
   search?: string;
+  skip?: number;
+  limit?: number;
+  [key: string]: unknown;
 }
 
 // ============= RESPUESTAS DE API =============
