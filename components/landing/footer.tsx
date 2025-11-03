@@ -3,7 +3,7 @@ import { ExternalLink, Users, Building2 } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="relative bg-gradient-to-b from-background to-muted border-t border-border">
+    <footer className="relative mt-16 bg-gradient-to-b from-background to-muted border-t border-border">
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-brand to-transparent" />
 
       <div className="container mx-auto px-4 p-6">

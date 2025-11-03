@@ -103,7 +103,12 @@ export default function PartidoDialog({
                     )}
 
                     {partido.active ? (
-                      <Badge className="bg-success/70 border-success/30">
+                      <Badge
+                        className={cn(
+                          "bg-success/70 border-success/30",
+                          textColor,
+                        )}
+                      >
                         <CheckCircle2 className="w-3 h-3 mr-1" />
                         Activo
                       </Badge>

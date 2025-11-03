@@ -32,7 +32,7 @@ export interface ComparadorContentProps {
 
 function calcularStats(legislador: PersonList) {
   const asistencias = legislador.active_period?.attendances || [];
-  const proyectos = legislador.active_period.bills || [];
+  const proyectos = legislador.active_period?.bills || [];
   const antecedentes = legislador.previous_cases || [];
   const biografia = legislador.detailed_biography || [];
 
@@ -206,9 +206,9 @@ export function ComparadorContent({
   const statsA = calcularStats(legisladorA);
   const statsB = calcularStats(legisladorB);
   const colorA =
-    legisladorA.active_period.original_party?.color_hex || "#6b7280";
+    legisladorA.active_period?.original_party?.color_hex || "#6b7280";
   const colorB =
-    legisladorB.active_period.original_party?.color_hex || "#6b7280";
+    legisladorB.active_period?.original_party?.color_hex || "#6b7280";
 
   return (
     <section className="relative py-12 md:py-20 overflow-hidden bg-gradient-to-b from-background via-muted/50 to-background">
@@ -581,26 +581,26 @@ function LegisladorSide({
             <div className="flex flex-col gap-1 mb-1.5">
               <Badge
                 className={`!whitespace-normal px-2 py-0.5 rounded-full backdrop-blur-xl border shadow-2xl text-white font-bold leading-tight text-center max-w-[140px] ${
-                  legislador.active_period.original_party
+                  legislador.active_period?.original_party
                     ? "border-white/30"
                     : "border-gray-400/30 bg-gray-500/70 text-white/90"
                 } ${isLeft ? "self-start" : "self-end"}`}
                 style={
-                  legislador.active_period.original_party
+                  legislador.active_period?.original_party
                     ? { backgroundColor: `${color}F0` }
                     : undefined
                 }
               >
                 <span className="break-words hyphens-auto" lang="es">
-                  {legislador.active_period.original_party
-                    ? legislador.active_period.original_party.name
+                  {legislador.active_period?.original_party
+                    ? legislador.active_period?.original_party.name
                     : "No agrupados"}
                 </span>
               </Badge>
 
-              {legislador.active_period.parliamentary_group &&
-                legislador.active_period.original_party?.name !==
-                  legislador.active_period.parliamentary_group && (
+              {legislador.active_period?.parliamentary_group &&
+                legislador.active_period?.original_party?.name !==
+                  legislador.active_period?.parliamentary_group && (
                   <Badge
                     variant="secondary"
                     className={`!whitespace-normal px-1.5 py-0.5 rounded-full bg-black/30 backdrop-blur-xl border border-white/20 text-white/90 leading-tight text-center max-w-[140px] ${
@@ -608,14 +608,14 @@ function LegisladorSide({
                     }`}
                   >
                     <span className="break-words hyphens-auto" lang="es">
-                      Bancada: {legislador.active_period.parliamentary_group}
+                      Bancada: {legislador.active_period?.parliamentary_group}
                     </span>
                   </Badge>
                 )}
             </div>
 
             <p className=" text-white/80 font-medium drop-shadow-md">
-              {legislador.active_period.electoral_district.name}
+              {legislador.active_period?.electoral_district.name}
             </p>
           </div>
 
@@ -646,26 +646,26 @@ function LegisladorSide({
             >
               <Badge
                 className={`!whitespace-normal px-4 py-2 rounded-full backdrop-blur-xl border shadow-2xl text-white font-bold text-sm leading-tight text-center max-w-[220px] ${
-                  legislador.active_period.original_party
+                  legislador.active_period?.original_party
                     ? "border-white/30"
                     : "border-gray-400/30 bg-gray-500/70 text-white/90"
                 } ${isLeft ? "self-start" : "self-end"}`}
                 style={
-                  legislador.active_period.original_party
+                  legislador.active_period?.original_party
                     ? { backgroundColor: `${color}F0` }
                     : undefined
                 }
               >
                 <span className="break-words hyphens-auto" lang="es">
-                  {legislador.active_period.original_party
-                    ? legislador.active_period.original_party.name
+                  {legislador.active_period?.original_party
+                    ? legislador.active_period?.original_party.name
                     : "No agrupados"}
                 </span>
               </Badge>
 
-              {legislador.active_period.parliamentary_group &&
-                legislador.active_period.original_party?.name !==
-                  legislador.active_period.parliamentary_group && (
+              {legislador.active_period?.parliamentary_group &&
+                legislador.active_period?.original_party?.name !==
+                  legislador.active_period?.parliamentary_group && (
                   <Badge
                     variant="secondary"
                     className={`!whitespace-normal px-3 py-1 rounded-full bg-black/30 backdrop-blur-xl border border-white/20 text-white/90 text-sm leading-tight text-center max-w-[220px] ${
@@ -673,7 +673,7 @@ function LegisladorSide({
                     }`}
                   >
                     <span className="break-words hyphens-auto" lang="es">
-                      Bancada: {legislador.active_period.parliamentary_group}
+                      Bancada: {legislador.active_period?.parliamentary_group}
                     </span>
                   </Badge>
                 )}
@@ -686,7 +686,7 @@ function LegisladorSide({
                 y: badgeY,
               }}
             >
-              {legislador.active_period.electoral_district.name}
+              {legislador.active_period?.electoral_district.name}
             </motion.p>
           </div>
         </div>

@@ -203,15 +203,15 @@ export default function DetailLegislador({
           {/* --- COLUMNA PRINCIPAL --- */}
           <div className="lg:col-span-2 space-y-4">
             {/* Formación Académica */}
-            {tieneEducacion && (
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <GraduationCap className="size-5" />
-                    Formación Académica
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <GraduationCap className="size-5" />
+                  Formación Académica
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {tieneEducacion ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {persona.technical_education &&
                       persona.technical_education !== "No" && (
@@ -265,7 +265,7 @@ export default function DetailLegislador({
                         <div className="p-3 bg-warning/10 border border-warning/30 rounded-lg">
                           <div className="flex items-center gap-2 mb-1.5">
                             <Award className="w-4 h-4 text-warning" />
-                            <span className="text-xs font-semibold text-warning-foreground uppercase tracking-wide">
+                            <span className="text-xs font-semibold text-warning uppercase tracking-wide">
                               Título Profesional
                             </span>
                           </div>
@@ -290,9 +290,11 @@ export default function DetailLegislador({
                         </div>
                       )}
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                ) : (
+                  <NoDataMessage text="No cuenta con información de estudios superiores registrada." />
+                )}
+              </CardContent>
+            </Card>
 
             {/* Biografía */}
             <Card className="shadow-sm">
@@ -339,7 +341,7 @@ export default function DetailLegislador({
                                           ? "default"
                                           : "secondary"
                                     }
-                                    className="text-xs font-medium"
+                                    className="text-xs font-medium text-white/90"
                                   >
                                     {item.relevance}
                                   </Badge>
@@ -428,8 +430,8 @@ export default function DetailLegislador({
                             className="p-3 bg-warning/10 border border-warning/30 rounded-lg"
                           >
                             <div className="flex items-start justify-between gap-2 mb-2">
-                              <span className="text-xs font-semibold text-warning-foreground uppercase">
-                                {antecedente.title || antecedente.type}
+                              <span className="text-xs font-semibold text-warning uppercase">
+                                {antecedente.title}
                               </span>
                               {antecedente.status && (
                                 <Badge
@@ -456,15 +458,15 @@ export default function DetailLegislador({
                             {(antecedente.source || antecedente.source_url) && (
                               <div className="mt-1 text-xs text-muted-foreground">
                                 {antecedente.source_url ? (
-                                  <a
+                                  <Link
                                     href={antecedente.source_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 underline hover:text-foreground"
+                                    className="inline-flex items-center gap-1 hover:underline text-primary transition-colors underline-offset-2"
                                   >
                                     {antecedente.source}
                                     <ExternalLink className="w-3 h-3 inline-block opacity-70" />
-                                  </a>
+                                  </Link>
                                 ) : (
                                   <span>{antecedente.source}</span>
                                 )}
