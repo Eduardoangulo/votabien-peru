@@ -161,7 +161,9 @@ export interface CreatePersonRequest {
   tiktok_url?: string;
 }
 
-// export interface UpdatePersonRequest extends Partial<CreatePersonRequest> {}
+export interface UpdatePersonRequest extends Partial<CreatePersonRequest> {
+  id: string;
+}
 
 export interface CreateLegislatorPeriodRequest {
   person_id: string;
