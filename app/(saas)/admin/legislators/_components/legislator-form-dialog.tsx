@@ -62,7 +62,7 @@ const legislatorPeriodSchema = z
     original_party_id: z
       .string()
       .min(1, "Debe seleccionar el partido original"),
-    current_party_id: z.string().optional(),
+    current_party_id: z.string().nullable(),
     start_date: z.string(),
     end_date: z.string(),
     parliamentary_group: z.string().transform((val) =>
@@ -120,7 +120,7 @@ export function LegislatorFormDialog({
       condition: initialData?.condition || LegislatorCondition.EN_EJERCICIO,
       electoral_district_id: "",
       original_party_id: "",
-      current_party_id: undefined,
+      current_party_id: null,
       start_date: "",
       end_date: "",
       parliamentary_group: "",

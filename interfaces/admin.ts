@@ -168,7 +168,7 @@ export interface UpdatePersonRequest extends Partial<CreatePersonRequest> {
 export interface CreateLegislatorPeriodRequest {
   person_id: string;
   original_party_id: string;
-  current_party_id?: string;
+  current_party_id: string | null;
   electoral_district_id: string;
   chamber: ChamberType;
   condition: LegislatorCondition;
