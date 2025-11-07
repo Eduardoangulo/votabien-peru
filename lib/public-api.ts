@@ -3,6 +3,8 @@ import {
   FiltersPerson,
   FiltersCandidates,
   PersonList,
+  ExecutiveRole,
+  FiltersLegislators,
 } from "@/interfaces/politics";
 import { API_BASE_URL } from "./config";
 
@@ -118,6 +120,13 @@ class PublicApiClient {
   }
 
   // ============= ENDPOINTS DE LEGISLADORES =============
+  /**
+   * Obtener lista de legisladores activos para mostrar en cards
+   */
+  async getLegisladoresCards(params?: FiltersLegislators) {
+    const query = this.buildQueryParams(params as Record<string, unknown>);
+    return this.get(`/api/v1/politics/legislators${query}`);
+  }
 
   /**
    * Obtener lista de grupos parlamentarios de legisladores activos
@@ -183,6 +192,14 @@ class PublicApiClient {
     return this.get(`/api/v1/politics/partidos/${id}`);
   }
 
+  // ============= ENDPOINTS DE EJECUTIVOS =============
+
+  /**
+   * Obtener lista de distritos electorales
+   */
+  async getEjecutivos(role: ExecutiveRole) {
+    return this.get(`/api/v1/politics/executives?role=${role}`);
+  }
   // ============= ENDPOINTS DE DISTRITOS =============
 
   /**

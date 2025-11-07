@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
 
     // Extraer parámetros
     const params = {
-      is_legislator_active: true,
+      active_only: true,
       chamber: searchParams.get("chamber") || undefined,
       search: searchParams.get("search") || undefined,
       groups:
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       limit: parseInt(searchParams.get("limit") || "10"),
     };
 
-    const legisladores = await publicApi.getPersonas(params);
+    const legisladores = await publicApi.getLegisladoresCards(params);
 
     return NextResponse.json(legisladores);
   } catch (error) {

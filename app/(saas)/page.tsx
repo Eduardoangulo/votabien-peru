@@ -86,7 +86,6 @@ export default async function VotaBienPage() {
         SeatParliamentary[]
       >,
     ]);
-
     const partidosConEscaños = partidos
       .filter((p) => p.total_seats > 0)
       .sort((a, b) => b.total_seats - a.total_seats);

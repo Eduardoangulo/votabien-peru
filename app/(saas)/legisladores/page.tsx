@@ -1,6 +1,6 @@
 import { publicApi } from "@/lib/public-api";
 import LegisladoresList from "@/components/politics/legisladores-list";
-import { ElectoralDistrictBase, PersonList } from "@/interfaces/politics";
+import { ElectoralDistrictBase, LegislatorCard } from "@/interfaces/politics";
 import Link from "next/link";
 
 interface PageProps {
@@ -18,7 +18,7 @@ export default async function LegisladoresPage({ searchParams }: PageProps) {
   const limit = 30;
 
   const apiParams = {
-    is_legislator_active: true,
+    active_only: true,
     chamber:
       params.chamber && params.chamber !== "all" ? params.chamber : undefined,
     search: params.search || undefined,
@@ -44,7 +44,7 @@ export default async function LegisladoresPage({ searchParams }: PageProps) {
   try {
     const [initialLegisladores, distritos, parliamentaryGroups] =
       await Promise.all([
-        publicApi.getPersonas(apiParams) as Promise<PersonList[]>,
+        publicApi.getLegisladoresCards(apiParams) as Promise<LegislatorCard[]>,
         publicApi.getDistritos() as Promise<ElectoralDistrictBase[]>,
         publicApi.getParliamentaryGroups() as Promise<string[]>,
       ]);

@@ -10,11 +10,10 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-  DrawerFooter
+  DrawerFooter,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import {
   Popover,
   PopoverContent,
@@ -59,13 +58,11 @@ export function FilterPanel<T extends Record<string, unknown>>({
   const [activeDrawer, setActiveDrawer] = useState<string | null>(null);
   const [openPopover, setOpenPopover] = useState<string | null>(null);
   const [searchTerms, setSearchTerms] = useState<Record<string, string>>({});
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // 🔍 Manejar búsqueda con Enter en desktop
   const handleSearchKeyDown = (
     key: keyof T,
-    event: KeyboardEvent<HTMLInputElement>
+    event: KeyboardEvent<HTMLInputElement>,
   ) => {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -76,27 +73,21 @@ export function FilterPanel<T extends Record<string, unknown>>({
     }
   };
 
-  // 🔍 Manejar cambio de texto del search (solo actualiza el estado local)
   const handleSearchChange = (key: keyof T, value: string) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
   };
 
-  // 📋 Manejar select simple
   const handleFilterChange = (key: keyof T, value: string) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
-
-    if (isDesktop) {
-      applyFiltersToUrl(newFilters);
-    }
+    applyFiltersToUrl(newFilters);
   };
 
-  // ✅ Manejar multi-select
   const handleMultiSelectChange = (
     key: keyof T,
     value: string,
-    checked: boolean
+    checked: boolean,
   ) => {
     const currentValues = (
       Array.isArray(filters[key]) ? filters[key] : []
@@ -111,25 +102,18 @@ export function FilterPanel<T extends Record<string, unknown>>({
 
     const newFilters = { ...filters, [key]: newValues };
     setFilters(newFilters);
-
-    if (isDesktop) {
-      applyFiltersToUrl(newFilters);
-    }
+    applyFiltersToUrl(newFilters);
   };
 
   const applyFiltersToUrl = (filtersToApply: T) => {
     const params = new URLSearchParams();
 
     Object.entries(filtersToApply).forEach(([key, value]) => {
-      // Para arrays: solo agregar si tiene elementos
       if (Array.isArray(value)) {
         if (value.length > 0) {
           value.forEach((v) => params.append(key, String(v)));
         }
-        // Si está vacío, no hacer nada (no agregar el parámetro)
-      }
-      // Para otros valores: agregar solo si no está vacío y no es el valor por defecto
-      else if (
+      } else if (
         value &&
         value !== emptyValue &&
         value !== "" &&
@@ -163,7 +147,7 @@ export function FilterPanel<T extends Record<string, unknown>>({
     if (specificValue && Array.isArray(filters[key])) {
       // Multi-select: remover solo un valor específico
       const newValues = (filters[key] as string[]).filter(
-        (v) => v !== specificValue
+        (v) => v !== specificValue,
       );
       const newFilters = { ...filters, [key]: newValues };
       setFilters(newFilters);
@@ -306,7 +290,7 @@ export function FilterPanel<T extends Record<string, unknown>>({
                 role="combobox"
                 className={cn(
                   "justify-between font-normal bg-background",
-                  selectedCount === 0 && "text-muted-foreground"
+                  selectedCount === 0 && "text-muted-foreground",
                 )}
               >
                 {/* 🔧 FIX 4: Mostrar placeholder cuando no hay selección */}
@@ -327,7 +311,7 @@ export function FilterPanel<T extends Record<string, unknown>>({
                       handleMultiSelectChange(
                         fieldKey,
                         option.value,
-                        !selectedValues.includes(option.value)
+                        !selectedValues.includes(option.value),
                       )
                     }
                   >
@@ -337,7 +321,7 @@ export function FilterPanel<T extends Record<string, unknown>>({
                         handleMultiSelectChange(
                           fieldKey,
                           option.value,
-                          checked as boolean
+                          checked as boolean,
                         )
                       }
                     />
@@ -373,13 +357,13 @@ export function FilterPanel<T extends Record<string, unknown>>({
       const currentValue = String(filters[fieldKey] || "");
       const hasValue = currentValue && currentValue !== "";
       const currentOption = field.options.find(
-        (opt) => opt.value === currentValue
+        (opt) => opt.value === currentValue,
       );
 
       // Filtrar opciones según búsqueda interna
       const searchTerm = searchTerms[field.id] || "";
       const filteredOptions = field.options.filter((option) =>
-        option.label.toLowerCase().includes(searchTerm.toLowerCase())
+        option.label.toLowerCase().includes(searchTerm.toLowerCase()),
       );
 
       return (
@@ -399,7 +383,7 @@ export function FilterPanel<T extends Record<string, unknown>>({
                 role="combobox"
                 className={cn(
                   "justify-between font-normal bg-background ",
-                  !hasValue && "text-muted-foreground"
+                  !hasValue && "text-muted-foreground",
                 )}
               >
                 {hasValue && currentOption
@@ -442,7 +426,8 @@ export function FilterPanel<T extends Record<string, unknown>>({
                       }}
                       className={cn(
                         "w-full text-left p-2 text-sm rounded-sm hover:bg-accent transition-colors",
-                        currentValue === option.value && "bg-accent font-medium"
+                        currentValue === option.value &&
+                          "bg-accent font-medium",
                       )}
                     >
                       {option.label}
@@ -467,7 +452,7 @@ export function FilterPanel<T extends Record<string, unknown>>({
   const renderMobileDrawerContent = (field: FilterField) => {
     const fieldKey = field.id as keyof T;
 
-    // ✅ MULTI-SELECT - Mobile Drawer
+    // MULTI-SELECT - Mobile Drawer
     if (field.type === "multi-select" && field.options) {
       const selectedValues = (
         Array.isArray(filters[fieldKey]) ? filters[fieldKey] : []
@@ -476,7 +461,7 @@ export function FilterPanel<T extends Record<string, unknown>>({
       // Filtrar opciones según búsqueda interna
       const searchTerm = searchTerms[field.id] || "";
       const filteredOptions = field.options.filter((option) =>
-        option.label.toLowerCase().includes(searchTerm.toLowerCase())
+        option.label.toLowerCase().includes(searchTerm.toLowerCase()),
       );
 
       return (
@@ -509,7 +494,7 @@ export function FilterPanel<T extends Record<string, unknown>>({
                     handleMultiSelectChange(
                       fieldKey,
                       option.value,
-                      !selectedValues.includes(option.value)
+                      !selectedValues.includes(option.value),
                     )
                   }
                 >
@@ -519,7 +504,7 @@ export function FilterPanel<T extends Record<string, unknown>>({
                       handleMultiSelectChange(
                         fieldKey,
                         option.value,
-                        checked as boolean
+                        checked as boolean,
                       )
                     }
                   />
@@ -545,7 +530,7 @@ export function FilterPanel<T extends Record<string, unknown>>({
       // Filtrar opciones según búsqueda interna
       const searchTerm = searchTerms[field.id] || "";
       const filteredOptions = field.options.filter((option) =>
-        option.label.toLowerCase().includes(searchTerm.toLowerCase())
+        option.label.toLowerCase().includes(searchTerm.toLowerCase()),
       );
 
       return (
@@ -580,7 +565,7 @@ export function FilterPanel<T extends Record<string, unknown>>({
                   }}
                   className={cn(
                     "w-full text-left p-3 rounded-lg hover:bg-accent transition-colors",
-                    currentValue === option.value && "bg-accent font-medium"
+                    currentValue === option.value && "bg-accent font-medium",
                   )}
                 >
                   {option.label}
@@ -599,16 +584,17 @@ export function FilterPanel<T extends Record<string, unknown>>({
     return null;
   };
 
-  // --- DESKTOP: Barra de filtros siempre visible ---
-  if (isDesktop) {
-    return (
-      <div className="w-full space-y-4">
-        <div className="bg-secondary border rounded-lg p-4">
+  const searchFields = fields.filter((f) => f.type === "search");
+  const otherFields = fields.filter((f) => f.type !== "search");
+  return (
+    <div className="w-full space-y-4">
+      {/* DESKTOP - Visible solo en lg+ */}
+      <div className="hidden lg:block">
+        <div className="bg-secondary w-full border rounded-lg p-4">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex-1 flex items-center gap-3 flex-wrap">
               {fields.map((field) => renderDesktopField(field))}
             </div>
-
             {hasActiveFilters && (
               <Button
                 onClick={clearFilters}
@@ -622,9 +608,8 @@ export function FilterPanel<T extends Record<string, unknown>>({
             )}
           </div>
         </div>
-
         {hasActiveFilters && (
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 mt-3">
             {activeFilters.map((filter, index) => (
               <Badge
                 key={`${String(filter.key)}-${filter.specificValue || index}`}
@@ -646,204 +631,168 @@ export function FilterPanel<T extends Record<string, unknown>>({
           </div>
         )}
       </div>
-    );
-  }
 
-  // --- MOBILE: Search siempre visible + Botones para otros filtros ---
-  const searchFields = fields.filter((f) => f.type === "search");
-  const otherFields = fields.filter((f) => f.type !== "search");
-
-  return (
-    <div className="w-full space-y-3">
-      {/* Search siempre visible en mobile */}
-      {searchFields.map((field) => {
-        const fieldKey = field.id as keyof T;
-        return (
-          <div key={field.id} className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              id={field.id}
-              type="search"
-              placeholder={
-                field.searchPlaceholder ||
-                field.placeholder ||
-                `Buscar ${field.label.toLowerCase()}...`
-              }
-              value={String(filters[fieldKey] || "")}
-              onChange={(e) => handleSearchChange(fieldKey, e.target.value)}
-              className="pl-9 bg-background"
-              enterKeyHint="search"
-            />
-            {filters[fieldKey] && (
-              <button
-                onClick={() => {
-                  const newFilters = { ...filters, [fieldKey]: "" };
-                  setFilters(newFilters);
-                  applyFiltersToUrl(newFilters);
-                }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-        );
-      })}
-
-      {/* Botones para otros filtros - FLEX responsive */}
-      {otherFields.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {otherFields.map((field) => {
-            const fieldKey = field.id as keyof T;
-            let selectedLabel = field.placeholder || field.label;
-
-            if (field.type === "multi-select") {
-              const selectedValues = (
-                Array.isArray(filters[fieldKey]) ? filters[fieldKey] : []
-              ) as string[];
-              if (selectedValues.length > 0) {
-                selectedLabel = `${field.placeholder || field.label} (${
-                  selectedValues.length
-                })`;
-              }
-            } else if (field.type === "select") {
-              const value = filters[fieldKey];
-              if (value && value !== emptyValue && value !== "") {
-                const option = field.options?.find(
-                  (opt) => opt.value === value
-                );
-                selectedLabel = option?.label || selectedLabel;
-              }
-            }
-
-            return (
-              <Button
-                key={field.id}
-                variant="outline"
-                className="justify-between flex-1 min-w-[140px]"
-                onClick={() => setActiveDrawer(field.id)}
-              >
-                <span className="truncate">{selectedLabel}</span>
-                <ChevronDown className="h-4 w-4 shrink-0 ml-2" />
-              </Button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Botones de acción */}
-      <div className="flex gap-2">
-        <Button onClick={applyFilters} className="flex-1">
-          Aplicar Filtros
-        </Button>
-        <Button
-          onClick={clearFilters}
-          variant="outline"
-          className="flex-1"
-          disabled={!hasActiveFilters}
-        >
-          Limpiar
-        </Button>
-      </div>
-
-      {/* Badges de filtros activos */}
-      {hasActiveFilters && (
-        <div className="flex flex-wrap items-center gap-2">
-          {activeFilters.map((filter, index) => (
-            <Badge
-              key={`${String(filter.key)}-${filter.specificValue || index}`}
-              variant="default"
-              className="gap-1.5 font-normal"
-            >
-              <span className="text-xs">
-                <strong>{filter.valueLabel}</strong>
-              </span>
-              <button
-                onClick={() => removeFilter(filter.key, filter.specificValue)}
-                className="rounded-full opacity-70 hover:opacity-100 transition-opacity"
-                aria-label={`Remover filtro ${filter.label}`}
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </Badge>
-          ))}
-        </div>
-      )}
-
-      {/* Drawers individuales para cada filtro */}
-      {otherFields.map((field) => (
-        <Drawer
-          key={field.id}
-          open={activeDrawer === field.id}
-          onOpenChange={(open) => {
-            if (!open) {
-              setActiveDrawer(null);
-              setSearchTerms((prev) => ({ ...prev, [field.id]: "" }));
-            }
-          }}
-        >
-          <DrawerContent>
-            <DrawerHeader>
-              <DrawerTitle>{field.label}</DrawerTitle>
-            </DrawerHeader>
-            <div className="px-4 pb-4 max-h-[60vh] overflow-y-auto">
-              {renderMobileDrawerContent(field)}
+      {/* MOBILE - Visible solo en < lg */}
+      <div className="lg:hidden w-full space-y-3">
+        {/* Search siempre visible en mobile */}
+        {searchFields.map((field) => {
+          const fieldKey = field.id as keyof T;
+          return (
+            <div key={field.id} className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id={field.id}
+                type="search"
+                placeholder={
+                  field.searchPlaceholder ||
+                  field.placeholder ||
+                  `Buscar ${field.label.toLowerCase()}...`
+                }
+                value={String(filters[fieldKey] || "")}
+                onChange={(e) => handleSearchChange(fieldKey, e.target.value)}
+                className="pl-9 bg-background"
+                enterKeyHint="search"
+              />
+              {filters[fieldKey] && (
+                <button
+                  onClick={() => {
+                    const newFilters = { ...filters, [fieldKey]: "" };
+                    setFilters(newFilters);
+                    applyFiltersToUrl(newFilters);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
-            <DrawerFooter className="flex-row gap-2">
-              <Button
-                onClick={() => {
-                  applyFilters();
-                  setActiveDrawer(null);
-                  setSearchTerms((prev) => ({ ...prev, [field.id]: "" }));
-                }}
-                className="flex-1"
+          );
+        })}
+
+        {/* Botones para otros filtros */}
+        {otherFields.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {otherFields.map((field) => {
+              const fieldKey = field.id as keyof T;
+              let selectedLabel = field.placeholder || field.label;
+
+              if (field.type === "multi-select") {
+                const selectedValues = (
+                  Array.isArray(filters[fieldKey]) ? filters[fieldKey] : []
+                ) as string[];
+                if (selectedValues.length > 0) {
+                  selectedLabel = `${field.placeholder || field.label} (${selectedValues.length})`;
+                }
+              } else if (field.type === "select") {
+                const value = filters[fieldKey];
+                if (value && value !== emptyValue && value !== "") {
+                  const option = field.options?.find(
+                    (opt) => opt.value === value,
+                  );
+                  selectedLabel = option?.label || selectedLabel;
+                }
+              }
+
+              return (
+                <Button
+                  key={field.id}
+                  variant="outline"
+                  className="justify-between flex-1 min-w-[140px]"
+                  onClick={() => setActiveDrawer(field.id)}
+                >
+                  <span className="truncate">{selectedLabel}</span>
+                  <ChevronDown className="h-4 w-4 shrink-0 ml-2" />
+                </Button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Botones de acción */}
+        <div className="flex gap-2">
+          <Button onClick={applyFilters} className="flex-1">
+            Aplicar Filtros
+          </Button>
+          <Button
+            onClick={clearFilters}
+            variant="outline"
+            className="flex-1"
+            disabled={!hasActiveFilters}
+          >
+            Limpiar
+          </Button>
+        </div>
+
+        {/* Badges de filtros activos */}
+        {hasActiveFilters && (
+          <div className="flex flex-wrap items-center gap-2">
+            {activeFilters.map((filter, index) => (
+              <Badge
+                key={`${String(filter.key)}-${filter.specificValue || index}`}
+                variant="default"
+                className="gap-1.5 font-normal"
               >
-                Filtrar
-              </Button>
-              <Button
-                onClick={() => {
-                  const fieldKey = field.id as keyof T;
-                  removeFilter(fieldKey);
-                  setSearchTerms((prev) => ({ ...prev, [field.id]: "" }));
-                }}
-                variant="outline"
-                className="flex-1"
-              >
-                Limpiar
-              </Button>
-            </DrawerFooter>
-          </DrawerContent>
-        </Drawer>
-      ))}
+                <span className="text-xs">
+                  <strong>{filter.valueLabel}</strong>
+                </span>
+                <button
+                  onClick={() => removeFilter(filter.key, filter.specificValue)}
+                  className="rounded-full opacity-70 hover:opacity-100 transition-opacity"
+                  aria-label={`Remover filtro ${filter.label}`}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        {/* Drawers */}
+        {otherFields.map((field) => (
+          <Drawer
+            key={field.id}
+            open={activeDrawer === field.id}
+            onOpenChange={(open) => {
+              if (!open) {
+                setActiveDrawer(null);
+                setSearchTerms((prev) => ({ ...prev, [field.id]: "" }));
+              }
+            }}
+          >
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>{field.label}</DrawerTitle>
+              </DrawerHeader>
+              <div className="px-4 pb-4 max-h-[60vh] overflow-y-auto">
+                {renderMobileDrawerContent(field)}
+              </div>
+              <DrawerFooter className="flex-row gap-2">
+                <Button
+                  onClick={() => {
+                    applyFilters();
+                    setActiveDrawer(null);
+                    setSearchTerms((prev) => ({ ...prev, [field.id]: "" }));
+                  }}
+                  className="flex-1"
+                >
+                  Filtrar
+                </Button>
+                <Button
+                  onClick={() => {
+                    const fieldKey = field.id as keyof T;
+                    removeFilter(fieldKey);
+                    setSearchTerms((prev) => ({ ...prev, [field.id]: "" }));
+                  }}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Limpiar
+                </Button>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+        ))}
+      </div>
     </div>
   );
-}
-
-// Hook personalizado mejorado
-export function useFilters<T extends Record<string, unknown>>(
-  initialFilters: T,
-  defaultFilters: T
-) {
-  const [filters, setFilters] = useState<T>(initialFilters);
-
-  const updateFilter = (key: keyof T, value: unknown) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const resetFilters = () => {
-    setFilters(defaultFilters);
-  };
-
-  const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
-    if (Array.isArray(value)) return value.length > 0;
-    return value !== defaultFilters[key as keyof T];
-  });
-
-  return {
-    filters,
-    updateFilter,
-    resetFilters,
-    hasActiveFilters,
-    setFilters,
-  };
 }

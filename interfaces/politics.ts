@@ -120,9 +120,15 @@ export interface PoliticalPartyDetail extends PoliticalPartyBase {
 }
 // ============= PERSONA Y LEGISLADOR =============
 
+export interface PersonBasicInfo {
+  id: string;
+  fullname: string;
+  image_url: string | null;
+  profession: string | null;
+}
+
 export interface PersonBase {
   id: string;
-  dni: string;
   name: string;
   lastname: string;
   fullname: string;
@@ -181,6 +187,18 @@ export interface PersonDetail extends PersonBase {
   candidacies: CandidateList[];
 }
 
+export interface LegislatorCard {
+  id: string;
+  chamber: ChamberType;
+  condition: LegislatorCondition;
+  parliamentary_group: string | null;
+  active: boolean;
+  start_date: string;
+  end_date: string;
+  person: PersonBasicInfo;
+  current_party: PoliticalPartyBase | null;
+  electoral_district: ElectoralDistrictBase;
+}
 // ============= CANDIDATURAS =============
 
 export interface CandidateBase {
@@ -247,6 +265,17 @@ export interface SeatParliamentary {
 }
 
 // ============= FILTROS Y OPCIONES =============
+
+export interface FiltersLegislators {
+  active_only?: boolean;
+  chamber?: ChamberType | string;
+  groups?: string | string[];
+  districts?: string | string[];
+  search?: string;
+  skip?: number;
+  limit?: number;
+  [key: string]: unknown;
+}
 
 export interface FiltersPerson {
   is_legislator_active?: boolean;

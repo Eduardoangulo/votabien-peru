@@ -3,7 +3,15 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Users, UserCheck, Info, ChevronRight } from "lucide-react";
+import {
+  Users,
+  ChevronRight,
+  AlertCircle,
+  Ban,
+  Briefcase,
+  UserX,
+  Skull,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -22,12 +30,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FilterField, FilterPanel } from "@/components/ui/filter-panel";
 import {
   ElectoralDistrictBase,
-  PersonList,
   FiltersPerson,
+  LegislatorCard,
+  LegislatorCondition,
 } from "@/interfaces/politics";
 
 interface LegisladoresListProps {
-  legisladores: PersonList[];
+  legisladores: LegislatorCard[];
   bancadas: string[];
   distritos: ElectoralDistrictBase[];
   currentFilters: FiltersPerson;
@@ -44,13 +53,54 @@ const LegisladorSkeleton = () => (
     <CardContent className="space-y-2 flex-grow">
       <Skeleton className="h-3 w-full" />
       <Skeleton className="h-3 w-2/3" />
-      <Skeleton className="h-3 w-1/2" />
     </CardContent>
     <CardFooter className="border-t">
       <Skeleton className="h-3 w-16 ml-auto" />
     </CardFooter>
   </Card>
 );
+
+const getConditionConfig = (condition: LegislatorCondition) => {
+  const configs = {
+    [LegislatorCondition.EN_EJERCICIO]: {
+      label: "En ejercicio",
+      icon: Briefcase,
+      className:
+        "bg-success/90 text-success-foreground border-success/30 hover:bg-success",
+      tooltip: "Legislador actualmente en funciones",
+    },
+    [LegislatorCondition.LICENCIA]: {
+      label: "Licencia",
+      icon: AlertCircle,
+      className:
+        "bg-warning/90 text-warning-foreground border-warning/30 hover:bg-warning",
+      tooltip: "Legislador con licencia temporal",
+    },
+    [LegislatorCondition.SUSPENDIDO]: {
+      label: "Suspendido",
+      icon: Ban,
+      className:
+        "bg-destructive/90 text-destructive-foreground border-destructive/30 hover:bg-destructive",
+      tooltip: "Legislador suspendido temporalmente",
+    },
+    [LegislatorCondition.DESTITUIDO]: {
+      label: "Destituido",
+      icon: UserX,
+      className:
+        "bg-muted/90 text-muted-foreground border-muted hover:bg-muted",
+      tooltip: "Legislador destituido del cargo",
+    },
+    [LegislatorCondition.FALLECIDO]: {
+      label: "Fallecido",
+      icon: Skull,
+      className:
+        "bg-secondary/90 text-secondary-foreground border-secondary/30 hover:bg-secondary",
+      tooltip: "En memoria",
+    },
+  };
+
+  return configs[condition] || configs[LegislatorCondition.EN_EJERCICIO];
+};
 
 const LegisladoresList = ({
   legisladores: initialLegisladores,
@@ -60,7 +110,7 @@ const LegisladoresList = ({
   infiniteScroll = true,
 }: LegisladoresListProps) => {
   const [legisladores, setLegisladores] =
-    useState<PersonList[]>(initialLegisladores);
+    useState<LegislatorCard[]>(initialLegisladores);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialLegisladores.length >= 10);
   const [currentSkip, setCurrentSkip] = useState(initialLegisladores.length);
@@ -117,7 +167,7 @@ const LegisladoresList = ({
         throw new Error("Error al cargar legisladores");
       }
 
-      const newLegisladores: PersonList[] = await response.json();
+      const newLegisladores: LegislatorCard[] = await response.json();
 
       if (newLegisladores.length === 0) {
         setHasMore(false);
@@ -137,7 +187,6 @@ const LegisladoresList = ({
     }
   }, [infiniteScroll, loading, hasMore, buildQueryString]);
 
-  // Intersection Observer
   useEffect(() => {
     if (!infiniteScroll) return;
 
@@ -185,7 +234,7 @@ const LegisladoresList = ({
     },
     {
       id: "groups",
-      label: "Partido Político",
+      label: "Grupo Parlamentario",
       type: "multi-select",
       placeholder: "Bancadas",
       options: [
@@ -202,7 +251,7 @@ const LegisladoresList = ({
       placeholder: "Distrito",
       options: [
         ...distritos.map((d) => ({
-          value: d.name.toLowerCase().replace(" ", "_"),
+          value: d.name,
           label: d.name,
         })),
       ],
@@ -254,82 +303,94 @@ const LegisladoresList = ({
             </p>
           </div>
         ) : (
-          legisladores.map((c) => (
-            <Link key={c.id} href={`/legisladores/${c.id}`}>
-              <Card className="pt-0 group cursor-pointer overflow-hidden border transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex flex-col h-full">
-                <div className="relative aspect-[3/4] bg-gradient-to-br from-primary/80 to-primary overflow-hidden">
-                  {c.image_url ? (
-                    <Image
-                      src={c.image_url}
-                      alt={`${c.name} ${c.lastname}`}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Users className="w-12 h-12 md:w-16 md:h-16 text-primary-foreground/70" />
-                    </div>
-                  )}
+          legisladores.map((leg) => {
+            const conditionConfig = getConditionConfig(leg.condition);
+            const ConditionIcon = conditionConfig.icon;
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+            return (
+              <Link key={leg.id} href={`/legisladores/${leg.person.id}`}>
+                <Card className="pt-0 group cursor-pointer overflow-hidden border transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex flex-col h-full">
+                  <div className="relative aspect-[3/4] bg-gradient-to-br from-primary/80 to-primary overflow-hidden">
+                    {leg.person.image_url ? (
+                      <Image
+                        src={leg.person.image_url}
+                        alt={leg.person.fullname}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                        priority={false}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Users className="w-12 h-12 md:w-16 md:h-16 text-primary-foreground/70" />
+                      </div>
+                    )}
 
-                  <TooltipProvider delayDuration={150}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="absolute top-2 right-2">
-                          <Badge
-                            className={`text-[10px] md:text-xs font-medium border backdrop-blur-sm ${
-                              c.active_period?.active
-                                ? "bg-success/90 text-success-foreground border-success/30"
-                                : "bg-muted/70 text-muted-foreground border-border"
-                            }`}
-                          >
-                            {c.active_period?.active ? (
-                              <UserCheck className="size-3" />
-                            ) : (
-                              <Info className="size-3" />
-                            )}
-                            {c.active_period?.active ? "Activo" : "Inactivo"}
-                          </Badge>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent side="left" className="text-xs">
-                        {c.active_period?.active
-                          ? "Actualmente en funciones"
-                          : "Fuera de funciones"}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
-                <CardHeader>
-                  <CardTitle className="text-sm font-semibold line-clamp-2 group-hover:text-primary transition-colors leading-tight">
-                    {c.name} {c.lastname}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-1.5 flex-grow">
-                  {c.profession && (
-                    <p className="text-[11px] md:text-xs text-muted-foreground line-clamp-2">
-                      {c.profession}
-                    </p>
-                  )}
-                  <p className="text-[10px] md:text-xs text-muted-foreground/80 font-mono">
-                    DNI: {c.dni}
-                  </p>
-                </CardContent>
+                    {/* Condition Badge - Top Right */}
+                    <TooltipProvider delayDuration={150}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="absolute top-2 right-2">
+                            <Badge
+                              className={`text-[10px] md:text-xs font-medium border backdrop-blur-sm transition-all ${conditionConfig.className}`}
+                            >
+                              <ConditionIcon className="size-3 mr-1" />
+                              {conditionConfig.label}
+                            </Badge>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="left" className="text-xs">
+                          {conditionConfig.tooltip}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
 
-                <CardFooter className="border-t">
-                  <div className="flex items-center justify-end w-full">
-                    <span className="inline-flex items-center text-primary group-hover:text-primary/80 font-medium text-[10px] md:text-xs transition-colors">
-                      Ver más
-                      <ChevronRight className="size-4" />
-                    </span>
+                    {/* Parliamentary Group - Bottom Left */}
+                    {leg.parliamentary_group && (
+                      <div className="absolute bottom-2 left-2">
+                        <Badge className="text-[10px] md:text-xs font-medium border backdrop-blur-md bg-background/80 text-foreground border-border/50 hover:bg-background/90 transition-all">
+                          {leg.parliamentary_group}
+                        </Badge>
+                      </div>
+                    )}
                   </div>
-                </CardFooter>
-              </Card>
-            </Link>
-          ))
+
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-semibold line-clamp-2 group-hover:text-primary transition-colors leading-tight">
+                      {leg.person.fullname}
+                    </CardTitle>
+                  </CardHeader>
+
+                  <CardContent className="space-y-2 flex-grow pt-0">
+                    {leg.person.profession && (
+                      <p className="text-[11px] md:text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                        {leg.person.profession}
+                      </p>
+                    )}
+
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] md:text-xs w-fit"
+                    >
+                      {leg.electoral_district.name}
+                    </Badge>
+                  </CardContent>
+
+                  <CardFooter className="border-t pt-3">
+                    <div className="flex items-center justify-end w-full">
+                      <span className="inline-flex items-center text-primary group-hover:text-primary/80 font-medium text-[10px] md:text-xs transition-colors">
+                        Ver perfil
+                        <ChevronRight className="size-4" />
+                      </span>
+                    </div>
+                  </CardFooter>
+                </Card>
+              </Link>
+            );
+          })
         )}
 
         {loading && (
