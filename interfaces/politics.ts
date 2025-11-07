@@ -199,6 +199,19 @@ export interface LegislatorCard {
   current_party: PoliticalPartyBase | null;
   electoral_district: ElectoralDistrictBase;
 }
+
+// ============= EJECUTIVOS =============
+
+export interface ExecutiveBase {
+  id: string;
+  role: ExecutiveRole;
+  ministry: string | null;
+  start_date: string;
+}
+
+export interface Executive extends ExecutiveBase {
+  person: PersonBasicInfo;
+}
 // ============= CANDIDATURAS =============
 
 export interface CandidateBase {
@@ -292,7 +305,6 @@ export interface FiltersCandidates {
   electoral_process_id?: string;
   type?: CandidacyType | string;
   districts?: string[] | string;
-  // estado?: CandidacyStatus;
   search?: string;
   skip?: number;
   limit?: number;

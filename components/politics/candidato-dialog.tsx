@@ -165,14 +165,6 @@ const CandidatoDialog = ({
                   Datos Personales
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {person.dni && (
-                    <div className="bg-muted/50 rounded-lg p-3 border">
-                      <p className="text-xs text-muted-foreground mb-0.5">
-                        DNI
-                      </p>
-                      <p className="text-sm font-semibold">{person.dni}</p>
-                    </div>
-                  )}
                   {edad && (
                     <div className="bg-muted/50 rounded-lg p-3 border">
                       <p className="text-xs text-muted-foreground mb-0.5">

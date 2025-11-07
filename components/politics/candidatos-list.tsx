@@ -168,7 +168,7 @@ const CandidatosList = ({
       label: "Buscar",
       type: "search",
       placeholder: "Buscar candidato...",
-      searchPlaceholder: "Nombre o DNI",
+      searchPlaceholder: "Nombre",
       defaultValue: "",
     },
     {

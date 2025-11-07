@@ -40,7 +40,6 @@ export interface PreviousCase {
 
 export interface Person {
   id: string;
-  dni: string;
   name: string;
   lastname: string;
   fullname: string;
@@ -140,7 +139,6 @@ export interface Candidate {
 
 // ============= REQUEST SCHEMAS =============
 export interface CreatePersonRequest {
-  dni: string;
   name: string;
   lastname: string;
   image_url?: string;
@@ -201,7 +199,6 @@ export interface CreateCandidateRequest {
 export interface LegislatorTableRow {
   id: string;
   fullname: string;
-  dni: string;
   chamber: ChamberType;
   party: string;
   district: string;
@@ -215,7 +212,6 @@ export interface LegislatorTableRow {
 export interface CandidateTableRow {
   id: string;
   fullname: string;
-  dni: string;
   type: CandidacyType;
   party: string;
   district?: string;

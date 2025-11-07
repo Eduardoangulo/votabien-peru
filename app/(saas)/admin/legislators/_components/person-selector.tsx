@@ -70,9 +70,6 @@ export function PersonSelector({
                 <p className="font-medium text-sm sm:text-base truncate">
                   {selectedPerson.fullname}
                 </p>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  DNI: {selectedPerson.dni}
-                </p>
               </div>
             </div>
             <Button
@@ -95,7 +92,7 @@ export function PersonSelector({
             <div className="flex-1 relative" ref={searchContainerRef}>
               <Search className="absolute left-2 top-2 sm:top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
               <Input
-                placeholder="Buscar por nombre o DNI..."
+                placeholder="Buscar por nombre..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={(e) => {
@@ -152,9 +149,6 @@ export function PersonSelector({
                       {person.fullname}
                     </p>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <p className="text-xs sm:text-sm text-muted-foreground">
-                        DNI: {person.dni}
-                      </p>
                       {person.profession && (
                         <Badge
                           variant="outline"

@@ -5,6 +5,8 @@ import {
   ElectoralProcess,
   ChamberType,
   SeatParliamentary,
+  ExecutiveRole,
+  Executive,
 } from "@/interfaces/politics";
 import { Suspense } from "react";
 import HeroDualSplit from "@/components/landing/hero-dual-split";
@@ -79,13 +81,15 @@ function getRandomItems<T>(array: T[], count: number): T[] {
 
 export default async function VotaBienPage() {
   try {
-    const [partidos, proceso_electoral, seats] = await Promise.all([
+    const [ejecutivos, partidos, proceso_electoral, seats] = await Promise.all([
+      publicApi.getEjecutivos(ExecutiveRole.PRESIDENTE) as Promise<Executive[]>,
       publicApi.getPartidos(true) as Promise<PoliticalPartyDetail[]>,
       publicApi.getProcesosElectorales(true) as Promise<ElectoralProcess[]>,
       publicApi.getSeatParliamentary(ChamberType.CONGRESO) as Promise<
         SeatParliamentary[]
       >,
     ]);
+
     const partidosConEscaños = partidos
       .filter((p) => p.total_seats > 0)
       .sort((a, b) => b.total_seats - a.total_seats);

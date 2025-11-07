@@ -669,10 +669,6 @@ export default function DetailLegislador({
                 <CardTitle>Información Personal</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-foreground/70">DNI:</span>
-                  <span className="font-medium">{persona.dni}</span>
-                </div>
                 {persona.birth_date && (
                   <div className="flex justify-between">
                     <span className="text-foreground/70">

@@ -30,7 +30,6 @@ export function PersonQuickCreateDialog({
 }: PersonQuickCreateDialogProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreatePersonRequest>({
-    dni: "",
     name: "",
     lastname: "",
     profession: "",
@@ -49,7 +48,6 @@ export function PersonQuickCreateDialog({
         onPersonCreated(result.data as PersonList);
         // Reset form
         setFormData({
-          dni: "",
           name: "",
           lastname: "",
           profession: "",
@@ -77,20 +75,6 @@ export function PersonQuickCreateDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="dni">DNI *</Label>
-            <Input
-              id="dni"
-              value={formData.dni}
-              onChange={(e) =>
-                setFormData({ ...formData, dni: e.target.value })
-              }
-              placeholder="12345678"
-              required
-              maxLength={8}
-            />
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="name">Nombres *</Label>
             <Input

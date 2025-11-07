@@ -229,7 +229,7 @@ const LegisladoresList = ({
       label: "Buscar",
       type: "search",
       placeholder: "Buscar legislador...",
-      searchPlaceholder: "Nombre o DNI",
+      searchPlaceholder: "Nombre",
       defaultValue: "",
     },
     {
