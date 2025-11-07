@@ -5,7 +5,9 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-provider";
 import { serverGetUser } from "@/lib/auth-actions";
 import { ThemeProvider } from "@/components/theme-provider";
-
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -38,7 +40,12 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider initialUser={initialUser}>{children}</AuthProvider>
+          <AuthProvider initialUser={initialUser}>
+            <TooltipProvider>
+              <NuqsAdapter>{children}</NuqsAdapter>
+            </TooltipProvider>
+            <Toaster />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
