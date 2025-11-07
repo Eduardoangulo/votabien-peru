@@ -1,9 +1,9 @@
 // ============= ENUMS =============
 
 export enum ChamberType {
-  CONGRESO = "congreso",
-  SENADO = "senado",
-  DIPUTADOS = "diputados",
+  CONGRESO = "Congreso",
+  SENADO = "Senado",
+  DIPUTADOS = "Diputados",
 }
 
 export enum CandidacyType {
@@ -19,6 +19,20 @@ export enum CandidacyStatus {
   HABIL = "Hábil",
   INHABILITADO = "Inhabilitado",
   TACADO = "Tacado",
+}
+export enum LegislatorCondition {
+  EN_EJERCICIO = "En_ejercicio",
+  FALLECIDO = "Fallecido",
+  SUSPENDIDO = "Suspendido",
+  LICENCIA = "Licencia",
+  DESTITUIDO = "Destituido",
+}
+
+export enum ExecutiveRole {
+  PRESIDENTE = "Presidente",
+  VICEPRESIDENTE = "Vicepresidente",
+  PRIMER_MINISTRO = "Primer_ministro",
+  MINISTRO = "Ministro",
 }
 
 export interface PreviousCase {
@@ -68,7 +82,7 @@ export interface PoliticalPartyBase {
   created_at: string;
 }
 
-export interface ElectoralDistrict {
+export interface ElectoralDistrictBase {
   id: string;
   name: string;
   code: string;
@@ -142,7 +156,7 @@ export interface LegislatorDetail {
   original_party: PoliticalPartyBase;
   current_party?: PoliticalPartyBase;
 
-  electoral_district: ElectoralDistrict;
+  electoral_district: ElectoralDistrictBase;
   bills: Bill[];
   attendances: Attendance[];
   created_at: Date;
@@ -181,7 +195,7 @@ export interface CandidateBase {
 export interface CandidateList extends CandidateBase {
   person: PersonBase;
   political_party: PoliticalPartyBase;
-  electoral_district: ElectoralDistrict | null;
+  electoral_district: ElectoralDistrictBase | null;
   electoral_process: ElectoralProcess;
 }
 
@@ -189,7 +203,7 @@ export interface CandidateDetail extends CandidateBase {
   person: PersonBase;
   legislative_periods: LegislatorDetail[] | [];
   political_party: PoliticalPartyBase;
-  electoral_district: ElectoralDistrict | null;
+  electoral_district: ElectoralDistrictBase | null;
   electoral_process: ElectoralProcess;
 
   // Propuestas y documentos
@@ -269,10 +283,3 @@ export interface PaginatedResponse<T> {
   skip: number;
   limit: number;
 }
-
-// ============= HELPERS DE TIPOS =============
-
-export type PersonListArray = PersonList[];
-export type CandidateListArray = CandidateList[];
-export type PartidoArray = PoliticalPartyBase[];
-export type DistritoArray = ElectoralDistrict[];

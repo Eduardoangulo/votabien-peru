@@ -21,7 +21,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { FilterField, FilterPanel } from "@/components/ui/filter-panel";
 import {
-  ElectoralDistrict,
+  ElectoralDistrictBase,
   PersonList,
   FiltersPerson,
 } from "@/interfaces/politics";
@@ -29,7 +29,7 @@ import {
 interface LegisladoresListProps {
   legisladores: PersonList[];
   bancadas: string[];
-  distritos: ElectoralDistrict[];
+  distritos: ElectoralDistrictBase[];
   currentFilters: FiltersPerson;
   infiniteScroll?: boolean;
 }
@@ -280,22 +280,22 @@ const LegisladoresList = ({
                         <div className="absolute top-2 right-2">
                           <Badge
                             className={`text-[10px] md:text-xs font-medium border backdrop-blur-sm ${
-                              c.active_period.active
+                              c.active_period?.active
                                 ? "bg-success/90 text-success-foreground border-success/30"
                                 : "bg-muted/70 text-muted-foreground border-border"
                             }`}
                           >
-                            {c.active_period.active ? (
+                            {c.active_period?.active ? (
                               <UserCheck className="size-3" />
                             ) : (
                               <Info className="size-3" />
                             )}
-                            {c.active_period.active ? "Activo" : "Inactivo"}
+                            {c.active_period?.active ? "Activo" : "Inactivo"}
                           </Badge>
                         </div>
                       </TooltipTrigger>
                       <TooltipContent side="left" className="text-xs">
-                        {c.active_period.active
+                        {c.active_period?.active
                           ? "Actualmente en funciones"
                           : "Fuera de funciones"}
                       </TooltipContent>

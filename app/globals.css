@@ -254,6 +254,30 @@ CHARTS:
   .bg-overlay {
     background: oklch(from var(--background) l c h / 0.95);
   }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: var(--muted);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+
+  .scrollbar-track-transparent::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thumb-muted::-webkit-scrollbar-thumb {
+    background: var(--muted);
+  }
 }
 
 @keyframes fadeInSector {

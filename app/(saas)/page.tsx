@@ -11,6 +11,7 @@ import HeroDualSplit from "@/components/landing/hero-dual-split";
 import { Skeleton } from "@/components/ui/skeleton";
 import ComparadorServer from "@/components/comparador/comparador-server";
 import PartidosSection from "@/components/landing/partidos-politicos";
+import Footer from "@/components/landing/footer";
 
 function ComparadorSkeleton() {
   return (
@@ -112,6 +113,7 @@ export default async function VotaBienPage() {
           partidosPreview={partidosPreview}
           totalPartidos={partidos.length}
         />
+        <Footer />
       </div>
     );
   } catch (error) {

@@ -1,5 +1,4 @@
-import Navbar from "@/components/admin-panel/navbar";
-import Footer from "@/components/landing/footer";
+import Navbar from "@/components/navbar/navbar";
 
 export default function PanelLayout({
   children,
@@ -9,8 +8,7 @@ export default function PanelLayout({
   return (
     <>
       <Navbar />
-      <main className="mt-16">{children}</main>
-      <Footer />
+      <main>{children}</main>
     </>
   );
 }

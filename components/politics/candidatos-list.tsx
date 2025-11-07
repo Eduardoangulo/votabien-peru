@@ -17,14 +17,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   CandidacyType,
   CandidateDetail,
-  ElectoralDistrict,
+  ElectoralDistrictBase,
   FiltersCandidates,
 } from "@/interfaces/politics";
 import { cn } from "@/lib/utils";
 
 interface CandidatosListProps {
   candidaturas: CandidateDetail[];
-  distritos: ElectoralDistrict[];
+  distritos: ElectoralDistrictBase[];
   procesoId: string;
   currentFilters: FiltersCandidates;
   infiniteScroll?: boolean;

@@ -1,3 +1,4 @@
+import { formatInTimeZone } from "date-fns-tz";
 /**
  * Formatea fechas parcialmente completas como:
  *  - "2021-07-13"  →  "13 jul 2021"
@@ -67,3 +68,29 @@ export function calcularDiasRestantes(fechaISO: string): number {
   );
   return Math.max(0, dias);
 }
+
+export const formatterDate = (
+  date: Date | string | number | null | undefined,
+): string => {
+  if (!date) {
+    return ""; // Retorna una cadena vacía si la fecha es nula o no válida
+  }
+  const formattedDate = formatInTimeZone(date, "America/Lima", "yyyy-MM-dd");
+
+  return formattedDate;
+};
+
+export const formatterDateWithTime = (
+  date: Date | string | number | null | undefined,
+): string => {
+  if (!date) {
+    return ""; // Retorna una cadena vacía si la fecha es nula o no válida
+  }
+  const formattedDate = formatInTimeZone(
+    date,
+    "America/Lima",
+    "yyyy-MM-dd HH:mm",
+  );
+
+  return formattedDate;
+};

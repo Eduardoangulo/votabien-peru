@@ -24,7 +24,6 @@ import { FormError } from "@/components/form-error";
 export const LoginForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const callbackUrl = searchParams.get("callbackUrl") || "/";
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"

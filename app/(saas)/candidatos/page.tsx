@@ -2,7 +2,7 @@ import { publicApi } from "@/lib/public-api";
 import CandidatosList from "@/components/politics/candidatos-list";
 import {
   CandidateDetail,
-  ElectoralDistrict,
+  ElectoralDistrictBase,
   ElectoralProcess,
 } from "@/interfaces/politics";
 import Link from "next/link";
@@ -85,7 +85,7 @@ const CandidatosPage = async ({ searchParams }: PageProps) => {
     };
     const [candidaturas, distritos] = await Promise.all([
       publicApi.getCandidaturas(apiParams) as Promise<CandidateDetail[]>,
-      publicApi.getDistritos() as Promise<ElectoralDistrict[]>,
+      publicApi.getDistritos() as Promise<ElectoralDistrictBase[]>,
     ]);
 
     const fechaElecciones = new Date(procesoActivo.election_date);

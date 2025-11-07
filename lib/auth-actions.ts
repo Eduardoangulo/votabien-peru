@@ -7,13 +7,13 @@ import {
   AuthTokens,
   LoginCredentials,
   RegisterData,
-  User,
+  AuthUser,
 } from "@/interfaces/auth";
 
 const getCookieOptions = (maxAge: number) => ({
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const, // ✅ Cambiado de 'strict' a 'lax'
+  sameSite: "lax" as const,
   maxAge,
   path: "/",
 });
@@ -58,14 +58,14 @@ export async function serverLogin(credentials: LoginCredentials) {
     cookieStore.set(
       "access_token",
       tokens.access_token,
-      getCookieOptions(tokens.expires_in || 1800)
+      getCookieOptions(tokens.expires_in || 1800),
     );
 
     if (tokens.refresh_token) {
       cookieStore.set(
         "refresh_token",
         tokens.refresh_token,
-        getCookieOptions(30 * 24 * 60 * 60)
+        getCookieOptions(30 * 24 * 60 * 60),
       );
     }
 
@@ -94,7 +94,7 @@ export async function serverRegister(data: RegisterData) {
       return { error: error.detail || "Registration failed" };
     }
 
-    const user: User = await response.json();
+    const user: AuthUser = await response.json();
     return { success: true, user };
   } catch (error) {
     console.error("Network error en registro:", error);
@@ -130,7 +130,7 @@ export async function serverGetUser() {
       return { error: error.detail || "Failed to get user" };
     }
 
-    const user: User = await response.json();
+    const user: AuthUser = await response.json();
     return { success: true, user };
   } catch (error) {
     console.error("Error obteniendo usuario:", error);
@@ -177,7 +177,7 @@ export async function serverVerifyAccount(email: string, token: string) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, token }),
-      }
+      },
     );
 
     if (!response.ok) {
