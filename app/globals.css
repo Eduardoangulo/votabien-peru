@@ -278,6 +278,15 @@ CHARTS:
   .scrollbar-thumb-muted::-webkit-scrollbar-thumb {
     background: var(--muted);
   }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @keyframes fadeInSector {
@@ -337,4 +346,13 @@ CHARTS:
 
 .delay-300 {
   animation-delay: 0.3s;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none; /* Evita el rebote visual */
+  overflow-x: hidden; /* Evita desbordes horizontales */
 }

@@ -370,7 +370,6 @@ class JWTUtils {
     return now >= calculatedExp - fiveMinutes;
   }
 }
-
 class SecurityManager {
   static getSecurityHeaders(pathname: string): SecurityHeaders {
     const baseHeaders: SecurityHeaders = {
@@ -380,15 +379,20 @@ class SecurityManager {
       "Referrer-Policy": "strict-origin-when-cross-origin",
       "Permissions-Policy":
         "camera=(), microphone=(), geolocation=(), payment=()",
-      "Strict-Transport-Security":
-        "max-age=63072000; includeSubDomains; preload",
     };
+
+    // Solo agregar HSTS en producción
+    if (process.env.NODE_ENV === "production") {
+      baseHeaders["Strict-Transport-Security"] =
+        "max-age=63072000; includeSubDomains; preload";
+    }
 
     // CSP más estricto para páginas HTML
     if (!pathname.startsWith("/api/")) {
       try {
-        const apiOrigin = new URL(API_BASE_URL).origin;
-
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        const apiOrigin = new URL(apiUrl).origin;
         const isProduction = process.env.NODE_ENV === "production";
 
         const scriptSrc = isProduction
@@ -398,13 +402,17 @@ class SecurityManager {
         const styleSrc =
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com";
 
+        const connectSrc = isProduction
+          ? `connect-src 'self' ${apiOrigin}`
+          : `connect-src 'self' ${apiOrigin} http://192.168.1.35:8000 http://localhost:8000 ws://192.168.1.35:3000 ws://localhost:3000`;
+
         baseHeaders["Content-Security-Policy"] = [
           "default-src 'self'",
           scriptSrc,
           styleSrc,
           "img-src 'self' data: https: blob:",
           "font-src 'self' data: https://fonts.gstatic.com",
-          `connect-src 'self' ${apiOrigin}`,
+          connectSrc,
           "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
           "frame-ancestors 'none'",
           "base-uri 'self'",
