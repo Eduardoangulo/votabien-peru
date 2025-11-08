@@ -2,7 +2,7 @@ import {
   ChamberType,
   FiltersPerson,
   FiltersCandidates,
-  PersonList,
+  PersonWithActivePeriod,
   FiltersLegislators,
 } from "@/interfaces/politics";
 import { API_BASE_URL } from "./config";
@@ -97,7 +97,7 @@ class PublicApiClient {
   /**
    * Obtener lista de personas políticas (legisladores actuales)
    */
-  async getPersonas(params?: FiltersPerson): Promise<PersonList[]> {
+  async getPersonas(params?: FiltersPerson): Promise<PersonWithActivePeriod[]> {
     const query = this.buildQueryParams(params as Record<string, unknown>);
     return this.get(`/api/v1/politics/personas${query}`);
   }

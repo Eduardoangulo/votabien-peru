@@ -15,12 +15,12 @@ import { CreatePersonRequest } from "@/interfaces/admin";
 import { createPerson } from "../_lib/actions";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { PersonList } from "@/interfaces/politics";
+import { PersonWithActivePeriod } from "@/interfaces/politics";
 
 interface PersonQuickCreateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onPersonCreated: (person: PersonList) => void;
+  onPersonCreated: (person: PersonWithActivePeriod) => void;
 }
 
 export function PersonQuickCreateDialog({
@@ -45,7 +45,7 @@ export function PersonQuickCreateDialog({
 
       if (result.success) {
         toast.success("Persona creada exitosamente");
-        onPersonCreated(result.data as PersonList);
+        onPersonCreated(result.data as PersonWithActivePeriod);
         // Reset form
         setFormData({
           name: "",

@@ -49,7 +49,7 @@ export function DataTable<TData>({
 
   return (
     <div
-      className={cn("w-full space-y-2.5 overflow-hidden", className)}
+      className={cn("w-full space-y-1 overflow-hidden", className)}
       {...props}
     >
       {children}

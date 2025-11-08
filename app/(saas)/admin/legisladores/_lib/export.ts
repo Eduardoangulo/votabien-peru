@@ -29,7 +29,7 @@ export function exportTableToCSV<TData extends AdminLegislator>(
   } = {},
 ): void {
   const {
-    filename = "legislators",
+    filename = "Legisladores",
     excludeColumns = [],
     onlySelected = false,
   } = opts;

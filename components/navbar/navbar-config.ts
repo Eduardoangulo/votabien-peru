@@ -19,8 +19,8 @@ export const publicNavGroups: NavGroup[] = [
       { href: "/legisladores", label: "Congresistas", icon: Users },
       { href: "/partidos", label: "Partidos", icon: Flag },
       { href: "/candidatos", label: "Candidatos 2026", icon: UserCheck },
-      { href: "/comparator", label: "Comparador", icon: GitCompare },
-      { href: "/about", label: "Nosotros", icon: Info },
+      { href: "/comparador", label: "Comparador", icon: GitCompare },
+      { href: "/nosotros", label: "Nosotros", icon: Info },
     ],
   },
 ];
@@ -31,9 +31,9 @@ export const adminNavGroups: NavGroup[] = [
     requiresAuth: true,
     requiresRole: ["super_admin", "admin", "editor"],
     links: [
-      { href: "/admin/legislators", label: "Legisladores", icon: FileEdit },
-      { href: "/admin/parties", label: "Partidos", icon: FileEdit },
-      { href: "/admin/candidates", label: "Candidatos", icon: FileEdit },
+      { href: "/admin/legisladores", label: "Legisladores", icon: FileEdit },
+      { href: "/admin/partidos", label: "Partidos", icon: FileEdit },
+      { href: "/admin/candidatos", label: "Candidatos", icon: FileEdit },
     ],
   },
   // {

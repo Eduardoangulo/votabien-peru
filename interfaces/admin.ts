@@ -3,40 +3,13 @@ import {
   CandidacyType,
   CandidacyStatus,
   LegislatorCondition,
-  PersonList,
+  PersonWithActivePeriod,
+  BiographyDetail,
+  WorkExperience,
+  PreviousCase,
 } from "@/interfaces/politics";
 
 // ============= PERSON =============
-export interface BiographyDetail {
-  type: string;
-  date: string;
-  title: string;
-  description: string;
-  relevance?: string;
-  source: string;
-  source_type: string;
-  source_url?: string;
-}
-
-export interface WorkExperience {
-  position: string;
-  organization: string;
-  period: string;
-  description: string;
-}
-
-export interface PreviousCase {
-  type: string;
-  title: string;
-  description: string;
-  status?: string;
-  sanction?: string;
-  date?: string;
-  period?: string;
-  source: string;
-  source_type: string;
-  source_url?: string;
-}
 
 export interface Person {
   id: string;
@@ -109,7 +82,7 @@ export interface AdminLegislator {
   parliamentary_group?: string;
   created_at: string;
   // Relaciones populadas
-  person: PersonList;
+  person: PersonWithActivePeriod;
   original_party: PoliticalParty;
   current_party?: PoliticalParty;
   electoral_district: ElectoralDistrictBase;

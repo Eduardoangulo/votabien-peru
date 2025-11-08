@@ -178,7 +178,7 @@ export interface LegislatorWithParty {
   created_at: string;
   original_party: PoliticalPartyBase;
 }
-export interface PersonList extends PersonBase {
+export interface PersonWithActivePeriod extends PersonBase {
   active_period: LegislatorDetail;
 }
 

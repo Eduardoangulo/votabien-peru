@@ -28,7 +28,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   ChamberType,
   LegislatorCondition,
-  PersonList,
+  PersonWithActivePeriod,
 } from "@/interfaces/politics";
 import { AdminLegislator } from "@/interfaces/admin";
 import {
@@ -109,7 +109,8 @@ export function LegislatorFormDialog({
   initialData,
 }: LegislatorFormDialogProps) {
   const { districts, parties } = useContext(AdminLegislatorContext);
-  const [selectedPerson, setSelectedPerson] = useState<PersonList | null>(null);
+  const [selectedPerson, setSelectedPerson] =
+    useState<PersonWithActivePeriod | null>(null);
   const router = useRouter();
   const form = useForm<z.output<typeof legislatorPeriodSchema>>({
     resolver: zodResolver(legislatorPeriodSchema),
@@ -140,7 +141,7 @@ export function LegislatorFormDialog({
     }
   }, [initialData, form]);
 
-  const handlePersonSelect = (person: PersonList | null) => {
+  const handlePersonSelect = (person: PersonWithActivePeriod | null) => {
     setSelectedPerson(person);
     if (person) {
       form.setValue("person_id", person.id);

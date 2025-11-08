@@ -18,7 +18,7 @@ export default function Footer() {
               verificada y actualizada sobre el Congreso del Perú.
             </p>
             <Link
-              href="/about"
+              href="/nosotros"
               className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors group"
             >
               <span>Conocer más</span>

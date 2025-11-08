@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-const shellVariants = cva("grid items-center gap-8 pt-6", {
+const shellVariants = cva("grid items-center gap-8 pt-4", {
   variants: {
     variant: {
       default: "container",

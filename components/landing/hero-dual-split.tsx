@@ -88,7 +88,7 @@ export default function HeroDualSplit({
 
   // Filtrar datos del ejecutivo
   const presidente = ejecutivos.find((m) => m.role === "Presidente");
-  const vicepresidente = ejecutivos.find((m) => m.role === "Vicepresidente");
+  // const vicepresidente = ejecutivos.find((m) => m.role === "Vicepresidente");
   const primerMinistro = ejecutivos.find((m) => m.role === "Primer_ministro");
   const ministros = ejecutivos.filter((m) => m.role === "Ministro");
 

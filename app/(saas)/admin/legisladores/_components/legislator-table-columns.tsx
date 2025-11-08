@@ -60,24 +60,16 @@ export function getColumns({
       enableSorting: false,
       enableHiding: false,
     },
-    // {
-    //   accessorKey: "id",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="ID" />
-    //   ),
-    //   cell: ({ row }) => <div className="w-20">#{row.getValue("id")}</div>,
-    //   enableSorting: false,
-    //   enableHiding: false,
-    // },
     {
-      accessorKey: "fullname",
+      accessorKey: "person.fullname",
+      id: "fullname",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Persona" />
+        <DataTableColumnHeader column={column} title="Apellidos y Nombres" />
       ),
       cell: ({ row }) => {
         return (
           <div className="flex space-x-2">
-            <span className="max-w-[31.25rem] truncate font-medium">
+            <span className="min-w-[20rem] max-w-[31.25rem] break-words font-medium whitespace-normal">
               {row.original.person.fullname}
             </span>
           </div>
@@ -95,6 +87,25 @@ export function getColumns({
             <Badge variant="outline">
               {row.original.electoral_district.name}
             </Badge>
+          </div>
+        );
+      },
+      enableSorting: false,
+    },
+    {
+      accessorKey: "chamber",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Cámara" />
+      ),
+      cell: ({ row }) => {
+        const chamber = row.original.chamber;
+        const Icon = getChamberIcon(chamber);
+        const colorClass = getChamberColor(chamber);
+
+        return (
+          <div className="flex w-[6.25rem] items-center">
+            <Icon className={`mr-2 size-4 ${colorClass}`} aria-hidden="true" />
+            <span className="capitalize">{chamber.toLowerCase()}</span>
           </div>
         );
       },
@@ -125,20 +136,20 @@ export function getColumns({
       enableSorting: false,
     },
     {
-      accessorKey: "chamber",
+      accessorKey: "parliamentary_group",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Cámara" />
+        <DataTableColumnHeader column={column} title="Bancada" />
       ),
       cell: ({ row }) => {
-        const chamber = row.original.chamber;
-        const Icon = getChamberIcon(chamber);
-        const colorClass = getChamberColor(chamber);
+        const bancada = row.original.parliamentary_group;
 
         return (
-          <div className="flex w-[6.25rem] items-center">
-            <Icon className={`mr-2 size-4 ${colorClass}`} aria-hidden="true" />
-            <span className="capitalize">{chamber.toLowerCase()}</span>
-          </div>
+          <Badge
+            variant="outline"
+            className="max-w-[200px] min-w-[200px] text-xs whitespace-normal break-words "
+          >
+            {bancada}
+          </Badge>
         );
       },
       enableSorting: false,
@@ -179,6 +190,25 @@ export function getColumns({
       enableSorting: false,
     },
     {
+      accessorKey: "institutional_email",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Email Institucional" />
+      ),
+      cell: ({ row }) => {
+        const email = row.original.institutional_email;
+
+        return (
+          <Badge
+            variant="outline"
+            className="max-w-[200px] min-w-[200px] text-xs whitespace-normal break-words "
+          >
+            {email}
+          </Badge>
+        );
+      },
+      enableSorting: false,
+    },
+    {
       accessorKey: "active",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Activo" />
@@ -210,7 +240,7 @@ export function getColumns({
               <Button
                 aria-label="Open menu"
                 variant="ghost"
-                className="flex size-8 p-0 data-[state=open]:bg-muted"
+                className="flex text-primary font-bold size-8 p-0 data-[state=open]:bg-muted"
               >
                 <Ellipsis className="size-4" aria-hidden="true" />
               </Button>
@@ -219,7 +249,7 @@ export function getColumns({
               <DropdownMenuItem
                 onSelect={() => setRowAction({ type: "update", row })}
               >
-                Editar
+                Actualizar
               </DropdownMenuItem>
               {/* <DropdownMenuItem
                 onSelect={() =>

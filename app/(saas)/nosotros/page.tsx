@@ -7,14 +7,9 @@ import {
   Scale,
   Shield,
   BookOpen,
-  Github,
-  ExternalLink,
   CheckCircle2,
   Target,
   Heart,
-  Code,
-  Database,
-  Globe,
   FileText,
 } from "lucide-react";
 import Link from "next/link";
@@ -59,13 +54,6 @@ export default function AboutPage() {
       description:
         "Todas las referencias incluyen enlaces a fuentes periodísticas oficiales y documentos públicos.",
       color: "bg-warning",
-    },
-    {
-      icon: Code,
-      title: "100% Open Source",
-      description:
-        "Código abierto en GitHub. Backend y frontend disponibles para la comunidad.",
-      color: "bg-primary",
     },
   ];
 
@@ -137,15 +125,6 @@ export default function AboutPage() {
               >
                 <Search className="w-5 h-5" />
                 Explorar Funciones
-              </Link>
-              <Link
-                href="https://github.com/antguivy/votabien-peru-frontend"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-card text-card-foreground font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-border"
-              >
-                <Github className="w-5 h-5" />
-                Ver en GitHub
               </Link>
             </div>
           </div>
@@ -391,63 +370,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-gradient-to-br from-primary/95 to-primary text-primary-foreground">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm font-medium mb-6">
-              <Code className="w-4 h-4" />
-              100% Código Abierto
-            </div>
-
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Transparencia desde el Código
-            </h2>
-
-            <p className="text-xl opacity-90 mb-8 leading-relaxed">
-              VotaBienPerú es completamente{" "}
-              <span className="font-semibold">open source</span>. Tanto el
-              backend como el frontend están disponibles públicamente en GitHub.
-            </p>
-
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-white/5 backdrop-blur rounded-xl p-6 border border-white/10">
-                <Database className="w-10 h-10 opacity-90 mb-4 mx-auto" />
-                <h3 className="text-lg font-bold mb-2">Backend</h3>
-                <Link
-                  href="https://github.com/antguivy/votabien-peru-backend"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 hover:opacity-80 font-medium transition-opacity"
-                >
-                  Ver repositorio
-                  <ExternalLink className="w-4 h-4" />
-                </Link>
-              </div>
-
-              <div className="bg-white/5 backdrop-blur rounded-xl p-6 border border-white/10">
-                <Globe className="w-10 h-10 opacity-90 mb-4 mx-auto" />
-                <h3 className="text-lg font-bold mb-2">Frontend</h3>
-                <Link
-                  href="https://github.com/antguivy/votabien-peru-frontend"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 hover:opacity-80 font-medium transition-opacity"
-                >
-                  Ver repositorio
-                  <ExternalLink className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
-            <p className="opacity-70 text-sm">
-              Creemos en la transparencia total. Cualquiera puede auditar
-              nuestro código, proponer mejoras o contribuir al proyecto.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 md:py-24">
+      <section className="py-16 md:py-24 bg-muted/50">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-8 md:p-12 shadow-2xl">
             <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-6">
@@ -466,13 +389,12 @@ export default function AboutPage() {
                 Explorar Congresistas
               </Link>
               <Link
-                href="https://github.com/antguivy/votabien-peru-frontend"
+                href="/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur text-primary-foreground font-bold rounded-lg border-2 border-white/30 hover:bg-white/20 transition-all duration-300"
               >
-                <Github className="w-5 h-5" />
-                Contribuir en GitHub
+                Volver al inicio
               </Link>
             </div>
           </div>

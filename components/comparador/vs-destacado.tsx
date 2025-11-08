@@ -16,7 +16,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Image from "next/image";
-import { PersonList } from "@/interfaces/politics";
+import { PersonWithActivePeriod } from "@/interfaces/politics";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -24,13 +24,13 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import React from "react";
 
 export interface ComparadorContentProps {
-  legisladorA: PersonList;
-  legisladorB: PersonList;
+  legisladorA: PersonWithActivePeriod;
+  legisladorB: PersonWithActivePeriod;
   isAnimating: boolean;
   onShuffleClick: () => void;
 }
 
-function calcularStats(legislador: PersonList) {
+function calcularStats(legislador: PersonWithActivePeriod) {
   const asistencias = legislador.active_period?.attendances || [];
   const proyectos = legislador.active_period?.bills || [];
   const antecedentes = legislador.previous_cases || [];
@@ -364,7 +364,7 @@ export function ComparadorContent({
 
 // Componente para cada lado del split
 interface LegisladorSideProps {
-  legislador: PersonList;
+  legislador: PersonWithActivePeriod;
   stats: ReturnType<typeof calcularStats>;
   side: "left" | "right";
   color: string;

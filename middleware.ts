@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { API_BASE_URL } from "./lib/config";
 
 // ============= TIPOS =============
 interface JWTPayload {
@@ -38,10 +37,11 @@ const ROUTE_CONFIG = {
     "/",
     "/legisladores",
     "/legisladores/[id]",
-    "/comparator",
+    "/comparador",
     "/candidatos",
     "/partidos",
-    "/about",
+    "/ejecutivo",
+    "/nosotros",
     "/contact",
     "/auth/login",
     // "/auth/register",
@@ -55,16 +55,16 @@ const ROUTE_CONFIG = {
 
   // Rutas API no pasan por middleware de auth
   apiExcluded: [
-    "/api/auth/login",
-    // "/api/auth/register",
     "/api/auth/refresh",
-    "/api/auth/verify-email",
-    "/api/auth/forgot-password",
-    "/api/auth/reset-password",
-    "/api/health",
-    "/api/public",
     "/api/legisladores",
     "/api/candidatos",
+    // "/api/auth/login",
+    // "/api/auth/register",
+    // "/api/auth/verify-email",
+    // "/api/auth/forgot-password",
+    // "/api/auth/reset-password",
+    // "/api/health",
+    // "/api/public",
   ],
   defaultProtectedRoute: "/",
   loginRoute: "/auth/login",

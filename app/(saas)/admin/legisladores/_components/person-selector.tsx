@@ -8,10 +8,10 @@ import { PersonQuickCreateDialog } from "./person-quick-create-dialog";
 import { publicApi } from "@/lib/public-api";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { PersonList } from "@/interfaces/politics";
+import { PersonWithActivePeriod } from "@/interfaces/politics";
 interface PersonSelectorProps {
-  onSelect: (person: PersonList | null) => void;
-  selectedPerson: PersonList | null;
+  onSelect: (person: PersonWithActivePeriod | null) => void;
+  selectedPerson: PersonWithActivePeriod | null;
 }
 
 export function PersonSelector({
@@ -19,7 +19,9 @@ export function PersonSelector({
   selectedPerson,
 }: PersonSelectorProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<PersonList[]>([]);
+  const [searchResults, setSearchResults] = useState<PersonWithActivePeriod[]>(
+    [],
+  );
   const [searching, setSearching] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -43,14 +45,14 @@ export function PersonSelector({
     }
   };
 
-  const handlePersonCreated = (person: PersonList) => {
+  const handlePersonCreated = (person: PersonWithActivePeriod) => {
     onSelect(person);
     setShowCreateDialog(false);
     setSearchResults([]);
     setSearchTerm("");
   };
 
-  const handleSelectPerson = (person: PersonList) => {
+  const handleSelectPerson = (person: PersonWithActivePeriod) => {
     onSelect(person);
     setSearchResults([]);
     setSearchTerm("");

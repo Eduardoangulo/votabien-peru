@@ -89,6 +89,10 @@ export function LegislatorsTable({ promises }: LegislatorsTableProps) {
     initialState: {
       sorting: [{ id: "created_at", desc: true }],
       columnPinning: { right: ["actions"] },
+      // Ocultar columnas al iniciar
+      columnVisibility: {
+        end_date: false,
+      },
     },
     getRowId: (originalRow, index) => `${originalRow.id}-${index}`,
     shallow: false,
