@@ -3,7 +3,6 @@ import {
   FiltersPerson,
   FiltersCandidates,
   PersonList,
-  ExecutiveRole,
   FiltersLegislators,
 } from "@/interfaces/politics";
 import { API_BASE_URL } from "./config";
@@ -197,8 +196,8 @@ class PublicApiClient {
   /**
    * Obtener lista de distritos electorales
    */
-  async getEjecutivos(role: ExecutiveRole) {
-    return this.get(`/api/v1/politics/executives?role=${role}`);
+  async getEjecutivos() {
+    return this.get(`/api/v1/politics/executives`);
   }
   // ============= ENDPOINTS DE DISTRITOS =============
 

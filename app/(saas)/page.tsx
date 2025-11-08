@@ -5,7 +5,6 @@ import {
   ElectoralProcess,
   ChamberType,
   SeatParliamentary,
-  ExecutiveRole,
   Executive,
 } from "@/interfaces/politics";
 import { Suspense } from "react";
@@ -82,14 +81,14 @@ function getRandomItems<T>(array: T[], count: number): T[] {
 export default async function VotaBienPage() {
   try {
     const [ejecutivos, partidos, proceso_electoral, seats] = await Promise.all([
-      publicApi.getEjecutivos(ExecutiveRole.PRESIDENTE) as Promise<Executive[]>,
+      publicApi.getEjecutivos() as Promise<Executive[]>,
       publicApi.getPartidos(true) as Promise<PoliticalPartyDetail[]>,
       publicApi.getProcesosElectorales(true) as Promise<ElectoralProcess[]>,
       publicApi.getSeatParliamentary(ChamberType.CONGRESO) as Promise<
         SeatParliamentary[]
       >,
     ]);
-
+    console.log("ejecutivo", ejecutivos);
     const partidosConEscaños = partidos
       .filter((p) => p.total_seats > 0)
       .sort((a, b) => b.total_seats - a.total_seats);
@@ -104,7 +103,10 @@ export default async function VotaBienPage() {
     return (
       <div className="min-h-screen">
         {/* Hero Dual Split */}
-        <HeroDualSplit proceso_electoral={proceso_electoral[0]} />
+        <HeroDualSplit
+          proceso_electoral={proceso_electoral[0]}
+          ejecutivos={ejecutivos}
+        />
         <Suspense fallback={<ComparadorSkeleton />}>
           <ComparadorServer />
         </Suspense>
