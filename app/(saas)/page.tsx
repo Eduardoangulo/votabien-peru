@@ -1,18 +1,19 @@
 import { publicApi } from "@/lib/public-api";
 import ErrorLanding from "@/components/landing/error-landing";
 import {
-  PoliticalPartyDetail,
   ElectoralProcess,
   ChamberType,
   SeatParliamentary,
   Executive,
+  PoliticalPartyListPaginated,
 } from "@/interfaces/politics";
 import { Suspense } from "react";
 import HeroDualSplit from "@/components/landing/hero-dual-split";
 import { Skeleton } from "@/components/ui/skeleton";
 import ComparadorServer from "@/components/comparador/comparador-server";
-import PartidosSection from "@/components/landing/partidos-politicos";
+import HemiclicleLegislator from "@/components/landing/hemicicle";
 import Footer from "@/components/landing/footer";
+import PartidosListBasic from "@/components/landing/partidos-list-basic";
 
 function ComparadorSkeleton() {
   return (
@@ -73,34 +74,26 @@ function ComparadorSkeleton() {
   );
 }
 
-function getRandomItems<T>(array: T[], count: number): T[] {
-  const shuffled = [...array].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
-}
-
 export default async function VotaBienPage() {
   try {
-    const [ejecutivos, partidos, proceso_electoral, seats] = await Promise.all([
+    const [partidos, ejecutivos, proceso_electoral, seats] = await Promise.all([
+      publicApi.getPartidos({
+        active: true,
+        limit: 8,
+      }) as Promise<PoliticalPartyListPaginated>,
       publicApi.getEjecutivos() as Promise<Executive[]>,
-      publicApi.getPartidos(true) as Promise<PoliticalPartyDetail[]>,
       publicApi.getProcesosElectorales(true) as Promise<ElectoralProcess[]>,
       publicApi.getSeatParliamentary(ChamberType.CONGRESO) as Promise<
         SeatParliamentary[]
       >,
     ]);
-    const partidosConEscaños = partidos
-      .filter((p) => p.total_seats > 0)
-      .sort((a, b) => b.total_seats - a.total_seats);
 
-    const partidosSinEscaños = partidos.filter((p) => p.total_seats === 0);
-
-    const partidosPreview = getRandomItems(partidosSinEscaños, 6);
     const seatsData = seats.sort((a, b) => {
       if (a.row !== b.row) return a.row - b.row;
       return a.number_seat - b.number_seat;
     });
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen ">
         {/* Hero Dual Split */}
         <HeroDualSplit
           proceso_electoral={proceso_electoral[0]}
@@ -110,13 +103,9 @@ export default async function VotaBienPage() {
           <ComparadorServer />
         </Suspense>
 
+        <HemiclicleLegislator seatsData={seatsData} />
         {/* Partidos Políticos */}
-        <PartidosSection
-          seatsData={seatsData}
-          partidosConEscaños={partidosConEscaños}
-          partidosPreview={partidosPreview}
-          totalPartidos={partidos.length}
-        />
+        <PartidosListBasic partidos={partidos.items} />
         <Footer />
       </div>
     );

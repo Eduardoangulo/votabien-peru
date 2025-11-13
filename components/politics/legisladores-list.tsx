@@ -33,11 +33,12 @@ import {
   FiltersPerson,
   LegislatorCard,
   LegislatorCondition,
+  ParliamentaryGroupBasic,
 } from "@/interfaces/politics";
 
 interface LegisladoresListProps {
   legisladores: LegislatorCard[];
-  bancadas: string[];
+  bancadas: ParliamentaryGroupBasic[];
   distritos: ElectoralDistrictBase[];
   currentFilters: FiltersPerson;
   infiniteScroll?: boolean;
@@ -239,8 +240,8 @@ const LegisladoresList = ({
       placeholder: "Bancadas",
       options: [
         ...bancadas.map((p) => ({
-          value: p,
-          label: p,
+          value: p.name,
+          label: p.name,
         })),
       ],
     },
@@ -349,10 +350,10 @@ const LegisladoresList = ({
                     </TooltipProvider>
 
                     {/* Parliamentary Group - Bottom Left */}
-                    {leg.parliamentary_group && (
+                    {leg.current_parliamentary_group && (
                       <div className="absolute bottom-2 left-2">
                         <Badge className="text-[10px] md:text-xs font-medium border backdrop-blur-md bg-background/80 text-foreground border-border/50 hover:bg-background/90 transition-all">
-                          {leg.parliamentary_group}
+                          {leg.current_parliamentary_group.name}
                         </Badge>
                       </div>
                     )}

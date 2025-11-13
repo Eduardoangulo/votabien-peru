@@ -584,13 +584,6 @@ const CandidatoDialog = ({
                             </div>
 
                             <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                              <div className="flex items-center gap-1.5 text-xs text-foreground/70">
-                                <Briefcase className="size-3 flex-shrink-0" />
-                                <span className="truncate">
-                                  {periodo.current_party?.name ||
-                                    "No agrupados"}
-                                </span>
-                              </div>
                               {periodo.electoral_district?.name && (
                                 <span className="flex items-center gap-1">
                                   <MapPin className="w-3 h-3" />

@@ -1,20 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { Building2, ChevronRight } from "lucide-react";
-import PartidoDialog from "./partido-dialog";
-import { PoliticalPartyDetail } from "@/interfaces/politics";
-import Image from "next/image";
 import { Card, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { PoliticalPartyBase } from "@/interfaces/politics";
+import { Building2, ChevronRight, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { getTextColor, needsOverlay } from "@/lib/utils/color-utils";
 
 interface PartidosListProps {
-  partidos: PoliticalPartyDetail[];
+  partidos: PoliticalPartyBase[];
 }
 
-const PartidosList = ({ partidos }: PartidosListProps) => {
-  const [selectedPartido, setSelectedPartido] =
-    useState<PoliticalPartyDetail | null>(null);
+const PartidosListBasic = ({ partidos }: PartidosListProps) => {
   if (!partidos || partidos.length === 0) {
     return (
       <div className="text-center py-16 md:py-20">
@@ -32,18 +29,36 @@ const PartidosList = ({ partidos }: PartidosListProps) => {
   }
 
   return (
-    <>
+    <section className="container mx-auto px-4 py-12">
+      {/* Header con título y descripción */}
+      <div className="text-center mb-8 md:mb-12">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3 md:mb-4">
+          Partidos Políticos
+        </h2>
+        <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+          Conoce los partidos políticos activos y sus propuestas para el país
+        </p>
+      </div>
+
+      {/* Grid de partidos */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 py-4 gap-4 md:gap-6">
-        {partidos.map((partido) => {
+        {partidos.map((partido, index) => {
+          // Mostrar: 6 en mobile/tablet, 6 en md/lg, 8 en xl
+          const isHiddenOnMobile = index >= 6; // Ocultar después del 6to en mobile y md
+          const isHiddenOnXl = index >= 8; // Ocultar después del 8vo en xl
+
+          if (isHiddenOnXl) return null; // No renderizar más de 8
           const partidoColor = partido.color_hex || "oklch(0.45 0.15 260)";
           const textColor = getTextColor(partidoColor);
           const hasOverlay = needsOverlay(partidoColor);
 
           return (
-            <button
+            <Link
               key={partido.id}
-              onClick={() => setSelectedPartido(partido)}
-              className="group text-left w-full"
+              href={`/partidos/${partido.id}`}
+              className={`group text-left w-full ${
+                isHiddenOnMobile ? "hidden xl:block" : ""
+              }`}
             >
               <Card className="shadow-sm hover:shadow-xl pt-0 transition-all duration-300 border-2 hover:border-primary/50 transform hover:-translate-y-1 h-full flex flex-col overflow-hidden">
                 <CardHeader
@@ -87,13 +102,6 @@ const PartidosList = ({ partidos }: PartidosListProps) => {
                       )}
                       <div
                         className={`text-sm md:text-base font-bold transition-colors line-clamp-4 leading-snug ${textColor} group-hover:opacity-90`}
-                        style={{
-                          textShadow: hasOverlay
-                            ? "none"
-                            : textColor === "text-white"
-                              ? "0 1px 2px rgba(0,0,0,0.1)"
-                              : "none",
-                        }}
                       >
                         {partido.name}
                       </div>
@@ -123,20 +131,23 @@ const PartidosList = ({ partidos }: PartidosListProps) => {
                   </span>
                 </CardFooter>
               </Card>
-            </button>
+            </Link>
           );
         })}
       </div>
 
-      {selectedPartido && (
-        <PartidoDialog
-          partido={selectedPartido}
-          isOpen={!!selectedPartido}
-          onClose={() => setSelectedPartido(null)}
-        />
-      )}
-    </>
+      {/* CTA para ver todos los partidos */}
+      <div className="flex justify-center mt-8 md:mt-12">
+        <Link
+          href="/partidos"
+          className="group inline-flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-primary text-primary-foreground rounded-full font-semibold text-sm md:text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+        >
+          Ver todos los partidos
+          <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
+        </Link>
+      </div>
+    </section>
   );
 };
 
-export default PartidosList;
+export default PartidosListBasic;

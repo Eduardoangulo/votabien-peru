@@ -1,38 +1,25 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Building2, Calendar, ExternalLink, Users } from "lucide-react";
+import { Building2, Users } from "lucide-react";
+import Image from "next/image";
+
 import {
-  PoliticalPartyBase,
-  PoliticalPartyDetail,
+  ParliamentaryGroupBasic,
   SeatParliamentary,
 } from "@/interfaces/politics";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import PartidoDialog from "../politics/partido-dialog";
 
 interface ParliamentaryGroup {
   name: string;
   seats: number;
   color: string;
   mainPartyId: string;
-  composition: Array<{
-    partyId: string;
-    partyName: string;
-    partyLogoUrl: string | null;
-    partyAcronym: string | null;
-    count: number;
-  }>;
+  logo_url: string;
+  composition: [];
 }
 
 interface PartidosSectionProps {
   seatsData: SeatParliamentary[];
-  partidosConEscaños: PoliticalPartyDetail[];
-  partidosPreview: PoliticalPartyDetail[];
-  totalPartidos: number;
 }
 
 interface Bubble {
@@ -53,83 +40,66 @@ function processSeatsForHemiciclo(
     string,
     {
       seats: number;
-      parties: Map<
-        string,
-        {
-          count: number;
-          party: PoliticalPartyBase;
-        }
-      >;
+      groupInfo: ParliamentaryGroupBasic;
     }
   >();
 
   seats.forEach((seat) => {
-    if (!seat.legislator) return;
+    if (!seat.legislator || !seat.legislator.current_parliamentary_group)
+      return;
 
-    const groupName = seat.legislator.parliamentary_group || "No Agrupados";
-    const party = seat.legislator.original_party;
+    const parliamentaryGroup = seat.legislator.current_parliamentary_group;
+    const groupId = parliamentaryGroup.id;
 
-    if (!groupMap.has(groupName)) {
-      groupMap.set(groupName, {
+    if (!groupMap.has(groupId)) {
+      groupMap.set(groupId, {
         seats: 0,
-        parties: new Map(),
+        groupInfo: parliamentaryGroup,
       });
     }
 
-    const group = groupMap.get(groupName)!;
+    const group = groupMap.get(groupId)!;
     group.seats++;
-
-    if (!group.parties.has(party.id)) {
-      group.parties.set(party.id, { count: 0, party });
-    }
-    group.parties.get(party.id)!.count++;
   });
 
   const parliamentaryGroups: ParliamentaryGroup[] = [];
 
-  groupMap.forEach((groupData, groupName) => {
-    let mainParty: PoliticalPartyBase | null = null;
-    let maxCount = 0;
-
-    groupData.parties.forEach((partyData) => {
-      if (partyData.count > maxCount) {
-        maxCount = partyData.count;
-        mainParty = partyData.party as PoliticalPartyBase;
-      }
+  groupMap.forEach((groupData) => {
+    parliamentaryGroups.push({
+      name: groupData.groupInfo.name,
+      seats: groupData.seats,
+      color: groupData.groupInfo.color_hex || "#94a3b8",
+      mainPartyId: groupData.groupInfo.id,
+      logo_url: groupData.groupInfo.logo_url || "",
+      composition: [],
     });
-
-    if (mainParty) {
-      const composition = Array.from(groupData.parties.values()).map((p) => ({
-        partyId: p.party.id,
-        partyName: p.party.name,
-        partyLogoUrl: p.party.logo_url,
-        partyAcronym: p.party.acronym,
-        count: p.count,
-      }));
-
-      parliamentaryGroups.push({
-        name: groupName,
-        seats: groupData.seats,
-        color:
-          groupName === "No Agrupados"
-            ? "#94a3b8" // gris fijo
-            : (mainParty as PoliticalPartyBase).color_hex,
-        mainPartyId: (mainParty as PoliticalPartyBase).id,
-        composition,
-      });
-    }
   });
 
-  return parliamentaryGroups;
+  // Ordenar por número de escaños (descendente)
+  return parliamentaryGroups.sort((a, b) => b.seats - a.seats);
 }
 
-export default function PartidosSection({
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+    const listener = () => setMatches(media.matches);
+    media.addEventListener("change", listener);
+    return () => media.removeEventListener("change", listener);
+  }, [matches, query]);
+
+  return matches;
+}
+
+// ========== COMPONENTE PRINCIPAL ==========
+
+export default function HemicileLegislator({
   seatsData,
-  partidosPreview,
-  totalPartidos,
 }: PartidosSectionProps) {
-  const [selectedPartido, setSelectedPartido] =
-    useState<PoliticalPartyDetail | null>(null);
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [selectedGroupMobile, setSelectedGroupMobile] = useState<string | null>(
     null,
@@ -216,8 +186,8 @@ export default function PartidosSection({
       const pos = positions[idx];
       let group: ParliamentaryGroup | null = null;
 
-      if (seat.legislator) {
-        const groupName = seat.legislator.parliamentary_group || "No Agrupados";
+      if (seat.legislator && seat.legislator.current_parliamentary_group) {
+        const groupName = seat.legislator.current_parliamentary_group.name;
         group = parliamentaryGroups.find((g) => g.name === groupName) || null;
       }
 
@@ -233,17 +203,15 @@ export default function PartidosSection({
 
     return result;
   }, [seatsData, parliamentaryGroups, svgConfig]);
-  const formatNumber = (num: number): string => {
-    return new Intl.NumberFormat("es-PE").format(num);
-  };
+
   const getColor = (bubble: Bubble): string => {
     if (!bubble.seat.legislator) return "hsl(var(--muted))";
-    return bubble.group?.color || "#94a3b8";
+    if (!bubble.seat.legislator.current_parliamentary_group) return "#94a3b8";
+    return (
+      bubble.seat.legislator.current_parliamentary_group.color_hex || "#94a3b8"
+    );
   };
-  const calcularAños = (fecha: Date | null): number | null => {
-    if (!fecha) return null;
-    return new Date().getFullYear() - new Date(fecha).getFullYear();
-  };
+
   const handleLegendClick = (groupName: string) => {
     if (!isMobile) return;
     setSelectedGroupMobile(
@@ -252,17 +220,28 @@ export default function PartidosSection({
   };
 
   const TooltipContent = ({ group }: { group: ParliamentaryGroup }) => {
-    const gridCols =
-      group.composition.length === 1 ? "grid-cols-1" : "grid-cols-2";
-
     return (
       <div className="bg-card border-2 border-primary/50 rounded-xl shadow-2xl p-4 backdrop-blur-sm w-[88vw] md:w-auto">
         <div className="flex items-center gap-3 mb-3">
-          <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0"
-            style={{ backgroundColor: group.color }}
-          >
-            <Building2 className="w-5 h-5 text-white" />
+          <div>
+            {group.logo_url ? (
+              <div className="relative size-8 bg-white rounded-md flex items-center justify-center shadow-md ring-1 ring-border overflow-hidden flex-shrink-0">
+                <Image
+                  src={group.logo_url}
+                  alt={group.name}
+                  fill
+                  className="object-contain p-0.5"
+                  sizes="48px"
+                />
+              </div>
+            ) : (
+              <div
+                className="w-8 h-8 rounded-md flex items-center justify-center shadow-md transition-transform duration-300 hover:scale-110 flex-shrink-0"
+                style={{ backgroundColor: group.color }}
+              >
+                <Building2 className="w-4 h-4 text-white" />
+              </div>
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-bold text-sm text-card-foreground leading-tight">
@@ -287,47 +266,12 @@ export default function PartidosSection({
             </div>
           </div>
         </div>
-
-        {group.composition.length > 0 && (
-          <div className="pt-2 border-t border-border">
-            <div className="text-xs text-muted-foreground mb-2 font-semibold">
-              Composición:
-            </div>
-            <div className={`grid ${gridCols} gap-2`}>
-              {group.composition.map((comp, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-2 text-xs bg-muted/30 rounded-lg p-2 transition-colors hover:bg-muted/50"
-                >
-                  {comp.partyLogoUrl ? (
-                    <Image
-                      src={comp.partyLogoUrl}
-                      alt={comp.partyName}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6 object-contain flex-shrink-0"
-                    />
-                  ) : (
-                    <div className="w-6 h-6 rounded bg-muted flex items-center justify-center flex-shrink-0">
-                      <Building2 className="w-3 h-3 text-muted-foreground" />
-                    </div>
-                  )}
-                  <span className="flex-1 text-card-foreground font-medium">
-                    {comp.partyName}
-                  </span>
-                  <span className="font-bold flex-shrink-0 text-primary">
-                    {comp.count}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     );
   };
+
   return (
-    <section className="bg-gradient-to-b from-muted/30 pb-10 md:pb-16 to-background overflow-hidden">
+    <section className="overflow-hidden">
       <div className="container mx-auto px-3 sm:px-4">
         <div className="mb-8 md:mb-16">
           <div className="text-center mb-6 md:mb-10 space-y-3 md:space-y-4">
@@ -399,7 +343,8 @@ export default function PartidosSection({
                     {/* Burbujas */}
                     {bubbles.map((bubble, idx) => {
                       const groupName =
-                        bubble.seat.legislator?.parliamentary_group || null;
+                        bubble.seat.legislator?.current_parliamentary_group
+                          ?.name || null;
                       const isHovered = hoveredGroup === groupName;
                       const isSelected = selectedGroupMobile === groupName;
                       const isOtherHovered =
@@ -508,27 +453,17 @@ export default function PartidosSection({
                 <p className="text-center md:text-left text-xs text-muted-foreground mb-2">
                   Selecciona un grupo parlamentario
                 </p>
-                {/* Layout: Carousel en mobile, Grid con scroll lock en desktop */}
                 <div
                   className="
-                    /* Mobile: Carousel horizontal con snap */
                     flex md:grid 
                     md:grid-cols-1 
                     gap-2 md:gap-2 md:space-y-0
-                    
-                    /* Mobile: Scroll horizontal suave */
                     overflow-x-auto md:overflow-x-hidden 
                     snap-x snap-mandatory md:snap-none
-                    
-                    /* Desktop: Scroll vertical con lock */
                     md:overflow-y-auto
                     md:overscroll-contain
-                    
-                    /* Estilos generales */
                     pb-2 md:pb-0
                     md:max-h-[500px]
-                    
-                    /* Scrollbar personalizado */
                     scrollbar-thin
                     scrollbar-track-transparent
                     scrollbar-thumb-primary/30
@@ -589,19 +524,32 @@ export default function PartidosSection({
                             : "none",
                         }}
                       >
-                        <div
-                          className="w-8 h-8 rounded-md flex items-center justify-center shadow-md transition-transform duration-300 hover:scale-110 flex-shrink-0"
-                          style={{ backgroundColor: group.color }}
-                        >
-                          <Building2 className="w-4 h-4 text-white" />
+                        <div>
+                          {group.logo_url ? (
+                            <div className="relative size-8 bg-white rounded-md flex items-center justify-center shadow-md ring-1 ring-border overflow-hidden flex-shrink-0">
+                              <Image
+                                src={group.logo_url}
+                                alt={group.name}
+                                fill
+                                className="object-contain p-0.5"
+                                sizes="48px"
+                              />
+                            </div>
+                          ) : (
+                            <div
+                              className="w-8 h-8 rounded-md flex items-center justify-center shadow-md transition-transform duration-300 hover:scale-110 flex-shrink-0"
+                              style={{ backgroundColor: group.color }}
+                            >
+                              <Building2 className="w-4 h-4 text-white" />
+                            </div>
+                          )}
                         </div>
                         <div className="flex-1 text-left min-w-0">
                           <div className="text-xs md:text-sm font-bold text-card-foreground truncate">
                             {group.name}
                           </div>
                           <div className="text-[10px] text-muted-foreground truncate">
-                            {group.composition.length} partido
-                            {group.composition.length !== 1 ? "s" : ""}
+                            Grupo Parlamentario
                           </div>
                         </div>
                         <div className="flex-shrink-0 text-right">
@@ -663,156 +611,7 @@ export default function PartidosSection({
             </div>
           </div>
         </div>
-
-        {/* PARTE 2: PARTIDOS */}
-        <div className="relative">
-          <div className="flex items-center gap-4 mb-8 md:mb-12">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-          </div>
-
-          <div className="text-center mb-8 md:mb-12 space-y-3 md:space-y-4">
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-foreground px-2">
-              Conoce a los Partidos Políticos
-            </h2>
-
-            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-              <span className="text-2xl md:text-3xl font-bold text-primary">
-                {totalPartidos}
-              </span>{" "}
-              partidos políticos registrados buscan tu voto en 2026. Conoce sus
-              propuestas, trayectoria y decide con información.
-            </p>
-          </div>
-          {/* Grid de partidos preview */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
-            {partidosPreview.map((partido, idx) => {
-              const años = calcularAños(partido.foundation_date);
-              const tieneRedes = !!(
-                partido.facebook_url ||
-                partido.twitter_url ||
-                partido.youtube_url ||
-                partido.tiktok_url
-              );
-
-              const color = partido.color_hex || "#6366f1";
-
-              return (
-                <Card
-                  key={partido.id}
-                  onClick={() => setSelectedPartido(partido)}
-                  className="group p-0 relative overflow-hidden border-2 hover:border-primary/50 rounded-xl md:rounded-2xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer text-left flex flex-col"
-                  style={{
-                    animation: mounted
-                      ? `fadeInUp 0.6s ease-out ${idx * 0.1}s both`
-                      : "none",
-                  }}
-                >
-                  <CardHeader className="relative h-20 md:h-28 p-0 overflow-hidden flex-shrink-0">
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        background: `linear-gradient(135deg, ${color} 0%, ${color}dd 100%)`,
-                      }}
-                    >
-                      <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.8)_1px,transparent_1px)] bg-[length:16px_16px]" />
-                    </div>
-
-                    <div className="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-500" />
-                    <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full -ml-8 -mb-8 group-hover:scale-110 transition-transform duration-500" />
-
-                    <div className="absolute inset-0 flex items-center justify-center p-3">
-                      <div className="relative w-14 h-14 md:w-20 md:h-20 bg-white rounded-lg md:rounded-xl flex items-center justify-center shadow-md overflow-hidden ring-1 ring-border group-hover:ring-primary/30 transition-all duration-300">
-                        {partido.logo_url ? (
-                          <Image
-                            src={partido.logo_url}
-                            alt={partido.name}
-                            width={80}
-                            height={80}
-                            className="object-contain p-1"
-                          />
-                        ) : (
-                          <Building2 className="w-8 h-8 md:w-10 md:h-10 text-muted-foreground" />
-                        )}
-                      </div>
-                    </div>
-                  </CardHeader>
-
-                  <CardContent className="p-4 md:p-6 pt-6 md:pt-10 flex flex-col flex-1">
-                    <h3 className="font-bold text-sm md:text-base lg:text-lg text-foreground mb-2 line-clamp-2 h-10 md:h-12 group-hover:text-primary transition-colors">
-                      {partido.name}
-                    </h3>
-
-                    <div className="h-5 mb-3">
-                      {partido.ideology && (
-                        <p className="text-xs text-muted-foreground line-clamp-1">
-                          {partido.ideology}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4 flex-wrap text-xs md:text-sm min-h-[1.5rem]">
-                      {partido.total_afiliates > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Users className="w-3 h-3 text-primary" />
-                          <span className="font-semibold">
-                            {formatNumber(partido.total_afiliates)}
-                          </span>
-                        </div>
-                      )}
-
-                      {años && (
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Calendar className="w-3 h-3" />
-                          <span>{años} años</span>
-                        </div>
-                      )}
-
-                      {tieneRedes && (
-                        <div className="flex items-center gap-1 text-success">
-                          <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-                          <span>Activo en redes</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-end pt-2 md:pt-3 border-t border-border mt-auto">
-                      <Button
-                        variant="secondary"
-                        className="px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm border border-border hover:border-primary/50 transition-all duration-300 group-hover:scale-105"
-                      >
-                        Conocer más
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-
-          <div className="text-center">
-            <Link
-              href="/partidos"
-              className="inline-flex items-center gap-2 md:gap-3 px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-bold rounded-lg md:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group text-sm md:text-base"
-            >
-              <span>Explorar los {totalPartidos} Partidos Políticos</span>
-              <ExternalLink className="w-4 h-4 md:w-5 md:h-5" />
-            </Link>
-
-            <p className="mt-3 md:mt-4 text-xs md:text-sm text-muted-foreground px-4">
-              Tu voto informado empieza aquí.
-            </p>
-          </div>
-        </div>
       </div>
-
-      {selectedPartido && (
-        <PartidoDialog
-          partido={selectedPartido}
-          isOpen={!!selectedPartido}
-          onClose={() => setSelectedPartido(null)}
-        />
-      )}
     </section>
   );
 }

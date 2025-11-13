@@ -40,6 +40,7 @@ const ROUTE_CONFIG = {
     "/comparador",
     "/candidatos",
     "/partidos",
+    "/partidos/[id]",
     "/ejecutivo",
     "/nosotros",
     "/contact",
@@ -51,6 +52,7 @@ const ROUTE_CONFIG = {
     "/auth/reset-password",
     "/health",
     "/maintenance",
+    "/peru-dep.geojson",
   ],
 
   // Rutas API no pasan por middleware de auth

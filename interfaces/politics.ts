@@ -69,6 +69,8 @@ export interface WorkExperience {
 export interface PartyHistory {
   year: number;
   event: string;
+  source: string | null;
+  source_type: string | null;
 }
 // ============= INTERFACES BASE =============
 
@@ -79,7 +81,7 @@ export interface PoliticalPartyBase {
   logo_url: string | null;
   color_hex: string;
   active: boolean;
-  created_at: string;
+  foundation_date: string | null;
 }
 
 export interface ElectoralDistrictBase {
@@ -101,22 +103,43 @@ export interface ElectoralProcess {
   created_at: string;
 }
 // ============= PARTIDO ==========================
+export interface SeatsByDistrict {
+  district_name: string;
+  district_code: string;
+  seats: number;
+}
+export interface ElectedLegislatorBasic {
+  id: string;
+  full_name: string;
+  photo_url: string | null;
+  district_name: string | null;
+  position: string | null;
+}
 export interface PoliticalPartyDetail extends PoliticalPartyBase {
   founder: string | null;
-  foundation_date: Date | null;
+  foundation_date: string | null;
   description: string | null;
   ideology: string | null;
   main_office: string | null;
   phone: string | null;
   email: string | null;
   website: string | null;
-  party_timeline: PartyHistory[] | [];
+  party_timeline: PartyHistory[];
   facebook_url: string | null;
   twitter_url: string | null;
   youtube_url: string | null;
   tiktok_url: string | null;
-  total_afiliates: number;
+  total_afiliates: number | null;
   total_seats: number;
+  seats_by_district: SeatsByDistrict[];
+  elected_legislators: ElectedLegislatorBasic[];
+}
+
+export interface PoliticalPartyListPaginated {
+  items: PoliticalPartyBase[];
+  total: number;
+  limit: number;
+  offset: number;
 }
 // ============= PERSONA Y LEGISLADOR =============
 
@@ -159,8 +182,7 @@ export interface LegislatorDetail {
   active: boolean;
   institutional_email: string | null;
   parliamentary_group: string | null;
-  original_party: PoliticalPartyBase;
-  current_party?: PoliticalPartyBase;
+  elected_by_party: PoliticalPartyBase;
 
   electoral_district: ElectoralDistrictBase;
   bills: Bill[];
@@ -168,15 +190,14 @@ export interface LegislatorDetail {
   created_at: Date;
 }
 
-export interface LegislatorWithParty {
-  chamber: string;
-  start_date: string;
-  end_date: string;
+export interface LegislatorInSeat {
+  id: string;
+  person_id: string;
+  chamber: ChamberType;
+  condition: LegislatorCondition;
   active: boolean;
-  institutional_email: string | null;
-  parliamentary_group: string | null;
-  created_at: string;
-  original_party: PoliticalPartyBase;
+  elected_by_party: PoliticalPartyBase;
+  current_parliamentary_group: ParliamentaryGroupBasic | null;
 }
 export interface PersonWithActivePeriod extends PersonBase {
   active_period: LegislatorDetail;
@@ -191,13 +212,22 @@ export interface LegislatorCard {
   id: string;
   chamber: ChamberType;
   condition: LegislatorCondition;
-  parliamentary_group: string | null;
+  current_parliamentary_group: ParliamentaryGroupBasic | null;
   active: boolean;
   start_date: string;
   end_date: string;
   person: PersonBasicInfo;
-  current_party: PoliticalPartyBase | null;
+  elected_by_party: PoliticalPartyBase | null;
   electoral_district: ElectoralDistrictBase;
+}
+
+// ============= BANCADAS =============
+export interface ParliamentaryGroupBasic {
+  id: string;
+  name: string;
+  acronym: string | null;
+  color_hex: string | null;
+  logo_url: string | null;
 }
 
 // ============= EJECUTIVOS =============
@@ -270,11 +300,11 @@ export interface Attendance {
 // ============= ESCAÑOS =============
 
 export interface SeatParliamentary {
+  id: string;
   chamber: string;
   number_seat: number;
   row: number;
-  legislator: LegislatorWithParty | null;
-  created_at: Date;
+  legislator: LegislatorInSeat | null;
 }
 
 // ============= FILTROS Y OPCIONES =============
@@ -311,6 +341,12 @@ export interface FiltersCandidates {
   [key: string]: unknown;
 }
 
+export interface FiltersRegulars {
+  search?: string;
+  skip?: number;
+  limit?: number;
+  [key: string]: unknown;
+}
 // ============= RESPUESTAS DE API =============
 
 export interface ApiResponse<T> {

@@ -1,34 +1,75 @@
-import ErrorLanding from "@/components/landing/error-landing";
-import PartidosList from "@/components/politics/partidos-list";
-import { PoliticalPartyDetail } from "@/interfaces/politics";
 import { publicApi } from "@/lib/public-api";
+import { PoliticalPartyListPaginated } from "@/interfaces/politics";
+import Link from "next/link";
+import PartidosListPaginated from "@/components/politics/partidos-list-paginated";
 
-const PartidoPage = async () => {
+interface PageProps {
+  searchParams: {
+    search?: string;
+    active?: string;
+    limit?: string;
+    offset?: string;
+  };
+}
+
+export default async function PartidosPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+
+  const limit = parseInt(params.limit || "30");
+  const offset = parseInt(params.offset || "0");
+
+  const apiParams = {
+    active:
+      params.active === "false"
+        ? false
+        : params.active === "true"
+          ? true
+          : undefined,
+    search: params.search || undefined,
+    limit,
+    offset,
+  };
+
+  const currentFilters = {
+    search: params.search || "",
+    active: params.active || "all",
+    limit,
+    offset,
+  };
+
   try {
-    const [partidos] = await Promise.all([
-      publicApi.getPartidos(true) as Promise<PoliticalPartyDetail[]>,
-    ]);
+    const partidos = (await publicApi.getPartidos(
+      apiParams,
+    )) as PoliticalPartyListPaginated;
 
     return (
-      <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-              Partidos Políticos del Perú
-            </h1>
-            <p className="text-muted-foreground">
-              Conoce la información completa de los partidos políticos activos
-            </p>
-          </div>
-
-          <PartidosList partidos={partidos} />
-        </div>
+      <div className="min-h-screen bg-background">
+        <PartidosListPaginated
+          partidos={partidos}
+          currentFilters={currentFilters}
+        />
       </div>
     );
   } catch (error) {
-    console.error("Error cargando datos de landing:", error);
-    return <ErrorLanding />;
-  }
-};
+    console.error("Error cargando partidos:", error);
 
-export default PartidoPage;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Error al cargar datos
+          </h1>
+          <p className="text-gray-600 mb-4">
+            No se pudieron cargar los partidos. Por favor, intenta nuevamente.
+          </p>
+          <Link
+            href="/partidos"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-block"
+          >
+            Reintentar
+          </Link>
+        </div>
+      </div>
+    );
+  }
+}

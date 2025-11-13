@@ -7,7 +7,6 @@ import {
   FileText,
   ExternalLink,
   Mail,
-  Briefcase,
   Check,
   Copy,
   User,
@@ -146,17 +145,17 @@ export default function DetailLegislador({
                 )}
 
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-3 text-primary-foreground mt-4">
-                  {periodoActivo?.original_party &&
-                    periodoActivo.original_party.logo_url && (
+                  {periodoActivo?.elected_by_party &&
+                    periodoActivo.elected_by_party.logo_url && (
                       <div className="inline-flex items-center gap-2 font-medium">
                         <Image
-                          src={periodoActivo.original_party.logo_url}
-                          alt={periodoActivo.original_party.name}
+                          src={periodoActivo.elected_by_party.logo_url}
+                          alt={periodoActivo.elected_by_party.name}
                           width={24}
                           height={24}
                           className="rounded-sm"
                         />
-                        <span>{periodoActivo.original_party.name}</span>
+                        <span>{periodoActivo.elected_by_party.name}</span>
                       </div>
                     )}
                   {periodoActivo?.parliamentary_group && (
@@ -752,13 +751,6 @@ export default function DetailLegislador({
                                 </span>
                               </div>
                             )}
-                          </div>
-
-                          <div className="flex items-center gap-1.5 text-xs text-foreground/70">
-                            <Briefcase className="size-3 flex-shrink-0" />
-                            <span className="truncate">
-                              {periodo.current_party?.name || "No agrupados"}
-                            </span>
                           </div>
 
                           {periodo.institutional_email && (

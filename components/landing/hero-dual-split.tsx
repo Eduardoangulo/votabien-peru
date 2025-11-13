@@ -254,7 +254,7 @@ export default function HeroDualSplit({
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.4 }}
           >
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-center bg-gradient-to-r from-primary via-white to-warning bg-clip-text text-transparent drop-shadow-2xl">
+            <h1 className="text-4xl lg:text-5xl xl:text-6xl font-black text-center bg-gradient-to-r from-primary via-white to-warning bg-clip-text text-transparent drop-shadow-2xl">
               2026: El Año del Cambio Democrático
             </h1>
             <p className="mt-4 text-base md:text-lg text-white/80 max-w-2xl mx-auto font-medium drop-shadow">

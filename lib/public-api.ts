@@ -4,6 +4,7 @@ import {
   FiltersCandidates,
   PersonWithActivePeriod,
   FiltersLegislators,
+  FiltersRegulars,
 } from "@/interfaces/politics";
 import { API_BASE_URL } from "./config";
 
@@ -131,12 +132,25 @@ class PublicApiClient {
    * Obtener lista de grupos parlamentarios de legisladores activos
    */
   async getParliamentaryGroups(active: boolean = true) {
-    return this.get(`/api/v1/politics/legislators/groups?active=${active}`);
+    return this.get(
+      `/api/v1/politics/parliamentary-groups?active_only=${active}`,
+    );
   }
+
+  // ============= ENDPOINTS DE versus =============
+
+  /**
+   * Obtener lista de legisladores versus simple
+   */
+  async getVersusLegislators(params?: FiltersRegulars) {
+    const query = this.buildQueryParams(params as Record<string, unknown>);
+    return this.get(`/api/v1/politics/legislators-versus${query}`);
+  }
+
   // ============= ENDPOINTS DE ESCAÑOS =============
 
   /**
-   * Obtener lista de candidaturas con filtros
+   * Obtener lista de escaños
    */
   async getSeatParliamentary(chamber: ChamberType) {
     return this.get(`/api/v1/politics/seats?chamber=${chamber}`);
@@ -180,8 +194,9 @@ class PublicApiClient {
   /**
    * Obtener lista de partidos políticos
    */
-  async getPartidos(activo = true) {
-    return this.get(`/api/v1/politics/partidos?activo=${activo}`);
+  async getPartidos(params?: FiltersRegulars) {
+    const query = this.buildQueryParams(params as Record<string, unknown>);
+    return this.get(`/api/v1/politics/partidos${query}`);
   }
 
   /**

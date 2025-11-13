@@ -1,400 +1,408 @@
-import {
-  Building2,
-  History,
-  Calendar,
-  CheckCircle2,
-  ExternalLink,
-  Globe,
-  Mail,
-  MapPin,
-  Phone,
-  Sparkles,
-  TrendingUp,
-  Users,
-} from "lucide-react";
-import {
-  SlSocialFacebook,
-  SlSocialTwitter,
-  SlSocialYoutube,
-} from "react-icons/sl";
-import { PiTiktokLogo } from "react-icons/pi";
-import {
-  Credenza,
-  CredenzaBody,
-  CredenzaContent,
-  CredenzaHeader,
-  CredenzaTitle,
-} from "@/components/ui/credenza";
-import { Badge } from "@/components/ui/badge";
-import { PartyHistory, PoliticalPartyDetail } from "@/interfaces/politics";
-import Image from "next/image";
-import { getTextColor, needsOverlay } from "@/lib/utils/color-utils";
-import { cn } from "@/lib/utils";
+// import {
+//   Building2,
+//   History,
+//   Calendar,
+//   CheckCircle2,
+//   ExternalLink,
+//   Globe,
+//   Mail,
+//   MapPin,
+//   Phone,
+//   Sparkles,
+//   TrendingUp,
+//   Users,
+// } from "lucide-react";
+// import {
+//   SlSocialFacebook,
+//   SlSocialTwitter,
+//   SlSocialYoutube,
+// } from "react-icons/sl";
+// import { PiTiktokLogo } from "react-icons/pi";
+// import {
+//   Credenza,
+//   CredenzaBody,
+//   CredenzaContent,
+//   CredenzaHeader,
+//   CredenzaTitle,
+// } from "@/components/ui/credenza";
+// import { Badge } from "@/components/ui/badge";
+// import { PartyHistory, PoliticalPartyDetail } from "@/interfaces/politics";
+// import Image from "next/image";
+// import { getTextColor, needsOverlay } from "@/lib/utils/color-utils";
+// import { cn } from "@/lib/utils";
+// import { PeruSeatsMap } from './peru-seats-map';
+// export default function PartidoDialog({
+//   partido,
+//   isOpen,
+//   onClose,
+// }: {
+//   partido: PoliticalPartyDetail;
+//   isOpen: boolean;
+//   onClose: () => void;
+// }) {
+//   const partidoColor = partido.color_hex;
+//   const hasOverlay = needsOverlay(partidoColor);
+//   const textColor = getTextColor(partidoColor);
 
-export default function PartidoDialog({
-  partido,
-  isOpen,
-  onClose,
-}: {
-  partido: PoliticalPartyDetail;
-  isOpen: boolean;
-  onClose: () => void;
-}) {
-  const partidoColor = partido.color_hex;
-  const hasOverlay = needsOverlay(partidoColor);
-  const textColor = getTextColor(partidoColor);
+//   const formatNumber = (num: number | null | undefined) => {
+//     if (!num) return "No disponible";
+//     return new Intl.NumberFormat("es-PE").format(num);
+//   };
 
-  const formatNumber = (num: number | null | undefined) => {
-    if (!num) return "No disponible";
-    return new Intl.NumberFormat("es-PE").format(num);
-  };
+//   const añosFundacion = partido.foundation_date
+//     ? new Date().getFullYear() - new Date(partido.foundation_date).getFullYear()
+//     : null;
 
-  const añosFundacion = partido.foundation_date
-    ? new Date().getFullYear() - new Date(partido.foundation_date).getFullYear()
-    : null;
+//   return (
+//     <Credenza open={isOpen} onOpenChange={onClose}>
+//       <CredenzaContent className="p-0 max-h-[90vh] overflow-hidden flex flex-col">
+//         {/* HEADER con gradiente del color del partido */}
+//         <CredenzaHeader>
+//           <CredenzaTitle>
+//             <div
+//               className={cn(
+//                 "p-2 rounded-md flex justify-center relative",
+//                 textColor,
+//               )}
+//               style={{
+//                 background: `linear-gradient(135deg, ${partidoColor} 0%, ${partidoColor}dd 100%)`,
+//               }}
+//             >
+//               {hasOverlay && (
+//                 <div className="absolute inset-0 bg-gradient-to-br from-black/30 to-black/10 z-[1]" />
+//               )}
+//               <div className="flex items-center gap-4 relative z-[2]">
+//                 {/* Logo */}
+//                 {partido.logo_url ? (
+//                   <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-xl flex items-center justify-center shadow-md ring-1 ring-border overflow-hidden flex-shrink-0">
+//                     <Image
+//                       src={partido.logo_url}
+//                       alt={partido.name}
+//                       fill
+//                       className="object-contain p-1"
+//                       sizes="64px"
+//                     />
+//                   </div>
+//                 ) : (
+//                   <div className="w-16 h-16 sm:w-20 sm:h-20 bg-card rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+//                     <Building2 className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground" />
+//                   </div>
+//                 )}
 
-  return (
-    <Credenza open={isOpen} onOpenChange={onClose}>
-      <CredenzaContent className="p-0 max-h-[90vh] overflow-hidden flex flex-col">
-        {/* HEADER con gradiente del color del partido */}
-        <CredenzaHeader>
-          <CredenzaTitle>
-            <div
-              className={cn(
-                "p-2 rounded-md flex justify-center relative",
-                textColor,
-              )}
-              style={{
-                background: `linear-gradient(135deg, ${partidoColor} 0%, ${partidoColor}dd 100%)`,
-              }}
-            >
-              {hasOverlay && (
-                <div className="absolute inset-0 bg-gradient-to-br from-black/30 to-black/10 z-[1]" />
-              )}
-              <div className="flex items-center gap-4 relative z-[2]">
-                {/* Logo */}
-                {partido.logo_url ? (
-                  <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-xl flex items-center justify-center shadow-md ring-1 ring-border overflow-hidden flex-shrink-0">
-                    <Image
-                      src={partido.logo_url}
-                      alt={partido.name}
-                      fill
-                      className="object-contain p-1"
-                      sizes="64px"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-card rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-                    <Building2 className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground" />
-                  </div>
-                )}
+//                 {/* Título y metadata */}
+//                 <div className="flex-1 min-w-0">
+//                   <h2 className="text-xl sm:text-2xl font-bold mb-2 leading-tight">
+//                     {partido.name}
+//                   </h2>
 
-                {/* Título y metadata */}
-                <div className="flex-1 min-w-0">
-                  <h2 className="text-xl sm:text-2xl font-bold mb-2 leading-tight">
-                    {partido.name}
-                  </h2>
+//                   <div className="flex flex-wrap items-center gap-2">
+//                     {partido.acronym && (
+//                       <Badge className="bg-background/30 border-0 font-bold text-sm">
+//                         {partido.acronym}
+//                       </Badge>
+//                     )}
 
-                  <div className="flex flex-wrap items-center gap-2">
-                    {partido.acronym && (
-                      <Badge className="bg-background/30 border-0 font-bold text-sm">
-                        {partido.acronym}
-                      </Badge>
-                    )}
+//                     {partido.active ? (
+//                       <Badge
+//                         className={cn(
+//                           "bg-success/70 border-success/30",
+//                           textColor,
+//                         )}
+//                       >
+//                         <CheckCircle2 className="w-3 h-3 mr-1" />
+//                         Activo
+//                       </Badge>
+//                     ) : (
+//                       <Badge variant="secondary">Inactivo</Badge>
+//                     )}
 
-                    {partido.active ? (
-                      <Badge
-                        className={cn(
-                          "bg-success/70 border-success/30",
-                          textColor,
-                        )}
-                      >
-                        <CheckCircle2 className="w-3 h-3 mr-1" />
-                        Activo
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary">Inactivo</Badge>
-                    )}
+//                     {partido.ideology && (
+//                       <Badge
+//                         className={cn("bg-background/30 border-0", textColor)}
+//                       >
+//                         {partido.ideology}
+//                       </Badge>
+//                     )}
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </CredenzaTitle>
+//         </CredenzaHeader>
 
-                    {partido.ideology && (
-                      <Badge
-                        className={cn("bg-background/30 border-0", textColor)}
-                      >
-                        {partido.ideology}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CredenzaTitle>
-        </CredenzaHeader>
+//         {/* BODY con scroll */}
+//         <CredenzaBody className="overflow-y-auto flex-1">
+//           <div className="space-y-6 sm:px-4">
+//             {/* Descripción */}
+//             {partido.description && (
+//               <div className="bg-muted/50 rounded-xl p-4">
+//                 <p className="text-sm sm:text-base text-foreground/90 text-justify leading-relaxed">
+//                   {partido.description}
+//                 </p>
+//               </div>
+//             )}
 
-        {/* BODY con scroll */}
-        <CredenzaBody className="overflow-y-auto flex-1">
-          <div className="space-y-6 sm:px-4">
-            {/* Descripción */}
-            {partido.description && (
-              <div className="bg-muted/50 rounded-xl p-4">
-                <p className="text-sm sm:text-base text-foreground/90 text-justify leading-relaxed">
-                  {partido.description}
-                </p>
-              </div>
-            )}
+//             {/* Stats rápidas */}
+//             <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(150px,1fr))] auto-rows-auto justify-center">
+//               {añosFundacion && (
+//                 <div className="bg-card border border-border rounded-lg p-3 text-center">
+//                   <Calendar className="w-5 h-5 text-primary mx-auto mb-1" />
+//                   <div className="text-xl sm:text-2xl font-bold text-foreground">
+//                     {añosFundacion}
+//                   </div>
+//                   <div className="text-xs text-muted-foreground">años</div>
+//                 </div>
+//               )}
 
-            {/* Stats rápidas */}
-            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(150px,1fr))] auto-rows-auto justify-center">
-              {añosFundacion && (
-                <div className="bg-card border border-border rounded-lg p-3 text-center">
-                  <Calendar className="w-5 h-5 text-primary mx-auto mb-1" />
-                  <div className="text-xl sm:text-2xl font-bold text-foreground">
-                    {añosFundacion}
-                  </div>
-                  <div className="text-xs text-muted-foreground">años</div>
-                </div>
-              )}
+//               {partido.total_afiliates && (
+//                 <div className="bg-card border border-border rounded-lg p-3 text-center">
+//                   <Users className="w-5 h-5 text-primary mx-auto mb-1" />
+//                   <div className="text-xl sm:text-2xl font-bold text-foreground">
+//                     {formatNumber(partido.total_afiliates)}
+//                   </div>
+//                   <div className="text-xs text-muted-foreground">afiliados</div>
+//                 </div>
+//               )}
 
-              {partido.total_afiliates && (
-                <div className="bg-card border border-border rounded-lg p-3 text-center">
-                  <Users className="w-5 h-5 text-primary mx-auto mb-1" />
-                  <div className="text-xl sm:text-2xl font-bold text-foreground">
-                    {formatNumber(partido.total_afiliates)}
-                  </div>
-                  <div className="text-xs text-muted-foreground">afiliados</div>
-                </div>
-              )}
+//               {partido.total_seats !== null &&
+//                 partido.total_seats !== undefined && (
+//                   <div className="bg-card border border-border rounded-lg p-3 text-center">
+//                     <TrendingUp className="w-5 h-5 text-primary mx-auto mb-1" />
+//                     <div className="text-xl sm:text-2xl font-bold text-foreground">
+//                       {partido.total_seats}
+//                     </div>
+//                     <div className="text-xs text-muted-foreground">escaños</div>
+//                   </div>
+//                 )}
 
-              {partido.total_seats !== null &&
-                partido.total_seats !== undefined && (
-                  <div className="bg-card border border-border rounded-lg p-3 text-center">
-                    <TrendingUp className="w-5 h-5 text-primary mx-auto mb-1" />
-                    <div className="text-xl sm:text-2xl font-bold text-foreground">
-                      {partido.total_seats}
-                    </div>
-                    <div className="text-xs text-muted-foreground">escaños</div>
-                  </div>
-                )}
+//               {partido.founder && (
+//                 <div className="bg-card border border-border rounded-lg p-3 text-center col-span-2 sm:col-span-1">
+//                   <Sparkles className="w-5 h-5 text-primary mx-auto mb-1" />
+//                   <div
+//                     className="text-xs font-semibold text-foreground truncate"
+//                     title={partido.founder}
+//                   >
+//                     {partido.founder}
+//                   </div>
+//                   <div className="text-xs text-muted-foreground">fundador</div>
+//                 </div>
+//               )}
+//             </div>
 
-              {partido.founder && (
-                <div className="bg-card border border-border rounded-lg p-3 text-center col-span-2 sm:col-span-1">
-                  <Sparkles className="w-5 h-5 text-primary mx-auto mb-1" />
-                  <div
-                    className="text-xs font-semibold text-foreground truncate"
-                    title={partido.founder}
-                  >
-                    {partido.founder}
-                  </div>
-                  <div className="text-xs text-muted-foreground">fundador</div>
-                </div>
-              )}
-            </div>
+//             {/* Información de contacto */}
+//             <div className="space-y-3">
+//               <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+//                 <Building2 className="w-5 h-5 text-primary" />
+//                 Información de Contacto
+//               </h3>
 
-            {/* Información de contacto */}
-            <div className="space-y-3">
-              <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-primary" />
-                Información de Contacto
-              </h3>
+//               <div className="grid gap-3">
+//                 {partido.main_office && (
+//                   <div className="flex items-start gap-3 bg-muted/30 rounded-lg p-3">
+//                     <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+//                     <div className="flex-1 min-w-0">
+//                       <div className="text-xs text-muted-foreground mb-0.5">
+//                         Sede Nacional
+//                       </div>
+//                       <div className="text-sm text-foreground">
+//                         {partido.main_office}
+//                       </div>
+//                     </div>
+//                   </div>
+//                 )}
 
-              <div className="grid gap-3">
-                {partido.main_office && (
-                  <div className="flex items-start gap-3 bg-muted/30 rounded-lg p-3">
-                    <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs text-muted-foreground mb-0.5">
-                        Sede Nacional
-                      </div>
-                      <div className="text-sm text-foreground">
-                        {partido.main_office}
-                      </div>
-                    </div>
-                  </div>
-                )}
+//                 {partido.phone && (
+//                   <div className="flex items-center gap-3 bg-muted/30 rounded-lg p-3">
+//                     <Phone className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+//                     <div className="flex-1 min-w-0">
+//                       <div className="text-xs text-muted-foreground mb-0.5">
+//                         Teléfono
+//                       </div>
+//                       <a
+//                         href={`tel:${partido.phone}`}
+//                         className="text-sm text-primary hover:underline"
+//                       >
+//                         {partido.phone}
+//                       </a>
+//                     </div>
+//                   </div>
+//                 )}
 
-                {partido.phone && (
-                  <div className="flex items-center gap-3 bg-muted/30 rounded-lg p-3">
-                    <Phone className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs text-muted-foreground mb-0.5">
-                        Teléfono
-                      </div>
-                      <a
-                        href={`tel:${partido.phone}`}
-                        className="text-sm text-primary hover:underline"
-                      >
-                        {partido.phone}
-                      </a>
-                    </div>
-                  </div>
-                )}
+//                 {partido.email && (
+//                   <div className="flex items-center gap-3 bg-muted/30 rounded-lg p-3">
+//                     <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+//                     <div className="flex-1 min-w-0">
+//                       <div className="text-xs text-muted-foreground mb-0.5">
+//                         Email
+//                       </div>
+//                       <a
+//                         href={`mailto:${partido.email}`}
+//                         className="text-sm text-primary hover:underline truncate block"
+//                       >
+//                         {partido.email}
+//                       </a>
+//                     </div>
+//                   </div>
+//                 )}
 
-                {partido.email && (
-                  <div className="flex items-center gap-3 bg-muted/30 rounded-lg p-3">
-                    <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs text-muted-foreground mb-0.5">
-                        Email
-                      </div>
-                      <a
-                        href={`mailto:${partido.email}`}
-                        className="text-sm text-primary hover:underline truncate block"
-                      >
-                        {partido.email}
-                      </a>
-                    </div>
-                  </div>
-                )}
+//                 {partido.website && (
+//                   <div className="flex items-center gap-3 bg-muted/30 rounded-lg p-3">
+//                     <Globe className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+//                     <div className="flex-1 min-w-0">
+//                       <div className="text-xs text-muted-foreground mb-0.5">
+//                         Sitio Web
+//                       </div>
+//                       <a
+//                         href={`https://${partido.website}`}
+//                         target="_blank"
+//                         rel="noopener noreferrer"
+//                         className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+//                       >
+//                         Visitar sitio
+//                         <ExternalLink className="w-3 h-3" />
+//                       </a>
+//                     </div>
+//                   </div>
+//                 )}
+//               </div>
+//             </div>
 
-                {partido.website && (
-                  <div className="flex items-center gap-3 bg-muted/30 rounded-lg p-3">
-                    <Globe className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs text-muted-foreground mb-0.5">
-                        Sitio Web
-                      </div>
-                      <a
-                        href={`https://${partido.website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                      >
-                        Visitar sitio
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+//             {/* Redes Sociales */}
+//             {(partido.facebook_url ||
+//               partido.twitter_url ||
+//               partido.tiktok_url ||
+//               partido.youtube_url) && (
+//               <div className="space-y-3">
+//                 <h3 className="text-lg font-bold text-foreground">
+//                   Redes Sociales
+//                 </h3>
 
-            {/* Redes Sociales */}
-            {(partido.facebook_url ||
-              partido.twitter_url ||
-              partido.tiktok_url ||
-              partido.youtube_url) && (
-              <div className="space-y-3">
-                <h3 className="text-lg font-bold text-foreground">
-                  Redes Sociales
-                </h3>
+//                 <div className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(140px,max-content))] justify-between">
+//                   {partido.facebook_url && (
+//                     <a
+//                       href={partido.facebook_url}
+//                       target="_blank"
+//                       rel="noopener noreferrer"
+//                       className="inline-flex items-center gap-2 px-4 py-2 bg-[#1877F2] text-white rounded-lg hover:opacity-90 transition-opacity"
+//                     >
+//                       <SlSocialFacebook className="w-4 h-4" />
+//                       <span className="text-sm font-medium">Facebook</span>
+//                     </a>
+//                   )}
 
-                <div className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(140px,max-content))] justify-between">
-                  {partido.facebook_url && (
-                    <a
-                      href={partido.facebook_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#1877F2] text-white rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      <SlSocialFacebook className="w-4 h-4" />
-                      <span className="text-sm font-medium">Facebook</span>
-                    </a>
-                  )}
+//                   {partido.twitter_url && (
+//                     <a
+//                       href={partido.twitter_url}
+//                       target="_blank"
+//                       rel="noopener noreferrer"
+//                       className="inline-flex items-center gap-2 px-4 py-2 bg-[#1DA1F2] text-white rounded-lg hover:opacity-90 transition-opacity"
+//                     >
+//                       <SlSocialTwitter className="w-4 h-4" />
+//                       <span className="text-sm font-medium">Twitter</span>
+//                     </a>
+//                   )}
 
-                  {partido.twitter_url && (
-                    <a
-                      href={partido.twitter_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#1DA1F2] text-white rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      <SlSocialTwitter className="w-4 h-4" />
-                      <span className="text-sm font-medium">Twitter</span>
-                    </a>
-                  )}
+//                   {partido.tiktok_url && (
+//                     <a
+//                       href={partido.tiktok_url}
+//                       target="_blank"
+//                       rel="noopener noreferrer"
+//                       className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-[#010101] via-[#121212] to-[#343434] text-white rounded-lg hover:opacity-90 transition-opacity"
+//                     >
+//                       <PiTiktokLogo className="w-4 h-4" />
+//                       <span className="text-sm font-medium">Tiktok</span>
+//                     </a>
+//                   )}
 
-                  {partido.tiktok_url && (
-                    <a
-                      href={partido.tiktok_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-[#010101] via-[#121212] to-[#343434] text-white rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      <PiTiktokLogo className="w-4 h-4" />
-                      <span className="text-sm font-medium">Tiktok</span>
-                    </a>
-                  )}
+//                   {partido.youtube_url && (
+//                     <a
+//                       href={partido.youtube_url}
+//                       target="_blank"
+//                       rel="noopener noreferrer"
+//                       className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF0000] text-white rounded-lg hover:opacity-90 transition-opacity"
+//                     >
+//                       <SlSocialYoutube className="w-4 h-4" />
+//                       <span className="text-sm font-medium">YouTube</span>
+//                     </a>
+//                   )}
+//                 </div>
+//               </div>
+//             )}
+//             {partido.seats_by_district && partido.seats_by_district.length > 0 && (
+//               <PeruSeatsMap
+//                 partyName={partido.name}
+//                 partyColor={partido.color_hex}
+//                 seatsByDistrict={partido.seats_by_district}
+//                 totalOriginalSeats={partido.total_original_seats}
+//                 totalCurrentSeats={partido.total_current_seats}
+//               />
+//             )}
+//             {/* Timeline histórico */}
+//             {partido.party_timeline && partido.party_timeline.length > 0 && (
+//               <div className="space-y-4">
+//                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+//                   <History className="w-5 h-5 text-primary" />
+//                   Historia del Partido
+//                 </h3>
 
-                  {partido.youtube_url && (
-                    <a
-                      href={partido.youtube_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF0000] text-white rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      <SlSocialYoutube className="w-4 h-4" />
-                      <span className="text-sm font-medium">YouTube</span>
-                    </a>
-                  )}
-                </div>
-              </div>
-            )}
+//                 <div className="bg-gradient-to-br from-primary/5 to-primary/0 rounded-xl p-4 sm:p-6">
+//                   <TimelineComponent items={partido.party_timeline} />
+//                 </div>
+//               </div>
+//             )}
+//           </div>
+//         </CredenzaBody>
+//       </CredenzaContent>
+//     </Credenza>
+//   );
+// }
 
-            {/* Timeline histórico */}
-            {partido.party_timeline && partido.party_timeline.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <History className="w-5 h-5 text-primary" />
-                  Historia del Partido
-                </h3>
+// // Componente de Timeline
+// const TimelineComponent = ({ items }: { items: PartyHistory[] }) => {
+//   const sortedItems = [...items].sort((a, b) => b.year - a.year);
 
-                <div className="bg-gradient-to-br from-primary/5 to-primary/0 rounded-xl p-4 sm:p-6">
-                  <TimelineComponent items={partido.party_timeline} />
-                </div>
-              </div>
-            )}
-          </div>
-        </CredenzaBody>
-      </CredenzaContent>
-    </Credenza>
-  );
-}
+//   return (
+//     <div className="relative space-y-6 sm:space-y-8">
+//       {sortedItems.map((item, idx) => (
+//         <div key={idx} className="relative flex gap-4 sm:gap-6 group">
+//           {/* Columna de tiempo - Fixed width */}
+//           <div className="flex-shrink-0 w-16 sm:w-20 text-right pt-1">
+//             <div className="inline-flex items-center justify-center w-full">
+//               <span className="text-lg sm:text-xl font-bold text-primary tabular-nums">
+//                 {item.year}
+//               </span>
+//             </div>
+//           </div>
 
-// Componente de Timeline
-const TimelineComponent = ({ items }: { items: PartyHistory[] }) => {
-  const sortedItems = [...items].sort((a, b) => b.year - a.year);
+//           {/* Línea y punto */}
+//           <div className="flex-shrink-0 flex flex-col items-center">
+//             {/* Punto */}
+//             <div className="relative z-10 w-3 h-3 rounded-full bg-primary ring-4 ring-background group-hover:ring-primary/20 group-hover:scale-125 transition-all duration-300 mt-2" />
 
-  return (
-    <div className="relative space-y-6 sm:space-y-8">
-      {sortedItems.map((item, idx) => (
-        <div key={idx} className="relative flex gap-4 sm:gap-6 group">
-          {/* Columna de tiempo - Fixed width */}
-          <div className="flex-shrink-0 w-16 sm:w-20 text-right pt-1">
-            <div className="inline-flex items-center justify-center w-full">
-              <span className="text-lg sm:text-xl font-bold text-primary tabular-nums">
-                {item.year}
-              </span>
-            </div>
-          </div>
+//             {/* Línea conectora (ocultar en el último elemento) */}
+//             {idx < sortedItems.length - 1 && (
+//               <div className="w-px flex-1 bg-gradient-to-b from-primary/80 via-primary/40 to-primary/20 min-h-[3rem]" />
+//             )}
+//           </div>
 
-          {/* Línea y punto */}
-          <div className="flex-shrink-0 flex flex-col items-center">
-            {/* Punto */}
-            <div className="relative z-10 w-3 h-3 rounded-full bg-primary ring-4 ring-background group-hover:ring-primary/20 group-hover:scale-125 transition-all duration-300 mt-2" />
+//           {/* Contenido del evento */}
+//           <div className="flex-1 pb-2 pt-0.5 min-w-0">
+//             <div className="bg-muted/40 hover:bg-muted/70 border border-border/50 hover:border-primary/30 rounded-xl p-3 sm:p-4 transition-all duration-300 group-hover:shadow-md">
+//               <p className="text-sm sm:text-base text-foreground leading-relaxed">
+//                 {item.event}
+//               </p>
+//             </div>
+//           </div>
+//         </div>
+//       ))}
 
-            {/* Línea conectora (ocultar en el último elemento) */}
-            {idx < sortedItems.length - 1 && (
-              <div className="w-px flex-1 bg-gradient-to-b from-primary/80 via-primary/40 to-primary/20 min-h-[3rem]" />
-            )}
-          </div>
-
-          {/* Contenido del evento */}
-          <div className="flex-1 pb-2 pt-0.5 min-w-0">
-            <div className="bg-muted/40 hover:bg-muted/70 border border-border/50 hover:border-primary/30 rounded-xl p-3 sm:p-4 transition-all duration-300 group-hover:shadow-md">
-              <p className="text-sm sm:text-base text-foreground leading-relaxed">
-                {item.event}
-              </p>
-            </div>
-          </div>
-        </div>
-      ))}
-
-      {/* Punto final decorativo */}
-      <div className="relative flex gap-4 sm:gap-6">
-        <div className="flex-shrink-0 w-16 sm:w-20" />
-        <div className="flex-shrink-0 flex flex-col items-center">
-          <div className="w-2 h-2 rounded-full bg-primary/30" />
-        </div>
-      </div>
-    </div>
-  );
-};
+//       {/* Punto final decorativo */}
+//       <div className="relative flex gap-4 sm:gap-6">
+//         <div className="flex-shrink-0 w-16 sm:w-20" />
+//         <div className="flex-shrink-0 flex flex-col items-center">
+//           <div className="w-2 h-2 rounded-full bg-primary/30" />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };

@@ -33,7 +33,7 @@ export default async function ClearancePage(props: IndexPageProps) {
   ]);
   const [districts, parties] = await Promise.all([
     publicApi.getDistritos() as Promise<ElectoralDistrictBase[]>,
-    publicApi.getPartidos(true) as Promise<PoliticalPartyBase[]>,
+    publicApi.getPartidos({ active: true }) as Promise<PoliticalPartyBase[]>,
   ]);
   return (
     <Shell className="gap-2 mx-auto">

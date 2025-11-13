@@ -1,6 +1,10 @@
 import { publicApi } from "@/lib/public-api";
 import LegisladoresList from "@/components/politics/legisladores-list";
-import { ElectoralDistrictBase, LegislatorCard } from "@/interfaces/politics";
+import {
+  ElectoralDistrictBase,
+  LegislatorCard,
+  ParliamentaryGroupBasic,
+} from "@/interfaces/politics";
 import Link from "next/link";
 
 interface PageProps {
@@ -46,7 +50,9 @@ export default async function LegisladoresPage({ searchParams }: PageProps) {
       await Promise.all([
         publicApi.getLegisladoresCards(apiParams) as Promise<LegislatorCard[]>,
         publicApi.getDistritos() as Promise<ElectoralDistrictBase[]>,
-        publicApi.getParliamentaryGroups() as Promise<string[]>,
+        publicApi.getParliamentaryGroups() as Promise<
+          ParliamentaryGroupBasic[]
+        >,
       ]);
     return (
       <div className="container mx-auto p-4">
