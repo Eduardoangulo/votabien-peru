@@ -113,7 +113,8 @@ export interface ElectedLegislatorBasic {
   full_name: string;
   photo_url: string | null;
   district_name: string | null;
-  position: string | null;
+  condition: string | null;
+  person_id: string;
 }
 export interface PoliticalPartyDetail extends PoliticalPartyBase {
   founder: string | null;

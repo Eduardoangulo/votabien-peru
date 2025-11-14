@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, Users, Info } from "lucide-react";
 import { SeatsByDistrict } from "@/interfaces/politics";
@@ -36,7 +35,7 @@ interface PeruSeatsMapSimpleProps {
   totalSeats: number;
 }
 
-export function PeruSeatsMapSimple({
+export default function PeruSeatsMapSimple({
   partyName,
   partyColor,
   seatsByDistrict,
@@ -72,8 +71,29 @@ export function PeruSeatsMapSimple({
   const getDistrictData = (
     districtName: string,
   ): SeatsByDistrict | undefined => {
+    const normalizedName = normalize(districtName);
+
+    if (normalizedName === "lima") {
+      const limaMetro = seatsByDistrict.find(
+        (d) => normalize(d.district_name) === "lima metropolitana",
+      );
+      const limaProv = seatsByDistrict.find(
+        (d) => normalize(d.district_name) === "lima provincias",
+      );
+
+      // Combinar los datos de ambas
+      if (limaMetro || limaProv) {
+        return {
+          district_code:
+            limaMetro?.district_code || limaProv?.district_code || "",
+          district_name: "Lima",
+          seats: (limaMetro?.seats || 0) + (limaProv?.seats || 0),
+        };
+      }
+    }
+
     return seatsByDistrict.find(
-      (d) => normalize(d.district_name) === normalize(districtName),
+      (d) => normalize(d.district_name) === normalizedName,
     );
   };
 
@@ -81,7 +101,19 @@ export function PeruSeatsMapSimple({
     const data = getDistrictData(districtName);
     if (!data || data.seats === 0) return "#E5E7EB";
 
-    const maxSeats = Math.max(...seatsByDistrict.map((d) => d.seats));
+    // Calcular el máximo considerando Lima completa
+    const allSeats = seatsByDistrict.map((d) => d.seats);
+    const limaMetro = seatsByDistrict.find(
+      (d) => normalize(d.district_name) === "lima metropolitana",
+    );
+    const limaProv = seatsByDistrict.find(
+      (d) => normalize(d.district_name) === "lima provincias",
+    );
+    if (limaMetro && limaProv) {
+      allSeats.push(limaMetro.seats + limaProv.seats);
+    }
+
+    const maxSeats = Math.max(...allSeats);
     const intensity = data.seats / maxSeats;
 
     const hex = partyColor.replace("#", "");
@@ -128,6 +160,7 @@ export function PeruSeatsMapSimple({
   const projectCoordinates = (
     coordinates: CoordinateArray,
     bounds: Bounds,
+    districtName?: string,
   ): CoordinateArray => {
     const [[minLon, minLat], [maxLon, maxLat]] = bounds;
     const width = 800;
@@ -139,8 +172,18 @@ export function PeruSeatsMapSimple({
     );
 
     const project = ([lon, lat]: Coordinate): Coordinate => {
-      const x = (lon - minLon) * scale;
-      const y = (maxLat - lat) * scale;
+      let x = (lon - minLon) * scale;
+      let y = (maxLat - lat) * scale;
+
+      // Escalar Callao para hacerlo más visible
+      if (districtName && normalize(districtName) === "callao") {
+        const callaoScale = 2.5; // Aumentar tamaño de Callao
+        const centerX = 200; // Centro aproximado de Callao en el mapa
+        const centerY = 450;
+        x = centerX + (x - centerX) * callaoScale;
+        y = centerY + (y - centerY) * callaoScale;
+      }
+
       return [x, y];
     };
 
@@ -162,10 +205,8 @@ export function PeruSeatsMapSimple({
       Array.isArray(coords[0][0]) &&
       typeof coords[0][0][0] === "number"
     ) {
-      // Polygon
       return coords as number[][][];
     }
-    // MultiPolygon: combinar todos los polígonos en uno solo array
     return (coords as number[][][][]).flat();
   };
 
@@ -251,121 +292,159 @@ export function PeruSeatsMapSimple({
             <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
               Este mapa muestra los escaños que {partyName} obtuvo en cada
               departamento electoral según los resultados oficiales de las
-              elecciones congresales.
+              últimas elecciones generales.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <Users className="w-4 h-4" />
-            <span className="text-xs font-medium">Total de Escaños</span>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{totalSeats}</p>
-        </div>
-
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <MapPin className="w-4 h-4" />
-            <span className="text-xs font-medium">Departamentos</span>
-          </div>
-          <p className="text-2xl font-bold text-foreground">
-            {districtsWithSeats}
-          </p>
-        </div>
-
-        <div className="bg-card border border-border rounded-lg p-4 col-span-2 md:col-span-1">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <Users className="w-4 h-4" />
-            <span className="text-xs font-medium">Porcentaje Nacional</span>
-          </div>
-          <p className="text-2xl font-bold text-foreground">
-            {((totalSeats / 130) * 100).toFixed(1)}%
-          </p>
-          <p className="text-xs text-muted-foreground">del Congreso</p>
-        </div>
-      </div>
-
-      {/* Map Container */}
-      <div className="bg-gradient-to-br from-primary/5 to-primary/0 rounded-xl p-6 border border-border">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* SVG Map */}
-          <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-slate-900 rounded-lg p-4 shadow-sm">
-              <svg
-                viewBox="0 0 800 1000"
-                className="w-full h-auto"
-                style={{ maxHeight: "700px" }}
-              >
-                <defs>
-                  <filter id="shadow">
-                    <feDropShadow
-                      dx="0"
-                      dy="2"
-                      stdDeviation="3"
-                      floodOpacity="0.3"
-                    />
-                  </filter>
-                </defs>
-
-                {geoData.features.map((feature, idx) => {
-                  const districtName = feature.properties.NOMBDEP;
-                  const data = getDistrictData(districtName);
-                  const seats = data?.seats || 0;
-
-                  const projectedCoords = projectCoordinates(
-                    feature.geometry.coordinates,
-                    bounds,
-                  );
-                  const pathData = coordinatesToPath(projectedCoords);
-                  const centroid = getCentroid(projectedCoords);
-
-                  return (
-                    <g key={idx}>
-                      <path
-                        d={pathData}
-                        fill={getDistrictColor(districtName)}
-                        stroke="#1F2937"
-                        strokeWidth="1.5"
-                        className="cursor-pointer transition-all duration-200"
-                        style={{
-                          filter:
-                            hoveredDistrict === districtName
-                              ? "url(#shadow) brightness(1.15)"
-                              : "none",
-                          strokeWidth:
-                            hoveredDistrict === districtName ? "2.5" : "1.5",
-                        }}
-                        onMouseEnter={() => setHoveredDistrict(districtName)}
-                        onMouseLeave={() => setHoveredDistrict(null)}
-                      />
-                      {seats > 0 && centroid && (
-                        <text
-                          x={centroid[0]}
-                          y={centroid[1]}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          className="text-4xl font-bold pointer-events-none select-none"
-                          fill="#1F2937"
-                          stroke="white"
-                          strokeWidth="3"
-                          paintOrder="stroke"
-                        >
-                          {seats}
-                        </text>
-                      )}
-                    </g>
-                  );
-                })}
-              </svg>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-1 lg:order-2 space-y-4">
+          <div className="grid grid-cols-3 lg:grid-cols-1 gap-4">
+            <div className="bg-card border border-border rounded-lg p-2">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <Users className="w-4 h-4" />
+                <span className="text-xs font-medium">Total de Escaños</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground text-center">
+                {totalSeats}
+              </p>
             </div>
 
-            {/* Hover tooltip */}
+            <div className="bg-card border border-border rounded-lg p-2">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <MapPin className="w-4 h-4" />
+                <span className="text-xs font-medium">Departamentos</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground text-center">
+                {districtsWithSeats}
+              </p>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-2">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <Users className="w-4 h-4" />
+                <span className="text-xs font-medium">Representación (%)</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground text-center">
+                {((totalSeats / 130) * 100).toFixed(1)}%
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mapa */}
+        <div className="lg:col-span-3 lg:order-1 space-y-4">
+          {/* SVG Map */}
+          <div className="relative bg-white dark:bg-slate-900 rounded-lg p-4 shadow-sm">
+            <div className="absolute bottom-4 left-4 bg-card border border-border rounded-lg p-2 shadow-lg">
+              <div className="flex flex-col gap-3 text-xs">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-4 h-4 rounded"
+                    style={{ backgroundColor: partyColor, opacity: 1 }}
+                  />
+                  <span className="text-muted-foreground">
+                    Mayor representación
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-4 h-4 rounded"
+                    style={{ backgroundColor: partyColor, opacity: 0.5 }}
+                  />
+                  <span className="text-muted-foreground">
+                    Representación media
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-gray-200" />
+                  <span className="text-muted-foreground">
+                    Sin representación
+                  </span>
+                </div>
+              </div>
+            </div>
+            <svg
+              viewBox="0 0 800 1000"
+              className="w-full h-auto"
+              style={{ maxHeight: "700px" }}
+            >
+              <defs>
+                <filter id="shadow">
+                  <feDropShadow
+                    dx="0"
+                    dy="2"
+                    stdDeviation="3"
+                    floodOpacity="0.3"
+                  />
+                </filter>
+              </defs>
+
+              {geoData.features.map((feature, idx) => {
+                const districtName = feature.properties.NOMBDEP;
+                const data = getDistrictData(districtName);
+                const seats = data?.seats || 0;
+
+                const projectedCoords = projectCoordinates(
+                  feature.geometry.coordinates,
+                  bounds,
+                  districtName,
+                );
+                const pathData = coordinatesToPath(projectedCoords);
+                const centroid = getCentroid(projectedCoords);
+
+                const isCallao = normalize(districtName) === "callao";
+
+                return (
+                  <g key={idx}>
+                    <path
+                      d={pathData}
+                      fill={getDistrictColor(districtName)}
+                      stroke="#1F2937"
+                      strokeWidth={isCallao ? "2.5" : "1.5"}
+                      className="cursor-pointer transition-all duration-200"
+                      style={{
+                        filter:
+                          hoveredDistrict === districtName
+                            ? "url(#shadow) brightness(1.15)"
+                            : "none",
+                        strokeWidth:
+                          hoveredDistrict === districtName
+                            ? "3"
+                            : isCallao
+                              ? "2.5"
+                              : "1.5",
+                      }}
+                      onMouseEnter={() => setHoveredDistrict(districtName)}
+                      onMouseLeave={() => setHoveredDistrict(null)}
+                    />
+                    {seats > 0 && centroid && (
+                      <text
+                        x={centroid[0]}
+                        y={centroid[1]}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        className="font-bold pointer-events-none select-none"
+                        fontSize={isCallao ? "48" : "32"}
+                        fill="#1F2937"
+                        stroke="white"
+                        strokeWidth="3"
+                        paintOrder="stroke"
+                      >
+                        {seats}
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
+            </svg>
+
+            {/* Tooltip posicionado en el lado derecho del mapa */}
             {hoveredData && (
-              <div className="mt-4 bg-card border-2 border-primary rounded-lg p-4 shadow-lg">
+              <div className="absolute top-1/2 right-4 -translate-y-1/2 bg-card border-2 border-primary rounded-lg p-4 shadow-lg max-w-xs z-10">
                 <h4 className="font-bold text-lg text-foreground mb-2">
                   {hoveredData.district_name}
                 </h4>
@@ -382,66 +461,6 @@ export function PeruSeatsMapSimple({
                 </div>
               </div>
             )}
-          </div>
-
-          {/* Legend */}
-          <div className="space-y-4">
-            <div className="bg-card border border-border rounded-lg p-4">
-              <h4 className="font-semibold text-sm text-foreground mb-3">
-                Leyenda
-              </h4>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-4 h-4 rounded"
-                    style={{ backgroundColor: partyColor, opacity: 1 }}
-                  />
-                  <span className="text-xs text-muted-foreground">
-                    Mayor concentración
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-4 h-4 rounded"
-                    style={{ backgroundColor: partyColor, opacity: 0.5 }}
-                  />
-                  <span className="text-xs text-muted-foreground">
-                    Concentración media
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-gray-200" />
-                  <span className="text-xs text-muted-foreground">
-                    Sin representación
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Top Districts */}
-            <div className="bg-card border border-border rounded-lg p-4">
-              <h4 className="font-semibold text-sm text-foreground mb-3">
-                Principales Departamentos
-              </h4>
-              <div className="space-y-2">
-                {[...seatsByDistrict]
-                  .sort((a, b) => b.seats - a.seats)
-                  .slice(0, 5)
-                  .map((district) => (
-                    <div
-                      key={district.district_code}
-                      className="flex items-center justify-between text-sm"
-                    >
-                      <span className="text-foreground truncate">
-                        {district.district_name}
-                      </span>
-                      <Badge variant="secondary" className="ml-2">
-                        {district.seats}
-                      </Badge>
-                    </div>
-                  ))}
-              </div>
-            </div>
           </div>
         </div>
       </div>

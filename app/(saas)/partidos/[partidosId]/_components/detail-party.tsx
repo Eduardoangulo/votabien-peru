@@ -28,7 +28,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getTextColor, needsOverlay } from "@/lib/utils/color-utils";
 import { cn } from "@/lib/utils";
-import { PeruSeatsMapSimple } from "@/components/politics/peru-seats-map";
+import PeruSeatsMapSimple from "@/components/politics/peru-seats-map";
 
 export default function DetailParty({
   party,
@@ -106,6 +106,33 @@ export default function DetailParty({
     party.tiktok_url ||
     party.youtube_url;
 
+  const CONDITION_STYLES: Record<string, { label: string; className: string }> =
+    {
+      En_ejercicio: {
+        label: "En ejercicio",
+        className:
+          "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+      },
+      Fallecido: {
+        label: "Fallecido",
+        className:
+          "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+      },
+      Suspendido: {
+        label: "Suspendido",
+        className:
+          "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      },
+      Licencia: {
+        label: "Licencia",
+        className:
+          "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+      },
+      Destituido: {
+        label: "Destituido",
+        className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+      },
+    };
   return (
     <div className="min-h-screen bg-background">
       {/* Breadcrumb */}
@@ -203,8 +230,7 @@ export default function DetailParty({
             </div>
           </div>
 
-          {/* ----- STATS MOVIDOS AQUI ----- */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 sm:mt-12">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
             {añosFundacion && (
               <div className="flex items-center gap-3">
                 <div
@@ -294,12 +320,10 @@ export default function DetailParty({
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {/* STATS ORIGINALES ELIMINADOS DE AQUI */}
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="container mx-auto p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-1 lg:order-1 flex flex-col space-y-8 order-1">
-            <div className="lg:sticky lg:top-8 space-y-6">
+            <div className="lg:sticky lg:top-18 space-y-2">
               {party.description && (
                 <Card className="order-1">
                   <CardHeader>
@@ -313,10 +337,8 @@ export default function DetailParty({
                 </Card>
               )}
 
-              {/* ----- REDES SOCIALES MODIFICADAS ----- */}
               {hasSocialLinks && (
                 <>
-                  {/* Desktop view: With Card */}
                   <Card className="hidden lg:block">
                     <CardHeader>
                       <CardTitle className="text-lg">Redes Sociales</CardTitle>
@@ -324,13 +346,10 @@ export default function DetailParty({
                     <CardContent>{socialLinks}</CardContent>
                   </Card>
 
-                  {/* Mobile view: No Card, just links */}
                   <div className="block lg:hidden">{socialLinks}</div>
                 </>
               )}
-              {/* ----- FIN DE REDES SOCIALES ----- */}
 
-              {/* Información de Contacto */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
@@ -411,11 +430,27 @@ export default function DetailParty({
             </div>
           </div>
 
-          <div className="lg:col-span-2 order-2 lg:order-2 space-y-8">
+          <div className="lg:col-span-2 order-2 lg:order-2 space-y-4">
+            {/* Timeline histórico */}
+            {party.party_timeline && party.party_timeline.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <History className="w-6 h-6 text-primary" />
+                    Historia del Partido
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-gradient-to-br from-primary/5 to-primary/0 rounded-xl p-6">
+                    <TimelineComponent items={party.party_timeline} />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             {/* Mapa de Escaños */}
             {party.seats_by_district && party.seats_by_district.length > 0 && (
               <Card>
-                <CardContent className="pt-6">
+                <CardContent>
                   <PeruSeatsMapSimple
                     partyName={party.name}
                     partyColor={party.color_hex}
@@ -445,11 +480,10 @@ export default function DetailParty({
                       {party.elected_legislators.map((legislator) => (
                         <Link
                           key={legislator.id}
-                          href={`/congresistas/${legislator.id}`}
+                          href={`/legisladores/${legislator.person_id}`}
                           className="group"
                         >
                           <div className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/50 hover:shadow-md transition-all duration-200 bg-card">
-                            {/* Foto */}
                             <div className="relative w-14 h-14 rounded-full overflow-hidden bg-muted flex-shrink-0 ring-2 ring-border group-hover:ring-primary/50 transition-all">
                               {legislator.photo_url ? (
                                 <Image
@@ -466,7 +500,6 @@ export default function DetailParty({
                               )}
                             </div>
 
-                            {/* Info */}
                             <div className="flex-1 min-w-0">
                               <h4 className="font-semibold text-sm text-foreground truncate group-hover:text-primary transition-colors">
                                 {legislator.full_name}
@@ -477,10 +510,19 @@ export default function DetailParty({
                                   {legislator.district_name}
                                 </p>
                               )}
-                              {legislator.position && (
-                                <p className="text-xs text-muted-foreground mt-0.5">
-                                  {legislator.position}
-                                </p>
+                              {legislator.condition && (
+                                <Badge
+                                  variant="secondary"
+                                  className={`text-[10px] px-2 py-0.5 ${
+                                    CONDITION_STYLES[legislator.condition]
+                                      ?.className
+                                  }`}
+                                >
+                                  {
+                                    CONDITION_STYLES[legislator.condition]
+                                      ?.label
+                                  }
+                                </Badge>
                               )}
                             </div>
 
@@ -492,23 +534,6 @@ export default function DetailParty({
                   </CardContent>
                 </Card>
               )}
-
-            {/* Timeline histórico */}
-            {party.party_timeline && party.party_timeline.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-xl">
-                    <History className="w-6 h-6 text-primary" />
-                    Historia del Partido
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="bg-gradient-to-br from-primary/5 to-primary/0 rounded-xl p-6">
-                    <TimelineComponent items={party.party_timeline} />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
         </div>
       </div>
@@ -523,7 +548,6 @@ const TimelineComponent = ({ items }: { items: PartyHistory[] }) => {
     <div className="relative space-y-6 sm:space-y-8">
       {sortedItems.map((item, idx) => (
         <div key={idx} className="relative flex gap-4 sm:gap-6 group">
-          {/* Columna de tiempo */}
           <div className="flex-shrink-0 w-16 sm:w-20 text-right pt-1">
             <span className="text-lg sm:text-xl font-bold text-primary tabular-nums">
               {item.year}
