@@ -9,6 +9,7 @@ import {
   FileEdit,
   // UserCog,
   // Settings,
+  BookHeadphones,
 } from "lucide-react";
 import { NavGroup } from "@/interfaces/navbar";
 
@@ -16,7 +17,8 @@ export const publicNavGroups: NavGroup[] = [
   {
     links: [
       { href: "/", label: "Inicio", icon: Home },
-      { href: "/legisladores", label: "Congresistas", icon: Users },
+      { href: "/aprende", label: "Aprende", icon: Users },
+      { href: "/legisladores", label: "Congresistas", icon: BookHeadphones },
       { href: "/partidos", label: "Partidos", icon: Flag },
       { href: "/candidatos", label: "Candidatos 2026", icon: UserCheck },
       { href: "/comparador", label: "Comparador", icon: GitCompare },

@@ -1,0 +1,212 @@
+import { Video } from "@/interfaces/aprende";
+
+const VIDEOS: Video[] = [
+  // YouTube
+  {
+    id: "featured-1",
+    video_id: "66mCo_zW_sk",
+    platform: "youtube",
+    category: "conceptos",
+    creator_name: "@onpeprensa - ONPE",
+    creator_type: "oficial",
+    is_featured: true,
+    title: "Bicameralidad y voto preferencial",
+    description: `🎙 Marisol Cuéllar, especialista en educación electoral de nuestra institución, explica por qué este es un proceso distinto al de años anteriores.
+                  🗣 “El Congreso de la República ahora estará integrado de forma bicameral, es decir, con un Senado y una Cámara de Diputados”.`,
+  },
+  {
+    id: "concepto-1",
+    video_id: "JApWatKy5Vo",
+    platform: "youtube",
+    category: "conceptos",
+    creator_name: "@ENTERARSE",
+    creator_type: "divulgador",
+    is_featured: false,
+    title: "El Estado Peruano: ¿Qué es y como está organizado?",
+    description: `Todos hablamos del Estado y de las decisiones que toma y que afectan a todos los peruanos. Pero, ¿realmente entendemos qué es? En este video, ofrecemos una breve introducción sobre cómo nuestra Constitución lo define y cómo está organizado.`,
+  },
+  {
+    id: "concepto-2",
+    video_id: "vyKGbOkuric",
+    platform: "youtube",
+    category: "conceptos",
+    creator_name: "@ENTERARSE",
+    creator_type: "divulgador",
+    is_featured: false,
+    title: "¿Qué hace el Poder Legislativo?",
+    description:
+      "Como hemos visto en otros videos, el Estado se compone de tres poderes: el Ejecutivo, el Legislativo y el Judicial. En esta ocasión, hablamos sobre el Poder Legislativo: ¿para qué sirve? ¿Cuáles son sus funciones?",
+  },
+  {
+    id: "concepto-3",
+    video_id: "-QsmawDSJn4",
+    platform: "youtube",
+    category: "conceptos",
+    creator_name: "@ENTERARSE",
+    creator_type: "divulgador",
+    is_featured: false,
+    title: "¿Qué hace el Poder Ejecutivo?",
+    description:
+      "En un video anterior hablamos de los tres poderes del Estado en el Perú: el Poder Ejecutivo, el Poder Legislativo y el Poder Judicial. Cada uno cumple una función específica para mantener el funcionamiento del aparato estatal. En esta ocasión, explicamos el Poder Ejecutivo: ¿para qué sirve? ¿Cuáles son sus funciones?",
+  },
+  {
+    id: "concepto-4",
+    video_id: "5hCzK9si-Qk",
+    platform: "youtube",
+    category: "conceptos",
+    creator_name: "@ENTERARSE",
+    creator_type: "divulgador",
+    is_featured: false,
+    title: "¿Qué hace el Poder Judicial?",
+    description:
+      "El Poder Judicial, al igual que los poderes Legislativo y Ejecutivo, es un organismo autónomo e independiente. Su función principal es la administración de justicia en todo el Perú, con el objetivo de garantizar la defensa de la propiedad y los derechos de todos los peruanos.",
+  },
+  {
+    id: "concepto-5",
+    video_id: "4ZhiKQvhBW4",
+    platform: "youtube",
+    category: "conceptos",
+    creator_name: "@ENTERARSE",
+    creator_type: "divulgador",
+    is_featured: false,
+    title: "¿Qué es un ministro?",
+    description:
+      "Los ministros son funcionarios esenciales para la democracia peruana. De hecho, el presidente de la República está prohibido de actuar si no cuenta con su respaldo. ¿Qué significa esto? ¿Qué otras funciones tienen los ministros? ¿Cuál es su relación con el Congreso y cómo funcionan los ministros en otros países?",
+  },
+  {
+    id: "concepto-6",
+    video_id: "l-PA5W7CDzQ",
+    platform: "youtube",
+    category: "conceptos",
+    creator_name: "@ENTERARSE",
+    creator_type: "divulgador",
+    is_featured: false,
+    title: "¿Cómo se fiscaliza al Congreso? (Perú)",
+    description:
+      "En varios videos hemos explicado los mecanismos que tiene el Poder Legislativo para fiscalizar al presidente y al resto del Poder Ejecutivo: voto de confianza, mociones de censura y acusaciones constitucionales. Pero siempre surge la pregunta en los comentarios: ¿y quién fiscaliza al Congreso?",
+  },
+  {
+    id: "concepto-7",
+    video_id: "CiTDTuhGQxo",
+    platform: "youtube",
+    category: "conceptos",
+    creator_name: "@ENTERARSE",
+    creator_type: "divulgador",
+    is_featured: false,
+    title: "El serio problema electoral del Perú - Entérate más",
+    description:
+      "El Perú irá a las elecciones de 2026 con 39 partidos políticos inscritos. A primera vista, esto podría parecer un signo de mayor democracia. Pero la evidencia muestra lo contrario: más partidos no significan mejores elecciones, sino más fragmentación, menos información y menor predictibilidad política.",
+  },
+  {
+    id: "concepto-8",
+    video_id: "9KwtiSQzkeY",
+    platform: "youtube",
+    category: "conceptos",
+    creator_name: "@ENTERARSE",
+    creator_type: "divulgador",
+    is_featured: false,
+    title: "La trampa del voto obligatorio que nadie explica",
+    description:
+      "En muchos países —como Perú, México, Bolivia y Brasil— el voto es obligatorio, pero casi nadie cuestiona si realmente ayuda a mejorar la democracia.",
+  },
+  {
+    id: "concepto-9",
+    video_id: "cQ1DsnZ7SkM",
+    platform: "youtube",
+    category: "conceptos",
+    creator_name: "@ENTERARSE",
+    creator_type: "divulgador",
+    is_featured: false,
+    title:
+      "Por qué el Congreso nunca te representará (y por qué eso es bueno para la democracia)",
+    description:
+      "La frase “el Congreso no me representa” se repite en casi todos los países, desde Perú hasta Estados Unidos. Pero, ¿alguna vez te has preguntado si esa afirmación realmente tiene sentido?",
+  },
+  {
+    id: "concepto-10",
+    video_id: "UEcoEru7ilM",
+    platform: "youtube",
+    category: "conceptos",
+    creator_name: "@ENTERARSE",
+    creator_type: "divulgador",
+    is_featured: false,
+    title: "¿Por qué el Reino Unido no tiene una Constitución?",
+    description:
+      "El Reino Unido es una de las democracias más estables del mundo… pero no tiene una Constitución. ¿Cómo es eso posible?",
+  },
+  {
+    id: "concepto-11",
+    video_id: "KdTRZrNdcBo",
+    platform: "youtube",
+    category: "academico",
+    creator_name: "@IUS360",
+    creator_type: "academico",
+    is_featured: false,
+    title:
+      "Análisis y diferencias de las constituciones de 1979 y 1993 l Oscar Pazo",
+    description: `#Constitucional ¿En qué aspectos destacan cada una de estas dos constituciones? ¿Existe alguna importancia en los preámbulos para el criterio interpretativo?`,
+  },
+  {
+    id: "podcast-1",
+    video_id: "zCbyDCv4hBM",
+    platform: "youtube",
+    category: "podcasts",
+    creator_name: "@PropuestasdelBicentenario",
+    creator_type: "academico",
+    is_featured: false,
+    title:
+      "¿Quién manda realmente en el Perú? | Rosa María Palacios en el Podcast PdB",
+    description:
+      "En el episodio 30 del podcast de Propuestas del Bicentenario, Luis Miguel Castilla, director ejecutivo de Videnza Instituto, conversa con Rosa María Palacios sobre la crisis política que atraviesa el Perú, el rol del Congreso, los riesgos del nuevo sistema electoral, el debilitamiento de la democracia y la urgencia de un voto ciudadano informado y consciente.",
+  },
+  //   {
+  //     id: "youtube-1",
+  //     video_id: "5py0G70acNM",
+  //     platform: "youtube",
+  //     category: "shorts",
+  //     creator_name: "@onpeprensa - ONPE",
+  //     creator_type: "oficial",
+  //     is_featured: false,
+  //     title: "¿Qué es un referéndum?",
+  //     description: "Explicación visual sobre mecanismos de participación",
+  //   },
+  {
+    id: "tiktok-1",
+    video_id: "7572034126589529364",
+    platform: "tiktok",
+    category: "shorts",
+    creator_name: "@onpe_oficial - ONPE",
+    creator_type: "oficial",
+    is_featured: false,
+    title: "¡Las Elecciones Generales 2026 se acercan!",
+    description:
+      "Visita la página web: https://eg2026.onpe.gob.pe/ . 💡 ¡Y recuerda! Desde el 23 de noviembre podrás elegir tu local de votación.",
+  },
+  {
+    id: "tiktok-2",
+    video_id: "7568868925123890453",
+    platform: "tiktok",
+    category: "shorts",
+    creator_name: "@onpe_oficial - ONPE",
+    creator_type: "oficial",
+    is_featured: false,
+    title: "Horario de votación",
+    description: `🕖 7 a. m. – 5 p. m. → Horario de votación
+                  ⏰ 6 a. m. → Hora de llegada para los miembros de mesa a los locales de votación`,
+  },
+  // Instagram (usa el shortcode del post)
+  //   {
+  //     id: "instagram-1",
+  //     video_id: "ABC123xyz",
+  //     platform: "instagram",
+  //     category: "shorts",
+  //     creator_name: "@educacioncivica",
+  //     creator_type: "profesor",
+  //     is_featured: false,
+  //     title: "¿Qué es un referéndum?",
+  //     description: "Explicación visual sobre mecanismos de participación",
+  //     thumbnail: "/thumbnails/instagram-referendum.jpg",
+  //   },
+];
+
+export default VIDEOS;

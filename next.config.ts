@@ -20,6 +20,16 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "img.youtube.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "p16-sign-sg.tiktokcdn.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "commons.wikimedia.org",
         pathname: "/**",
       },

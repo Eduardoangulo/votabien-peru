@@ -4,7 +4,6 @@ import {
   ElectoralProcess,
   ChamberType,
   SeatParliamentary,
-  Executive,
   PoliticalPartyListPaginated,
 } from "@/interfaces/politics";
 import { Suspense } from "react";
@@ -76,12 +75,12 @@ function ComparadorSkeleton() {
 
 export default async function VotaBienPage() {
   try {
-    const [partidos, ejecutivos, proceso_electoral, seats] = await Promise.all([
+    const [partidos, proceso_electoral, seats] = await Promise.all([
       publicApi.getPartidos({
         active: true,
         limit: 8,
       }) as Promise<PoliticalPartyListPaginated>,
-      publicApi.getEjecutivos() as Promise<Executive[]>,
+      // publicApi.getEjecutivos() as Promise<Executive[]>,
       publicApi.getProcesosElectorales(true) as Promise<ElectoralProcess[]>,
       publicApi.getSeatParliamentary(ChamberType.CONGRESO) as Promise<
         SeatParliamentary[]
@@ -95,10 +94,11 @@ export default async function VotaBienPage() {
     return (
       <div className="min-h-screen ">
         {/* Hero Dual Split */}
-        <HeroDualSplit
+        {/* <HeroDualSplit
           proceso_electoral={proceso_electoral[0]}
           ejecutivos={ejecutivos}
-        />
+        /> */}
+        <HeroDualSplit proceso_electoral={proceso_electoral[0]} />
         <Suspense fallback={<ComparadorSkeleton />}>
           <ComparadorServer />
         </Suspense>

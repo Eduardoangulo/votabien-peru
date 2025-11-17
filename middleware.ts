@@ -35,6 +35,7 @@ const ROUTE_CONFIG = {
 
   public: [
     "/",
+    "/aprende",
     "/legisladores",
     "/legisladores/[id]",
     "/comparador",
@@ -415,7 +416,7 @@ class SecurityManager {
           "img-src 'self' data: https: blob:",
           "font-src 'self' data: https://fonts.gstatic.com",
           connectSrc,
-          "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
+          "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://www.tiktok.com",
           "frame-ancestors 'none'",
           "base-uri 'self'",
           "form-action 'self'",
