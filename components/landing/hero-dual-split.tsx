@@ -9,12 +9,12 @@ import {
   Users,
   Columns,
   Building2,
-  Scale,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { Executive } from "@/interfaces/politics";
-
+import YouTubeVideoDialog from "@/components/youtube-video-dialog";
+import { PiYoutubeLogoFill } from "react-icons/pi";
 // ============= INTERFACES =============
 
 interface ElectoralProcess {
@@ -26,7 +26,8 @@ interface HeroDualSplitProps {
   ejecutivos?: Executive[];
 }
 
-type TabType = "ejecutivo" | "legislativo" | "judicial";
+type TabType = "ejecutivo" | "legislativo";
+// type TabType = "ejecutivo" | "legislativo" | "judicial";
 
 // ============= UTILIDADES =============
 const calcularDiasRestantes = (fecha: string) => {
@@ -117,12 +118,12 @@ export default function HeroDualSplit({
       icon: Users,
       disabled: false,
     },
-    {
-      id: "judicial" as TabType,
-      label: "Judicial",
-      icon: Scale,
-      disabled: true,
-    },
+    // {
+    //   id: "judicial" as TabType,
+    //   label: "Judicial",
+    //   icon: Scale,
+    //   disabled: true,
+    // },
   ];
 
   return (
@@ -219,7 +220,7 @@ export default function HeroDualSplit({
                   `}
                 >
                   <Icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="inline">{tab.label}</span>
 
                   {isActive && (
                     <motion.div
@@ -359,10 +360,12 @@ export default function HeroDualSplit({
                       </div>
                     </div>
 
-                    <button className="relative inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-warning text-black font-semibold hover:bg-warning/90 transition-shadow shadow-lg">
-                      Entiende el Cambio
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
+                    <YouTubeVideoDialog
+                      videoId="66mCo_zW_sk"
+                      buttonText="Entiende el Cambio"
+                      buttonIcon={<PiYoutubeLogoFill className="size-5" />}
+                      autoplay={true}
+                    />
                   </div>
                 </div>
               </div>
@@ -381,7 +384,7 @@ export default function HeroDualSplit({
             >
               {/* Título centrado entre ambos paneles */}
               <div className="absolute top-6 md:top-12 left-1/2 -translate-x-1/2 z-30 text-center px-4">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r from-primary via-white to-info bg-clip-text text-transparent drop-shadow-2xl leading-tight">
+                <h1 className="truncate text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r from-primary via-white to-info bg-clip-text text-transparent drop-shadow-2xl leading-tight">
                   Poder Ejecutivo del Perú
                 </h1>
               </div>

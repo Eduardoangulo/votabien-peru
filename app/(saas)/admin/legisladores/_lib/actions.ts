@@ -6,13 +6,17 @@ import {
   CreatePersonRequest,
   UpdatePersonRequest,
   CreateLegislatorPeriodRequest,
-  CreateCandidateRequest,
-  updateLegislatorPeriodRequest,
+  UpdateLegislatorPeriodRequest,
 } from "@/interfaces/admin";
 import {
   BulkUpdateLegislatorsRequest,
   BulkUpdateLegislatorsResponse,
 } from "./types";
+import { extractErrorMessage } from "@/lib/api-error-handler";
+import {
+  CreateParliamentaryMembership,
+  UpdateParliamentaryMembership,
+} from "@/interfaces/parliamentary-membership";
 
 // ============= PERSONAS =============
 
@@ -22,9 +26,8 @@ export async function createPerson(data: CreatePersonRequest) {
       "/api/v1/politics/admin/personas",
       data,
     );
-    revalidatePath("/admin/persons");
-    revalidatePath("/admin/legislators");
-    revalidatePath("/admin/candidates");
+    revalidatePath("/admin/legisladores");
+    revalidatePath("/admin/candidatos");
     return { success: true, data: result };
   } catch (error) {
     console.error("Error creating person:", error);
@@ -44,9 +47,8 @@ export async function updatePerson(
       `/api/v1/politics/admin/personas/${personId}`,
       data,
     );
-    revalidatePath("/admin/persons");
-    revalidatePath("/admin/legislators");
-    revalidatePath("/admin/candidates");
+    revalidatePath("/admin/legisladores");
+    revalidatePath("/admin/candidatos");
     return { success: true, data: result };
   } catch (error) {
     console.error("Error updating person:", error);
@@ -65,10 +67,10 @@ export async function createLegislatorPeriod(
 ) {
   try {
     const result = await serverApi.post(
-      `/api/v1/politics/admin/legislators/new-period`,
+      `/api/v1/politics/admin/legisladores/new-period`,
       data,
     );
-    revalidatePath("/admin/legislators");
+    revalidatePath("/admin/legisladores");
     return { success: true, data: result };
   } catch (error) {
     console.error("Error creating legislator period:", error);
@@ -83,14 +85,14 @@ export async function createLegislatorPeriod(
 }
 
 export async function updateLegislatorPeriod(
-  data: updateLegislatorPeriodRequest,
+  data: UpdateLegislatorPeriodRequest,
 ) {
   try {
     const result = await serverApi.put(
-      `/api/v1/politics/admin/legislators/${data.id}`,
+      `/api/v1/politics/admin/legisladores/${data.id}`,
       data,
     );
-    revalidatePath("/admin/legislators");
+    revalidatePath("/admin/legisladores");
     return { success: true, data: result };
   } catch (error) {
     console.error("Error updating legislator period:", error);
@@ -107,9 +109,9 @@ export async function updateLegislatorPeriod(
 export async function deleteLegislatorPeriod(legislatorId: string) {
   try {
     const result = await serverApi.delete(
-      `/api/v1/politics/admin/legislators/${legislatorId}`,
+      `/api/v1/politics/admin/legisladores/${legislatorId}`,
     );
-    revalidatePath("/admin/legislators");
+    revalidatePath("/admin/legisladores");
     return { success: true, data: result };
   } catch (error) {
     console.error("Error deleting legislator period:", error);
@@ -128,11 +130,11 @@ export async function bulkUpdateLegislators(
 ) {
   try {
     const result = await serverApi.patch<BulkUpdateLegislatorsResponse>(
-      "/api/v1/politics/admin/legislators/bulk-update",
+      "/api/v1/politics/admin/legisladores/bulk-update",
       input,
     );
 
-    revalidatePath("/admin/legislators");
+    revalidatePath("/admin/legisladores");
 
     return {
       data: result,
@@ -149,45 +151,120 @@ export async function bulkUpdateLegislators(
     };
   }
 }
-// ============= CANDIDATOS =============
 
-export async function createCandidate(data: CreateCandidateRequest) {
-  try {
-    const result = await serverApi.post(
-      "/api/v1/politics/admin/candidaturas",
-      data,
-    );
-    revalidatePath("/admin/candidates");
-    return { success: true, data: result };
-  } catch (error) {
-    console.error("Error creating candidate:", error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Error al crear candidatura",
-    };
-  }
-}
-
-export async function updateCandidate(
-  candidateId: string,
-  data: CreateCandidateRequest,
+export async function createParliamentaryMembership(
+  legislator_id: string,
+  data: CreateParliamentaryMembership,
 ) {
   try {
-    const result = await serverApi.put(
-      `/api/v1/politics/admin/candidaturas/${candidateId}`,
+    const result = await serverApi.post(
+      `/api/v1/admin/legislators/${legislator_id}/memberships`,
       data,
     );
-    revalidatePath("/admin/candidates");
+    revalidatePath("/admin/legisladores");
+    console.log("result_data", result);
     return { success: true, data: result };
   } catch (error) {
-    console.error("Error updating candidate:", error);
+    console.error("Error creating membership:", error);
     return {
       success: false,
       error:
         error instanceof Error
           ? error.message
-          : "Error al actualizar candidatura",
+          : "Error al crear cambio de bancada",
     };
   }
 }
+
+export async function updateParliamentaryMembership(
+  legislator_id: string,
+  data: UpdateParliamentaryMembership,
+) {
+  try {
+    const { id, ...bodyData } = data;
+    const result = await serverApi.put(
+      `/api/v1/admin/legislators/${legislator_id}/memberships/${id}`,
+      bodyData,
+    );
+    revalidatePath("/admin/legisladores");
+    return { success: true, data: result };
+  } catch (error) {
+    console.error("Error updating membership:", error);
+    return {
+      success: false,
+      error: extractErrorMessage(
+        error,
+        "Error al actualizar cambio de bancada",
+      ),
+    };
+  }
+}
+
+export async function deleteParliamentaryMembership(
+  legislator_id: string,
+  membership_id: string,
+) {
+  try {
+    await serverApi.delete(
+      `/api/v1/admin/legislators/${legislator_id}/memberships/${membership_id}`,
+    );
+
+    revalidatePath("/admin/legisladores");
+
+    return {
+      success: true,
+      message: "Cambio de bancada eliminado exitosamente",
+    };
+  } catch (error) {
+    console.error("Error deleting membership:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Error al eliminar cambio de bancada",
+    };
+  }
+}
+// ============= CANDIDATOS =============
+
+// export async function createCandidate(data: CreateCandidateRequest) {
+//   try {
+//     const result = await serverApi.post(
+//       "/api/v1/politics/admin/candidaturas",
+//       data
+//     );
+//     revalidatePath("/admin/candidatos");
+//     return { success: true, data: result };
+//   } catch (error) {
+//     console.error("Error creating candidate:", error);
+//     return {
+//       success: false,
+//       error:
+//         error instanceof Error ? error.message : "Error al crear candidatura",
+//     };
+//   }
+// }
+
+// export async function updateCandidate(
+//   candidateId: string,
+//   data: CreateCandidateRequest
+// ) {
+//   try {
+//     const result = await serverApi.put(
+//       `/api/v1/politics/admin/candidaturas/${candidateId}`,
+//       data
+//     );
+//     revalidatePath("/admin/candidatos");
+//     return { success: true, data: result };
+//   } catch (error) {
+//     console.error("Error updating candidate:", error);
+//     return {
+//       success: false,
+//       error:
+//         error instanceof Error
+//           ? error.message
+//           : "Error al actualizar candidatura",
+//     };
+//   }
+// }

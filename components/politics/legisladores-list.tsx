@@ -17,7 +17,6 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -33,8 +32,8 @@ import {
   FiltersPerson,
   LegislatorCard,
   LegislatorCondition,
-  ParliamentaryGroupBasic,
 } from "@/interfaces/politics";
+import { ParliamentaryGroupBasic } from "@/interfaces/parliamentary-membership";
 
 interface LegisladoresListProps {
   legisladores: LegislatorCard[];
@@ -352,39 +351,41 @@ const LegisladoresList = ({
                     {/* Parliamentary Group - Bottom Left */}
                     {leg.current_parliamentary_group && (
                       <div className="absolute bottom-2 left-2">
-                        <Badge className="text-[10px] md:text-xs font-medium border backdrop-blur-md bg-background/80 text-foreground border-border/50 hover:bg-background/90 transition-all">
+                        <Badge className="text-[10px] md:text-xs font-medium border backdrop-blur-md bg-background/80 text-foreground border-border/50 hover:bg-background/90 transition-all whitespace-normal break-words">
                           {leg.current_parliamentary_group.name}
                         </Badge>
                       </div>
                     )}
                   </div>
 
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-semibold line-clamp-2 group-hover:text-primary transition-colors leading-tight">
+                  {/* Contenido optimizado */}
+                  <div className="flex flex-col flex-grow px-3">
+                    {/* Nombre */}
+                    <h3 className="text-sm md:text-base font-semibold line-clamp-2 group-hover:text-primary transition-colors leading-tight mb-2">
                       {leg.person.fullname}
-                    </CardTitle>
-                  </CardHeader>
+                    </h3>
 
-                  <CardContent className="space-y-2 flex-grow pt-0">
-                    {leg.person.profession && (
-                      <p className="text-[11px] md:text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                        {leg.person.profession}
-                      </p>
-                    )}
+                    <div className="mt-auto pt-2">
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] md:text-xs w-fit"
+                      >
+                        {leg.electoral_district.name}
+                      </Badge>
+                    </div>
+                  </div>
 
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] md:text-xs w-fit"
-                    >
-                      {leg.electoral_district.name}
-                    </Badge>
-                  </CardContent>
+                  <CardFooter className="border-t mt-auto">
+                    <div className="flex items-center w-full gap-2">
+                      {leg.person.profession && (
+                        <p className="text-[11px] md:text-xs text-muted-foreground line-clamp-2 leading-snug flex-1 min-w-0">
+                          {leg.person.profession}
+                        </p>
+                      )}
 
-                  <CardFooter className="border-t pt-3">
-                    <div className="flex items-center justify-end w-full">
-                      <span className="inline-flex items-center text-primary group-hover:text-primary/80 font-medium text-[10px] md:text-xs transition-colors">
+                      <span className="inline-flex items-center text-primary group-hover:text-primary/80 font-medium text-[10px] md:text-xs transition-colors whitespace-nowrap ml-auto">
                         Ver perfil
-                        <ChevronRight className="size-4" />
+                        <ChevronRight className="size-3.5 ml-0.5 group-hover:translate-x-0.5 transition-transform" />
                       </span>
                     </div>
                   </CardFooter>

@@ -356,3 +356,156 @@ body {
   overscroll-behavior: none; /* Evita el rebote visual */
   overflow-x: hidden; /* Evita desbordes horizontales */
 }
+
+/* ========================================
+   SONNER TOAST CUSTOMIZATION
+   Integrado con variables CSS custom del componente
+   ======================================== */
+
+@layer components {
+  /* Contenedor base del toast */
+  [data-sonner-toaster] [data-sonner-toast] {
+    @apply rounded-lg border shadow-lg;
+    background: var(--normal-bg) !important;
+    border-color: var(--normal-border) !important;
+    color: var(--normal-text) !important;
+  }
+
+  /* Título del toast */
+  [data-sonner-toaster] [data-sonner-toast] [data-title] {
+    @apply font-semibold text-sm;
+  }
+
+  /* Descripción del toast */
+  [data-sonner-toaster] [data-sonner-toast] [data-description] {
+    @apply text-xs;
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  /* Botón de cerrar */
+  [data-sonner-toaster] [data-sonner-toast] [data-close-button] {
+    @apply rounded-md transition-colors;
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast] [data-close-button]:hover {
+    background: hsl(var(--muted) / 0.5) !important;
+  }
+
+  /* Toast de ÉXITO */
+  [data-sonner-toaster] [data-sonner-toast][data-type="success"] {
+    background: var(--success-bg) !important;
+    border-color: var(--success-border) !important;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast][data-type="success"] [data-title] {
+    color: var(--success-text) !important;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast][data-type="success"] [data-icon] {
+    color: var(--success-text) !important;
+  }
+
+  /* Toast de ERROR */
+  [data-sonner-toaster] [data-sonner-toast][data-type="error"] {
+    background: var(--error-bg) !important;
+    border-color: var(--error-border) !important;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast][data-type="error"] [data-title] {
+    color: var(--error-text) !important;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast][data-type="error"] [data-icon] {
+    color: var(--error-text) !important;
+  }
+
+  /* Toast de WARNING */
+  [data-sonner-toaster] [data-sonner-toast][data-type="warning"] {
+    background: var(--warning-bg) !important;
+    border-color: var(--warning-border) !important;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast][data-type="warning"] [data-title] {
+    color: var(--warning-text) !important;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast][data-type="warning"] [data-icon] {
+    color: var(--warning-text) !important;
+  }
+
+  /* Toast de INFO */
+  [data-sonner-toaster] [data-sonner-toast][data-type="info"] {
+    background: var(--info-bg) !important;
+    border-color: var(--info-border) !important;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast][data-type="info"] [data-title] {
+    color: var(--info-text) !important;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast][data-type="info"] [data-icon] {
+    color: var(--info-text) !important;
+  }
+
+  /* Toast de LOADING */
+  [data-sonner-toaster] [data-sonner-toast][data-type="loading"] {
+    background: var(--normal-bg) !important;
+    border-color: var(--normal-border) !important;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast][data-type="loading"] [data-icon] {
+    color: hsl(var(--primary)) !important;
+  }
+
+  /* Progress bar (si usas duration) */
+  [data-sonner-toaster] [data-sonner-toast] [data-progress] {
+    background: currentColor !important;
+    opacity: 0.2;
+  }
+
+  /* Animaciones suaves */
+  [data-sonner-toaster] [data-sonner-toast] {
+    animation-duration: 0.3s !important;
+  }
+
+  /* Botones de acción personalizados */
+  [data-sonner-toaster] [data-sonner-toast] [data-button] {
+    @apply rounded-md px-3 py-1.5 text-sm font-medium transition-colors;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast] [data-cancel-button] {
+    background: hsl(var(--muted)) !important;
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast] [data-cancel-button]:hover {
+    background: hsl(var(--muted) / 0.8) !important;
+  }
+}
+
+/* ========================================
+   DARK MODE - Ajustes de contraste
+   ======================================== */
+
+@layer components {
+  .dark [data-sonner-toaster] [data-sonner-toast][data-type="success"] {
+    background: hsl(var(--success) / 0.15) !important;
+    border-color: hsl(var(--success) / 0.35) !important;
+  }
+
+  .dark [data-sonner-toaster] [data-sonner-toast][data-type="error"] {
+    background: hsl(var(--destructive) / 0.15) !important;
+    border-color: hsl(var(--destructive) / 0.35) !important;
+  }
+
+  .dark [data-sonner-toaster] [data-sonner-toast][data-type="warning"] {
+    background: hsl(var(--warning) / 0.15) !important;
+    border-color: hsl(var(--warning) / 0.35) !important;
+  }
+
+  .dark [data-sonner-toaster] [data-sonner-toast][data-type="info"] {
+    background: hsl(var(--info) / 0.15) !important;
+    border-color: hsl(var(--info) / 0.35) !important;
+  }
+}

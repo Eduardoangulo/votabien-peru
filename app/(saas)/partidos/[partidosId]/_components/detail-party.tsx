@@ -51,7 +51,7 @@ export default function DetailParty({
   const socialLinks = (
     <div className="flex flex-wrap gap-3">
       {party.facebook_url && (
-        <a
+        <Link
           href={party.facebook_url}
           target="_blank"
           rel="noopener noreferrer"
@@ -59,11 +59,11 @@ export default function DetailParty({
         >
           <SlSocialFacebook className="w-4 h-4" />
           <span className="text-sm font-medium">Facebook</span>
-        </a>
+        </Link>
       )}
 
       {party.twitter_url && (
-        <a
+        <Link
           href={party.twitter_url}
           target="_blank"
           rel="noopener noreferrer"
@@ -71,11 +71,11 @@ export default function DetailParty({
         >
           <SlSocialTwitter className="w-4 h-4" />
           <span className="text-sm font-medium">Twitter</span>
-        </a>
+        </Link>
       )}
 
       {party.tiktok_url && (
-        <a
+        <Link
           href={party.tiktok_url}
           target="_blank"
           rel="noopener noreferrer"
@@ -83,11 +83,11 @@ export default function DetailParty({
         >
           <PiTiktokLogo className="w-4 h-4" />
           <span className="text-sm font-medium">TikTok</span>
-        </a>
+        </Link>
       )}
 
       {party.youtube_url && (
-        <a
+        <Link
           href={party.youtube_url}
           target="_blank"
           rel="noopener noreferrer"
@@ -95,7 +95,7 @@ export default function DetailParty({
         >
           <SlSocialYoutube className="w-4 h-4" />
           <span className="text-sm font-medium">YouTube</span>
-        </a>
+        </Link>
       )}
     </div>
   );

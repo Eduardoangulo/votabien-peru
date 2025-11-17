@@ -129,7 +129,29 @@ class ServerApiClient {
       throw new Error(`API Error: ${response.status}`);
     }
 
-    return response.json();
+    // ✅ Si es 204 No Content, no hay body que parsear
+    if (response.status === 204 || response.status === 205) {
+      return null as T;
+    }
+
+    // ✅ Verificar si hay contenido antes de parsear
+    const contentLength = response.headers.get("content-length");
+    if (contentLength === "0") {
+      return null as T;
+    }
+
+    // ✅ Leer texto primero para evitar errores
+    const text = await response.text();
+    if (!text || text.trim() === "") {
+      return null as T;
+    }
+
+    // ✅ Parsear JSON solo si hay contenido
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      return null as T;
+    }
   }
 }
 

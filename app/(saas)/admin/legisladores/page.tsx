@@ -15,9 +15,10 @@ import { CreateLegislator } from "./_components/buttons";
 import { AdminLegislatorProvider } from "@/components/context/admin-legislator";
 import { publicApi } from "@/lib/public-api";
 import {
-  PoliticalPartyBase,
   ElectoralDistrictBase,
+  PoliticalPartyListPaginated,
 } from "@/interfaces/politics";
+import { ParliamentaryGroupBasic } from "@/interfaces/parliamentary-membership";
 
 interface IndexPageProps {
   searchParams: Promise<SearchParams>;
@@ -31,13 +32,23 @@ export default async function ClearancePage(props: IndexPageProps) {
     getLegislatorConditionCounts(),
     getDistrictsCounts(),
   ]);
-  const [districts, parties] = await Promise.all([
+  const [districts, parties, parliamentaryGroups] = await Promise.all([
     publicApi.getDistritos() as Promise<ElectoralDistrictBase[]>,
-    publicApi.getPartidos({ active: true }) as Promise<PoliticalPartyBase[]>,
+    publicApi.getPartidos({
+      active: true,
+      limit: 100,
+    }) as Promise<PoliticalPartyListPaginated>,
+    publicApi.getParliamentaryGroups(true) as Promise<
+      ParliamentaryGroupBasic[]
+    >,
   ]);
   return (
     <Shell className="gap-2 mx-auto">
-      <AdminLegislatorProvider districts={districts} parties={parties}>
+      <AdminLegislatorProvider
+        districts={districts}
+        parties={parties.items}
+        parliamentaryGroups={parliamentaryGroups}
+      >
         {/* <FeatureFlagsProvider> */}
         <Suspense fallback={<Skeleton className="h-7 w-52" />}>
           <div className="flex flex-row justify-between px-1">

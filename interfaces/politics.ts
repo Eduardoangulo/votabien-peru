@@ -1,5 +1,7 @@
 // ============= ENUMS =============
 
+import { ParliamentaryGroupBasic } from "./parliamentary-membership";
+
 export enum ChamberType {
   CONGRESO = "Congreso",
   SENADO = "Senado",
@@ -33,6 +35,17 @@ export enum ExecutiveRole {
   VICEPRESIDENTE = "Vicepresidente",
   PRIMER_MINISTRO = "Primer_ministro",
   MINISTRO = "Ministro",
+}
+
+export enum GroupChangeReason {
+  INICIAL = "inicial",
+  CAMBIO_VOLUNTARIO = "cambio_voluntario",
+  EXPULSION = "expulsion",
+  RENUNCIA = "renuncia",
+  DISOLUCION_BANCADA = "disolucion_bancada",
+  CAMBIO_ESTRATEGICO = "cambio_estrategico",
+  SANCION_DISCIPLINARIA = "sancion_disciplinaria",
+  OTRO = "otro",
 }
 
 export interface PreviousCase {
@@ -223,13 +236,6 @@ export interface LegislatorCard {
 }
 
 // ============= BANCADAS =============
-export interface ParliamentaryGroupBasic {
-  id: string;
-  name: string;
-  acronym: string | null;
-  color_hex: string | null;
-  logo_url: string | null;
-}
 
 // ============= EJECUTIVOS =============
 

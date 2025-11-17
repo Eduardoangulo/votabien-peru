@@ -143,7 +143,7 @@ export function ComparadorContent({
 
       <div className="container mx-auto px-4">
         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center flex-wrap">
-          <Link href="/comparator">
+          <Link href="/comparador">
             <Button
               size="lg"
               className="group relative overflow-hidden bg-gradient-to-r from-primary via-primary to-primary/90 hover:from-primary/90 hover:via-primary hover:to-primary shadow-lg hover:shadow-xl hover:shadow-primary/25 transition-all duration-300"

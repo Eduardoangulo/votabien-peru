@@ -114,12 +114,52 @@ export default function DetailLegislador({
         return "secondary";
     }
   };
+  const hasSocialLinks =
+    persona.facebook_url || persona.twitter_url || persona.tiktok_url;
+  const socialLinks = (
+    <div className="flex flex-wrap gap-3">
+      {persona.facebook_url && (
+        <Link
+          href={persona.facebook_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1877F2] text-white rounded-lg hover:opacity-90 transition-opacity"
+        >
+          <SlSocialFacebook className="w-4 h-4" />
+          <span className="text-sm font-medium">Facebook</span>
+        </Link>
+      )}
 
+      {persona.twitter_url && (
+        <Link
+          href={persona.twitter_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1DA1F2] text-white rounded-lg hover:opacity-90 transition-opacity"
+        >
+          <SlSocialTwitter className="w-4 h-4" />
+          <span className="text-sm font-medium">Twitter</span>
+        </Link>
+      )}
+
+      {persona.tiktok_url && (
+        <Link
+          href={persona.tiktok_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-[#010101] via-[#121212] to-[#343434] text-white rounded-lg hover:opacity-90 transition-opacity"
+        >
+          <PiTiktokLogo className="w-4 h-4" />
+          <span className="text-sm font-medium">TikTok</span>
+        </Link>
+      )}
+    </div>
+  );
   return (
     <div className="bg-background min-h-screen">
-      <div className="container mx-auto py-4">
+      <div className="container mx-auto p-4">
         {/* ===== HERO SECTION ===== */}
-        <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden mt-4">
+        <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
           <div className="bg-gradient-to-r from-primary to-primary/90 p-4 text-primary-foreground relative">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5"></div>
 
@@ -198,7 +238,7 @@ export default function DetailLegislador({
         </section>
 
         {/* ===== CONTENIDO PRINCIPAL ===== */}
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* --- COLUMNA PRINCIPAL --- */}
           <div className="lg:col-span-2 space-y-4">
             {/* Formación Académica */}
@@ -611,91 +651,18 @@ export default function DetailLegislador({
               </Card>
             )}
 
-            {/* Redes Sociales */}
-            {(persona.facebook_url ||
-              persona.twitter_url ||
-              persona.tiktok_url) && (
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle>Redes Sociales</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <FieldGroup className="gap-3">
-                    {persona.facebook_url && (
-                      <a
-                        href={persona.facebook_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 text-sm text-info hover:underline p-2 -m-2 rounded-md hover:bg-info/10 transition-colors"
-                      >
-                        <SlSocialFacebook className="size-4" />
-                        <span>Facebook</span>
-                        <ExternalLink className="size-3 ml-auto" />
-                      </a>
-                    )}
-                    {persona.twitter_url && (
-                      <a
-                        href={persona.twitter_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 text-sm text-info hover:underline p-2 -m-2 rounded-md hover:bg-info/10 transition-colors"
-                      >
-                        <SlSocialTwitter className="size-4" />
-                        <span>Twitter / X</span>
-                        <ExternalLink className="size-3 ml-auto" />
-                      </a>
-                    )}
-                    {persona.tiktok_url && (
-                      <a
-                        href={persona.tiktok_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 text-sm text-foreground hover:text-primary p-2 -m-2 rounded-md hover:bg-muted transition-colors"
-                      >
-                        <PiTiktokLogo className="size-4" />
-                        <span>Tiktok</span>
-                        <ExternalLink className="size-3 ml-auto" />
-                      </a>
-                    )}
-                  </FieldGroup>
-                </CardContent>
-              </Card>
-            )}
+            {hasSocialLinks && (
+              <>
+                <Card className="hidden lg:block">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Redes Sociales</CardTitle>
+                  </CardHeader>
+                  <CardContent>{socialLinks}</CardContent>
+                </Card>
 
-            {/* Información Personal */}
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle>Información Personal</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                {persona.birth_date && (
-                  <div className="flex justify-between">
-                    <span className="text-foreground/70">
-                      Fecha de Nacimiento:
-                    </span>
-                    <span className="font-medium">
-                      {new Date(persona.birth_date).toLocaleDateString(
-                        "es-ES",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        },
-                      )}
-                    </span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-foreground/70">Registro:</span>
-                  <span className="font-medium">
-                    {new Date(persona.created_at).toLocaleDateString("es-ES", {
-                      year: "numeric",
-                      month: "short",
-                    })}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+                <div className="block lg:hidden">{socialLinks}</div>
+              </>
+            )}
 
             {/* Historial Legislativo */}
             <Card className="shadow-sm">

@@ -131,7 +131,7 @@ class PublicApiClient {
   /**
    * Obtener lista de grupos parlamentarios de legisladores activos
    */
-  async getParliamentaryGroups(active: boolean = true) {
+  async getParliamentaryGroups(active: boolean) {
     return this.get(
       `/api/v1/politics/parliamentary-groups?active_only=${active}`,
     );

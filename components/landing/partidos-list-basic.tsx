@@ -41,13 +41,14 @@ const PartidosListBasic = ({ partidos }: PartidosListProps) => {
       </div>
 
       {/* Grid de partidos */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 py-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6">
         {partidos.map((partido, index) => {
           // Mostrar: 6 en mobile/tablet, 6 en md/lg, 8 en xl
-          const isHiddenOnMobile = index >= 6; // Ocultar después del 6to en mobile y md
-          const isHiddenOnXl = index >= 8; // Ocultar después del 8vo en xl
+          const isHiddenOnMobile = index >= 6;
+          const isHiddenOnXl = index >= 8;
 
-          if (isHiddenOnXl) return null; // No renderizar más de 8
+          if (isHiddenOnXl) return null;
+
           const partidoColor = partido.color_hex || "oklch(0.45 0.15 260)";
           const textColor = getTextColor(partidoColor);
           const hasOverlay = needsOverlay(partidoColor);
@@ -60,9 +61,10 @@ const PartidosListBasic = ({ partidos }: PartidosListProps) => {
                 isHiddenOnMobile ? "hidden xl:block" : ""
               }`}
             >
-              <Card className="shadow-sm hover:shadow-xl pt-0 transition-all duration-300 border-2 hover:border-primary/50 transform hover:-translate-y-1 h-full flex flex-col overflow-hidden">
+              <Card className="p-0 shadow-sm hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/50 transform hover:-translate-y-1 h-full flex flex-col overflow-hidden">
+                {/* Header con diseño vertical optimizado */}
                 <CardHeader
-                  className="relative overflow-hidden p-4 flex-grow"
+                  className="relative overflow-hidden p-4 md:p-6 flex-grow flex flex-col items-center justify-center text-center min-h-[180px] md:min-h-[200px]"
                   style={{
                     background: `linear-gradient(135deg, ${partidoColor} 0%, ${partidoColor}dd 100%)`,
                   }}
@@ -71,37 +73,44 @@ const PartidosListBasic = ({ partidos }: PartidosListProps) => {
                     <div className="absolute inset-0 bg-gradient-to-br from-gray-900/40 to-gray-900/20"></div>
                   )}
 
-                  <CardTitle className="flex items-start gap-3 relative z-10">
-                    <div className="flex-shrink-0">
-                      <div className="w-16 h-16 md:w-18 md:h-18 bg-white rounded-lg flex items-center justify-center shadow-md overflow-hidden ring-1 ring-white/20 group-hover:ring-white/40 transition-all duration-300">
+                  <CardTitle className="flex flex-col items-center relative z-10 w-full h-full">
+                    {/* Logo centrado arriba - SIEMPRE en la misma posición */}
+                    <div className="flex-shrink-0 pt-2">
+                      <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-xl flex items-center justify-center shadow-lg overflow-hidden ring-2 ring-white/30 group-hover:ring-white/50 group-hover:scale-105 transition-all duration-300">
                         {partido.logo_url ? (
                           <Image
                             src={partido.logo_url}
                             alt={partido.name}
-                            width={72}
-                            height={72}
-                            className="object-contain p-1"
+                            width={80}
+                            height={80}
+                            className="object-contain p-1.5"
                           />
                         ) : (
-                          <Building2 className="w-8 h-8 text-muted-foreground" />
+                          <Building2 className="w-8 h-8 md:w-10 md:h-10 text-muted-foreground" />
                         )}
                       </div>
                     </div>
 
-                    <div className="flex-grow min-w-0">
+                    <div className="flex flex-col items-center gap-2 md:gap-3 flex-grow justify-center mt-3">
+                      {/* Acrónimo destacado - solo si existe */}
                       {partido.acronym && (
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold shadow-sm mb-2 backdrop-blur-sm ${
+                          className={`inline-flex items-center px-3 py-1 md:px-4 md:py-1.5 rounded-full text-sm md:text-base font-bold shadow-md backdrop-blur-sm ${
                             textColor === "text-white"
-                              ? "bg-white/20 text-white"
-                              : "bg-gray-900/20 text-gray-900"
+                              ? "bg-white/25 text-white ring-1 ring-white/30"
+                              : "bg-gray-900/25 text-gray-900 ring-1 ring-gray-900/30"
                           }`}
                         >
                           {partido.acronym}
                         </span>
                       )}
+
                       <div
-                        className={`text-sm md:text-base font-bold transition-colors line-clamp-4 leading-snug ${textColor} group-hover:opacity-90`}
+                        className={`text-xs md:text-sm font-semibold transition-colors leading-tight px-2 ${textColor} group-hover:opacity-90 ${
+                          partido.acronym
+                            ? "line-clamp-2 md:line-clamp-3"
+                            : "line-clamp-3 md:line-clamp-4"
+                        }`}
                       >
                         {partido.name}
                       </div>
@@ -109,7 +118,8 @@ const PartidosListBasic = ({ partidos }: PartidosListProps) => {
                   </CardTitle>
                 </CardHeader>
 
-                <CardFooter className="p-4 flex items-center justify-between border-t border-border flex-shrink-0">
+                {/* Footer compacto */}
+                <CardFooter className="p-3 md:p-4 flex items-center justify-between border-t border-border/50 flex-shrink-0 bg-card">
                   <span
                     className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${
                       partido.active
@@ -127,7 +137,7 @@ const PartidosListBasic = ({ partidos }: PartidosListProps) => {
 
                   <span className="inline-flex items-center text-primary group-hover:text-primary/80 font-medium text-xs transition-colors">
                     Ver más
-                    <ChevronRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight className="w-3.5 h-3.5 ml-0.5 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </CardFooter>
               </Card>

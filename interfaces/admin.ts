@@ -8,6 +8,10 @@ import {
   WorkExperience,
   PreviousCase,
 } from "@/interfaces/politics";
+import {
+  ParliamentaryGroupBasic,
+  ParliamentaryMembershipWithGroup,
+} from "./parliamentary-membership";
 
 // ============= PERSON =============
 
@@ -66,25 +70,25 @@ export interface ElectoralProcess {
 }
 
 // ============= LEGISLATOR =============
+
 export interface AdminLegislator {
   id: string;
   person_id: string;
   fullname: string;
-  original_party_id: string;
-  current_party_id?: string;
+  elected_by_party_id: string;
   electoral_district_id: string;
   chamber: ChamberType;
   condition: LegislatorCondition;
   start_date: string;
-  end_date: string;
+  end_date: string | null;
   active: boolean;
   institutional_email?: string;
-  parliamentary_group?: string;
+  current_parliamentary_group: ParliamentaryGroupBasic | null;
+  parliamentary_memberships: ParliamentaryMembershipWithGroup[];
   created_at: string;
   // Relaciones populadas
   person: PersonWithActivePeriod;
-  original_party: PoliticalParty;
-  current_party?: PoliticalParty;
+  elected_by_party: PoliticalParty;
   electoral_district: ElectoralDistrictBase;
 }
 
@@ -138,18 +142,17 @@ export interface UpdatePersonRequest extends Partial<CreatePersonRequest> {
 
 export interface CreateLegislatorPeriodRequest {
   person_id: string;
-  original_party_id: string;
-  current_party_id: string | null;
+  elected_by_party_id: string;
   electoral_district_id: string;
   chamber: ChamberType;
   condition: LegislatorCondition;
   start_date: string;
-  end_date: string;
+  end_date: string | null;
   active: boolean;
   institutional_email?: string;
   parliamentary_group?: string;
 }
-export interface updateLegislatorPeriodRequest
+export interface UpdateLegislatorPeriodRequest
   extends Partial<CreateLegislatorPeriodRequest> {
   id: string;
 }
@@ -194,3 +197,5 @@ export interface CandidateTableRow {
   was_elected: boolean;
   person_id: string;
 }
+
+//  ============= GRUPOS PARLAMENTARIOS ================

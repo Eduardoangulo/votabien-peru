@@ -59,19 +59,11 @@ const legislatorPeriodSchema = z
     electoral_district_id: z
       .string()
       .min(1, "Debe seleccionar un distrito electoral"),
-    original_party_id: z
+    elected_by_party_id: z
       .string()
       .min(1, "Debe seleccionar el partido original"),
-    current_party_id: z.string().nullable(),
     start_date: z.string(),
-    end_date: z.string(),
-    parliamentary_group: z.string().transform((val) =>
-      val
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toUpperCase()
-        .trim(),
-    ),
+    end_date: z.string().nullable(),
     institutional_email: z
       .union([z.email({ message: "Email inválido" }), z.literal("")])
       .optional(),
@@ -120,11 +112,9 @@ export function LegislatorFormDialog({
       chamber: initialData?.chamber || ChamberType.CONGRESO,
       condition: initialData?.condition || LegislatorCondition.EN_EJERCICIO,
       electoral_district_id: "",
-      original_party_id: "",
-      current_party_id: null,
+      elected_by_party_id: "",
       start_date: "",
       end_date: "",
-      parliamentary_group: "",
       institutional_email: "",
       active: true,
     },
@@ -176,7 +166,7 @@ export function LegislatorFormDialog({
 
   return (
     <Credenza open={open} onOpenChange={onOpenChange}>
-      <CredenzaContent className="md:min-w-2xl">
+      <CredenzaContent className="sm:max-w-2xl lg:max-w-3xl max-h-[90vh] flex flex-col">
         <CredenzaHeader>
           <CredenzaTitle>
             {mode === "create"
@@ -189,8 +179,8 @@ export function LegislatorFormDialog({
         </CredenzaHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CredenzaBody className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="">
+            <CredenzaBody className="space-y-4 ">
               {/* Selector de Persona */}
               <FormField
                 control={form.control}
@@ -340,21 +330,14 @@ export function LegislatorFormDialog({
                 {/* Partido Original */}
                 <FormField
                   control={form.control}
-                  name="original_party_id"
+                  name="elected_by_party_id"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Partido Original *</FormLabel>
                       <Select
-                        onValueChange={(value) => {
-                          field.onChange(value);
-
-                          // Si estamos creando, igualar también el current_party
-                          if (mode === "create") {
-                            form.setValue("current_party_id", value);
-                          }
-                        }}
+                        onValueChange={(value) => field.onChange(value)}
                         defaultValue={field.value}
-                        disabled={mode === "edit"} // 🔒 Solo lectura en modo edición
+                        disabled={mode === "edit"}
                       >
                         <FormControl>
                           <SelectTrigger
@@ -391,95 +374,26 @@ export function LegislatorFormDialog({
                     </FormItem>
                   )}
                 />
-
-                {/* Partido Actual */}
-                <FormField
-                  control={form.control}
-                  name="current_party_id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Partido Actual (opcional)</FormLabel>
-                      <Select
-                        onValueChange={(value) =>
-                          field.onChange(value === "none" ? undefined : value)
-                        }
-                        value={field.value || "none"}
-                      >
-                        <FormControl>
-                          <SelectTrigger
-                            className={`
-                              w-full 
-                              h-auto min-h-15
-                              text-left
-                              whitespace-normal break-words  
-                            `}
-                          >
-                            <SelectValue placeholder="Seleccione Doctor" />
-                          </SelectTrigger>
-                        </FormControl>
-
-                        <SelectContent
-                          className="w-[var(--radix-select-trigger-width)]"
-                          position="popper"
-                          sideOffset={4}
-                        >
-                          <div className="max-h-[300px] overflow-y-auto">
-                            <SelectItem
-                              value="none"
-                              className="cursor-pointer h-auto py-2"
-                            >
-                              <span className="block text-left break-words leading-snug">
-                                Sin partido
-                              </span>
-                            </SelectItem>
-
-                            {parties?.map((party) => (
-                              <SelectItem
-                                key={party.id}
-                                value={party.id}
-                                className="cursor-pointer h-auto py-2"
-                              >
-                                <span className="block text-left break-words leading-snug">
-                                  {party.name}
-                                </span>
-                              </SelectItem>
-                            ))}
-                          </div>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormItem>
+                  <FormLabel>Grupo Parlamentario</FormLabel>
+                  <FormControl>
+                    <Input
+                      value={
+                        initialData?.current_parliamentary_group?.name ?? ""
+                      }
+                      readOnly
+                      disabled
+                      className="                w-full 
+                h-auto min-h-15
+                text-left
+                whitespace-normal break-words"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Grupo Parlamentario */}
-                <FormField
-                  control={form.control}
-                  name="parliamentary_group"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Grupo Parlamentario</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Ej: Bloque Magisterial"
-                          {...field}
-                          onChange={(e) => {
-                            const value = e.target.value
-                              .normalize("NFD")
-                              .replace(/[\u0300-\u036f]/g, "") // quita tildes
-                              .toUpperCase() // convierte a mayúsculas
-                              .trimStart(); // evita espacios iniciales mientras escribe
-
-                            field.onChange(value);
-                          }}
-                          value={field.value || ""}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <FormField
                   control={form.control}
                   name="condition"
@@ -507,26 +421,25 @@ export function LegislatorFormDialog({
                     </FormItem>
                   )}
                 />
+                {/* Email Institucional */}
+                <FormField
+                  control={form.control}
+                  name="institutional_email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Institucional</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="ejemplo@congreso.gob.pe"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-
-              {/* Email Institucional */}
-              <FormField
-                control={form.control}
-                name="institutional_email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Institucional</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="ejemplo@congreso.gob.pe"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               {/* Estado Activo */}
               <FormField

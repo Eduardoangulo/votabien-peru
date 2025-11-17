@@ -50,7 +50,7 @@ export default async function LegisladoresPage({ searchParams }: PageProps) {
       await Promise.all([
         publicApi.getLegisladoresCards(apiParams) as Promise<LegislatorCard[]>,
         publicApi.getDistritos() as Promise<ElectoralDistrictBase[]>,
-        publicApi.getParliamentaryGroups() as Promise<
+        publicApi.getParliamentaryGroups(true) as Promise<
           ParliamentaryGroupBasic[]
         >,
       ]);

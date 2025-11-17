@@ -221,8 +221,8 @@ export default function HemicileLegislator({
 
   const TooltipContent = ({ group }: { group: ParliamentaryGroup }) => {
     return (
-      <div className="bg-card border-2 border-primary/50 rounded-xl shadow-2xl p-4 backdrop-blur-sm w-[88vw] md:w-auto">
-        <div className="flex items-center gap-3 mb-3">
+      <div className="bg-card border-2 border-primary/50 rounded-xl shadow-2xl p-4 backdrop-blur-sm w-auto">
+        <div className="flex items-center gap-3">
           <div>
             {group.logo_url ? (
               <div className="relative size-8 bg-white rounded-md flex items-center justify-center shadow-md ring-1 ring-border overflow-hidden flex-shrink-0">
@@ -290,7 +290,6 @@ export default function HemicileLegislator({
             </p>
           </div>
 
-          {/* Layout optimizado: Hemiciclo + Leyenda lado a lado en desktop */}
           <div className="bg-card rounded-xl md:rounded-2xl shadow-2xl p-3 sm:p-4 md:p-6 mb-4 md:mb-6">
             <div className="flex flex-col lg:flex-row lg:items-start lg:gap-6 min-h-0">
               {/* === HEMICICLO === */}
@@ -456,14 +455,14 @@ export default function HemicileLegislator({
                 <div
                   className="
                     flex md:grid 
-                    md:grid-cols-1 
+                    lg:grid-cols-1 
                     gap-2 md:gap-2 md:space-y-0
                     overflow-x-auto md:overflow-x-hidden 
                     snap-x snap-mandatory md:snap-none
-                    md:overflow-y-auto
-                    md:overscroll-contain
-                    pb-2 md:pb-0
-                    md:max-h-[500px]
+                    lg:overflow-y-auto
+                    lg:overscroll-contain
+                    p-2
+                    lg:max-h-[500px]
                     scrollbar-thin
                     scrollbar-track-transparent
                     scrollbar-thumb-primary/30
@@ -544,20 +543,18 @@ export default function HemicileLegislator({
                             </div>
                           )}
                         </div>
-                        <div className="flex-1 text-left min-w-0">
-                          <div className="text-xs md:text-sm font-bold text-card-foreground truncate">
+
+                        <div className="flex justify-between min-w-[200px] max-w-[250px] items-center">
+                          <div className="text-xs text-left md:text-sm font-bold text-card-foreground whitespace-normal">
                             {group.name}
                           </div>
-                          <div className="text-[10px] text-muted-foreground truncate">
-                            Grupo Parlamentario
-                          </div>
-                        </div>
-                        <div className="flex-shrink-0 text-right">
-                          <div className="text-base font-bold text-card-foreground">
-                            {group.seats}
-                          </div>
-                          <div className="text-[10px] text-muted-foreground">
-                            {((group.seats / totalSeats) * 100).toFixed(1)}%
+                          <div className="flex-shrink-0 text-right">
+                            <div className="text-base font-bold text-card-foreground">
+                              {group.seats}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground">
+                              {((group.seats / totalSeats) * 100).toFixed(1)}%
+                            </div>
                           </div>
                         </div>
                       </button>

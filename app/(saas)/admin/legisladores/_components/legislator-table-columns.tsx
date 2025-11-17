@@ -3,7 +3,7 @@
 import * as React from "react";
 import { type DataTableRowAction } from "@/lib/types";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ellipsis } from "lucide-react";
+import { ArrowRightLeft, Ellipsis, SquarePen } from "lucide-react";
 
 import { formatterDate } from "@/lib/utils/date";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,7 @@ import {
   getConditionColor,
   getConditionIcon,
 } from "@/lib/utils/color-enums";
+import { Separator } from "@/components/ui/separator";
 
 interface GetColumnsProps {
   setRowAction: React.Dispatch<
@@ -112,12 +113,12 @@ export function getColumns({
       enableSorting: false,
     },
     {
-      accessorKey: "original_party",
+      accessorKey: "elected_party",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Partido Origen" />
       ),
       cell: ({ row }) => {
-        const party = row.original.original_party;
+        const party = row.original.elected_by_party;
         const textColor =
           party.color_hex === "#ffffff" ? "text-black" : "text-white";
 
@@ -136,17 +137,17 @@ export function getColumns({
       enableSorting: false,
     },
     {
-      accessorKey: "parliamentary_group",
+      accessorKey: "current_parliamentary_group",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Bancada" />
       ),
       cell: ({ row }) => {
-        const bancada = row.original.parliamentary_group;
+        const bancada = row.original.current_parliamentary_group?.name;
 
         return (
           <Badge
             variant="outline"
-            className="max-w-[200px] min-w-[200px] text-xs whitespace-normal break-words "
+            className="max-w-[250px] min-w-[250px] w-full block whitespace-normal break-words text-xs"
           >
             {bancada}
           </Badge>
@@ -245,19 +246,21 @@ export function getColumns({
                 <Ellipsis className="size-4" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end" className="w-40">
+              <Separator />
               <DropdownMenuItem
                 onSelect={() => setRowAction({ type: "update", row })}
               >
+                <SquarePen className="size-4" />
                 Actualizar
               </DropdownMenuItem>
-              {/* <DropdownMenuItem
-                onSelect={() =>
-                  setRowAction({ type: "delete", row })
-                }
+              <DropdownMenuItem
+                onSelect={() => setRowAction({ type: "update-bancada", row })}
               >
-                Eliminar
-              </DropdownMenuItem> */}
+                <ArrowRightLeft className="size-4" />
+                Cambios de Bancada
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );

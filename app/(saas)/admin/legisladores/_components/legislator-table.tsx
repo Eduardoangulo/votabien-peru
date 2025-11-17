@@ -18,6 +18,7 @@ import {
   PaginatedLegislatorsResponse,
 } from "../_lib/types";
 import { LegislatorFormDialog } from "./legislator-form-dialog";
+import { ParliamentaryMembershipDialog } from "./legislator-bancadas-dialog";
 
 interface LegislatorsTableProps {
   promises: Promise<
@@ -39,12 +40,10 @@ export function LegislatorsTable({ promises }: LegislatorsTableProps) {
   ] = React.use(promises);
   const [rowAction, setRowAction] =
     React.useState<DataTableRowAction<AdminLegislator> | null>(null);
-
   const columns = React.useMemo(
     () => getColumns({ setRowAction }),
     [setRowAction],
   );
-
   const filterFields: DataTableFilterField<AdminLegislator>[] = [
     {
       id: "fullname",
@@ -114,6 +113,15 @@ export function LegislatorsTable({ promises }: LegislatorsTableProps) {
           onOpenChange={() => setRowAction(null)}
           mode="edit"
           initialData={rowAction.row.original}
+        />
+      )}
+      {rowAction?.type === "update-bancada" && (
+        <ParliamentaryMembershipDialog
+          open={true}
+          onOpenChange={() => setRowAction(null)}
+          legislator_id={rowAction.row.original.id}
+          legislatorName={rowAction.row.original.person.fullname}
+          memberships={rowAction.row.original.parliamentary_memberships}
         />
       )}
     </>
