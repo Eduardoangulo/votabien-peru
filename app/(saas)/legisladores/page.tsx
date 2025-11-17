@@ -1,11 +1,8 @@
 import { publicApi } from "@/lib/public-api";
 import LegisladoresList from "@/components/politics/legisladores-list";
-import {
-  ElectoralDistrictBase,
-  LegislatorCard,
-  ParliamentaryGroupBasic,
-} from "@/interfaces/politics";
+import { ElectoralDistrictBase, LegislatorCard } from "@/interfaces/politics";
 import Link from "next/link";
+import { ParliamentaryGroupBasic } from "@/interfaces/parliamentary-membership";
 
 interface PageProps {
   searchParams: {

@@ -4,10 +4,8 @@ import { useState, useEffect, useMemo } from "react";
 import { Building2, Users } from "lucide-react";
 import Image from "next/image";
 
-import {
-  ParliamentaryGroupBasic,
-  SeatParliamentary,
-} from "@/interfaces/politics";
+import { SeatParliamentary } from "@/interfaces/politics";
+import { ParliamentaryGroupBasic } from "@/interfaces/parliamentary-membership";
 
 interface ParliamentaryGroup {
   name: string;

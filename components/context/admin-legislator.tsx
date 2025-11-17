@@ -1,7 +1,7 @@
 "use client";
+import { ParliamentaryGroupBasic } from "@/interfaces/parliamentary-membership";
 import {
   ElectoralDistrictBase,
-  ParliamentaryGroupBasic,
   PoliticalPartyBase,
 } from "@/interfaces/politics";
 import React, { createContext, ReactNode } from "react";

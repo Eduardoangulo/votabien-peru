@@ -1,8 +1,5 @@
-import {
-  ElectoralDistrictBase,
-  ParliamentaryGroupBasic,
-  PoliticalPartyBase,
-} from "./politics";
+import { ParliamentaryGroupBasic } from "./parliamentary-membership";
+import { ElectoralDistrictBase, PoliticalPartyBase } from "./politics";
 
 export interface AttendanceStats {
   porcentaje: number | null;
