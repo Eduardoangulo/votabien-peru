@@ -409,11 +409,15 @@ class SecurityManager {
           ? `connect-src 'self' ${apiOrigin}`
           : `connect-src 'self' ${apiOrigin} http://192.168.1.35:8000 http://localhost:8000 ws://192.168.1.35:3000 ws://localhost:3000`;
 
+        const imgSrc = isProduction
+          ? "img-src 'self' data: blob: https://p16-sign-sg.tiktokcdn.com https://*.tiktokcdn.com https://i.ytimg.com https://*.googleusercontent.com"
+          : "img-src 'self' data: https: blob:";
+
         baseHeaders["Content-Security-Policy"] = [
           "default-src 'self'",
           scriptSrc,
           styleSrc,
-          "img-src 'self' data: https: blob:",
+          imgSrc,
           "font-src 'self' data: https://fonts.gstatic.com",
           connectSrc,
           "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://www.tiktok.com",
