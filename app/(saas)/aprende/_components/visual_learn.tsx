@@ -499,6 +499,7 @@ function VideoThumbnail({
             alt=""
             className="object-cover transition-transform duration-500 group-hover:scale-105"
             fill
+            unoptimized={video.thumbnail?.includes("tiktokcdn")}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority={isFeatured}
           />
