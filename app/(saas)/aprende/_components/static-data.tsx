@@ -190,7 +190,19 @@ const VIDEOS: Video[] = [
     creator_name: "@onpe_oficial - ONPE",
     creator_type: "oficial",
     is_featured: false,
-    title: "Horario de votación",
+    title: "Horario de votación para las elecciones generales 2026",
+    description: `🕖 7 a. m. – 5 p. m. → Horario de votación
+                  ⏰ 6 a. m. → Hora de llegada para los miembros de mesa a los locales de votación`,
+  },
+  {
+    id: "tiktok-3",
+    video_id: "7568868925123890453",
+    platform: "tiktok",
+    category: "shorts",
+    creator_name: "@onpe_oficial - ONPE",
+    creator_type: "oficial",
+    is_featured: false,
+    title: "Horario de votación para las elecciones generales 2026",
     description: `🕖 7 a. m. – 5 p. m. → Horario de votación
                   ⏰ 6 a. m. → Hora de llegada para los miembros de mesa a los locales de votación`,
   },

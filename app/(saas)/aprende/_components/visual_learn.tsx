@@ -150,7 +150,13 @@ export default function VisualLearn({ videos }: { videos: Video[] }) {
                   aria-pressed={isActive}
                 >
                   <Icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{cat.label}</span>
+
+                  {/* 👇 cambio clave */}
+                  <span
+                    className={`${isActive ? "inline" : "hidden sm:inline"}`}
+                  >
+                    {cat.label}
+                  </span>
                 </button>
               );
             })}
@@ -179,13 +185,13 @@ export default function VisualLearn({ videos }: { videos: Video[] }) {
                 )}
               </div>
 
-              <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0">
+              <div className="flex gap-4 md:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
                 {filteredVideos
                   .filter((v) => v.category === "shorts")
                   .map((video) => (
                     <div
                       key={video.id}
-                      className="flex-shrink-0 w-[200px] md:w-[240px] snap-center"
+                      className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] snap-center"
                       ref={
                         playingVideoId === video.id && !isMinimized
                           ? activeVideoRef
