@@ -162,7 +162,6 @@ export async function createParliamentaryMembership(
       data,
     );
     revalidatePath("/admin/legisladores");
-    console.log("result_data", result);
     return { success: true, data: result };
   } catch (error) {
     console.error("Error creating membership:", error);

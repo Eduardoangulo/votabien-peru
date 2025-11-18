@@ -18,7 +18,6 @@ import { Category, Video } from "@/interfaces/aprende";
 import MiniPlayer from "./miniplayer";
 import Image from "next/image";
 
-// ============= COMPONENTE PRINCIPAL (CLIENT) =============
 export default function VisualLearn({ videos }: { videos: Video[] }) {
   const [selectedCategory, setSelectedCategory] = useState<Category | "all">(
     "all",
@@ -56,8 +55,10 @@ export default function VisualLearn({ videos }: { videos: Video[] }) {
     setIsMinimized(false);
   };
 
-  const handleMinimize = (e: React.MouseEvent) => {
+  const handleMinimize = (e: React.MouseEvent, videoId: string) => {
     e.stopPropagation();
+    const video = videos.find((v) => v.id === videoId);
+    if (video?.category === "shorts") return;
     setIsMinimized(true);
   };
 
@@ -112,7 +113,7 @@ export default function VisualLearn({ videos }: { videos: Video[] }) {
                 <VideoPlayer
                   video={featuredVideo}
                   onClose={handleStopVideo}
-                  onMinimize={handleMinimize}
+                  onMinimize={(e) => handleMinimize(e, featuredVideo.id)}
                   isMuted={isMuted}
                   onToggleMute={() => setIsMuted(!isMuted)}
                 />
@@ -146,12 +147,8 @@ export default function VisualLearn({ videos }: { videos: Video[] }) {
                       ? "bg-brand text-brand-foreground shadow-lg scale-105"
                       : "bg-muted text-foreground hover:bg-muted/80 hover:scale-105"
                   }`}
-                  aria-label={`Filtrar por ${cat.label}`}
-                  aria-pressed={isActive}
                 >
                   <Icon className="w-4 h-4" />
-
-                  {/* 👇 cambio clave */}
                   <span
                     className={`${isActive ? "inline" : "hidden sm:inline"}`}
                   >
@@ -166,7 +163,7 @@ export default function VisualLearn({ videos }: { videos: Video[] }) {
 
       {/* GRID DE VIDEOS */}
       <section className="max-w-7xl mx-auto px-4 py-8 md:py-12">
-        {/* Sección de Shorts con scroll horizontal */}
+        {/* Sección de Shorts */}
         {(selectedCategory === "all" || selectedCategory === "shorts") &&
           filteredVideos.some((v) => v.category === "shorts") && (
             <div className="mb-12">
@@ -185,38 +182,78 @@ export default function VisualLearn({ videos }: { videos: Video[] }) {
                 )}
               </div>
 
-              <div className="flex gap-4 md:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
-                {filteredVideos
-                  .filter((v) => v.category === "shorts")
-                  .map((video) => (
-                    <div
-                      key={video.id}
-                      className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] snap-center"
-                      ref={
-                        playingVideoId === video.id && !isMinimized
-                          ? activeVideoRef
-                          : null
-                      }
-                    >
-                      {playingVideoId === video.id && !isMinimized ? (
-                        <VideoPlayer
-                          video={video}
-                          onClose={handleStopVideo}
-                          onMinimize={handleMinimize}
-                          isMuted={isMuted}
-                          onToggleMute={() => setIsMuted(!isMuted)}
-                          isShort
-                        />
-                      ) : (
-                        <VideoThumbnail
-                          video={video}
-                          onPlay={() => handlePlayVideo(video.id)}
-                          isShort
-                        />
-                      )}
-                    </div>
-                  ))}
-              </div>
+              {/* Vista "Todos": Scroll horizontal en desktop y mobile */}
+              {selectedCategory === "all" && (
+                <div className="flex gap-4 md:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+                  {filteredVideos
+                    .filter((v) => v.category === "shorts")
+                    .slice(0, 6)
+                    .map((video) => (
+                      <div
+                        key={video.id}
+                        className="flex-shrink-0 w-[200px] sm:w-[220px] md:w-[240px] snap-center"
+                        ref={
+                          playingVideoId === video.id && !isMinimized
+                            ? activeVideoRef
+                            : null
+                        }
+                      >
+                        {playingVideoId === video.id && !isMinimized ? (
+                          <VideoPlayer
+                            video={video}
+                            onClose={handleStopVideo}
+                            onMinimize={(e) => handleMinimize(e, video.id)}
+                            isMuted={isMuted}
+                            onToggleMute={() => setIsMuted(!isMuted)}
+                            isShort
+                          />
+                        ) : (
+                          <VideoThumbnail
+                            video={video}
+                            onPlay={() => handlePlayVideo(video.id)}
+                            isShort
+                          />
+                        )}
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {/* Vista "Shorts": Grid en desktop, vertical en mobile */}
+              {selectedCategory === "shorts" && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                  {filteredVideos
+                    .filter((v) => v.category === "shorts")
+                    .map((video) => (
+                      <div
+                        key={video.id}
+                        className="mx-auto w-full max-w-[360px] md:max-w-none"
+                        ref={
+                          playingVideoId === video.id && !isMinimized
+                            ? activeVideoRef
+                            : null
+                        }
+                      >
+                        {playingVideoId === video.id && !isMinimized ? (
+                          <VideoPlayer
+                            video={video}
+                            onClose={handleStopVideo}
+                            onMinimize={(e) => handleMinimize(e, video.id)}
+                            isMuted={isMuted}
+                            onToggleMute={() => setIsMuted(!isMuted)}
+                            isShort
+                          />
+                        ) : (
+                          <VideoThumbnail
+                            video={video}
+                            onPlay={() => handlePlayVideo(video.id)}
+                            isShort
+                          />
+                        )}
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -238,7 +275,7 @@ export default function VisualLearn({ videos }: { videos: Video[] }) {
                   <VideoPlayer
                     video={video}
                     onClose={handleStopVideo}
-                    onMinimize={handleMinimize}
+                    onMinimize={(e) => handleMinimize(e, video.id)}
                     isMuted={isMuted}
                     onToggleMute={() => setIsMuted(!isMuted)}
                   />
@@ -281,8 +318,7 @@ export default function VisualLearn({ videos }: { videos: Video[] }) {
   );
 }
 
-// ============= COMPONENTE DE VIDEO REPRODUCIÉNDOSE =============
-
+// ============= VIDEO PLAYER =============
 interface VideoPlayerProps {
   video: Video;
   onClose: (e?: React.MouseEvent) => void;
@@ -302,24 +338,15 @@ function VideoPlayer({
 }: VideoPlayerProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Construir la URL con autoplay y mute para YouTube
+  // Solo autoplay, sin parámetros de mute que causen doble audio
   const embedUrl = (() => {
     const baseUrl = video.embed_url || "";
-
-    if (video.platform === "youtube") {
-      const muteParam = isMuted ? "1" : "0";
-      return baseUrl.includes("?")
-        ? `${baseUrl}&autoplay=1&mute=${muteParam}`
-        : `${baseUrl}?autoplay=1&mute=${muteParam}`;
-    }
-
-    // TikTok e Instagram solo necesitan autoplay
     return baseUrl.includes("?")
       ? `${baseUrl}&autoplay=1`
       : `${baseUrl}?autoplay=1`;
   })();
 
-  // 🎵 UNMUTE TikTok por defecto cuando carga
+  // Control de mute solo para TikTok
   useEffect(() => {
     if (video.platform !== "tiktok") return;
 
@@ -341,7 +368,6 @@ function VideoPlayer({
     return () => window.removeEventListener("message", handleMessage);
   }, [video.platform, isMuted]);
 
-  // 🔇 Controlar mute/unmute para TikTok
   useEffect(() => {
     if (video.platform !== "tiktok") return;
 
@@ -359,7 +385,6 @@ function VideoPlayer({
       <div className={isShort ? "h-full" : "relative aspect-video"}>
         <iframe
           ref={iframeRef}
-          key={embedUrl} // 🔑 Re-renderiza YouTube cuando cambia mute
           src={embedUrl}
           className="w-full h-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -370,7 +395,8 @@ function VideoPlayer({
 
       {/* Controles superiores */}
       <div className="absolute top-3 right-3 flex gap-2 z-10">
-        {(video.platform === "youtube" || video.platform === "tiktok") && (
+        {/* Solo mostrar control de mute para TikTok */}
+        {video.platform === "tiktok" && (
           <button
             onClick={onToggleMute}
             className="w-9 h-9 rounded-full bg-background/80 hover:bg-background flex items-center justify-center transition-colors group backdrop-blur-sm"
@@ -383,13 +409,18 @@ function VideoPlayer({
             )}
           </button>
         )}
-        <button
-          onClick={onMinimize}
-          className="w-9 h-9 rounded-full bg-background/80 hover:bg-background flex items-center justify-center transition-colors group backdrop-blur-sm"
-          aria-label="Minimizar"
-        >
-          <MinusSquare className="w-4 h-4 text-foreground group-hover:text-brand transition-colors" />
-        </button>
+
+        {/* Botón minimizar solo para videos horizontales */}
+        {!isShort && (
+          <button
+            onClick={onMinimize}
+            className="w-9 h-9 rounded-full bg-background/80 hover:bg-background flex items-center justify-center transition-colors group backdrop-blur-sm"
+            aria-label="Minimizar"
+          >
+            <MinusSquare className="w-4 h-4 text-foreground group-hover:text-brand transition-colors" />
+          </button>
+        )}
+
         <button
           onClick={onClose}
           className="w-9 h-9 rounded-full bg-background/80 hover:bg-background flex items-center justify-center transition-colors group backdrop-blur-sm"
@@ -427,7 +458,7 @@ function VideoPlayer({
   );
 }
 
-// ============= COMPONENTE DE THUMBNAIL =============
+// ============= VIDEO THUMBNAIL =============
 function VideoThumbnail({
   video,
   onPlay,
@@ -469,7 +500,6 @@ function VideoThumbnail({
             className="object-cover transition-transform duration-500 group-hover:scale-105"
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            unoptimized={video.thumbnail?.includes("tiktokcdn")}
             priority={isFeatured}
           />
           <div className="absolute inset-0" />

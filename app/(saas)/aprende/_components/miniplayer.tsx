@@ -35,7 +35,8 @@ export default function MiniPlayer({
         </div>
 
         <div className="absolute top-2 right-2 flex gap-2">
-          {video.platform === "youtube" && (
+          {/* Solo mostrar botón de mute para TikTok */}
+          {video.platform === "tiktok" && (
             <button
               onClick={onToggleMute}
               className="w-8 h-8 rounded-full bg-background/80 hover:bg-background flex items-center justify-center transition-colors"

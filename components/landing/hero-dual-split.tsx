@@ -74,7 +74,7 @@ export default function HeroDualSplit({
   );
 
   return (
-    <section className="relative w-full md:min-h-[calc(100vh-4rem)] overflow-y-auto rounded-md border border-border/40 flex flex-col bg-background">
+    <section className="relative w-full flex flex-col bg-background md:h-[calc(100vh-4rem)] md:max-h-[900px] overflow-hidden rounded-md border border-border/40">
       {/* ============= FONDOS ============= */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -83,29 +83,31 @@ export default function HeroDualSplit({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 z-0 overflow-hidden"
         >
           <div className="absolute inset-0 bg-gradient-to-t from-green-500 via-transparent to-black/20 mix-blend-multiply" />
 
           {/* Imagen izquierda */}
-          <div className="absolute top-0 left-0 w-full h-1/2 md:w-1/2 md:h-full">
+          <div className="absolute top-0 left-0 w-full h-1/2 md:w-1/2 md:h-full overflow-hidden">
             <Image
               src="/images/hero-left.jpg"
               alt="Congreso actual"
               fill
-              className="object-cover object-center grayscale-[1] brightness-[0.55] contrast-[1.1]"
+              className="object-cover object-center grayscale-[1] brightness-[0.55] contrast-[1.1] scale-105"
               priority
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
 
           {/* Imagen derecha */}
-          <div className="absolute bottom-0 left-0 w-full h-1/2 md:top-0 md:left-1/2 md:w-1/2 md:h-full">
+          <div className="absolute bottom-0 left-0 w-full h-1/2 md:top-0 md:left-1/2 md:w-1/2 md:h-full overflow-hidden">
             <Image
               src="/images/hero-right.jpg"
               alt="Nuevo Congreso 2026"
               fill
-              className="object-cover object-center saturate-[1.15] brightness-[0.65] contrast-[1.05]"
+              className="object-cover object-center saturate-[1.15] brightness-[0.65] contrast-[1.05] scale-105"
               priority
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
 
@@ -163,7 +165,7 @@ export default function HeroDualSplit({
       </div>
 
       {/* ============= CONTENIDO COMPARATIVO ============= */}
-      <div className="relative z-10 flex-1 flex flex-col md:flex-row overflow-hidden">
+      <div className="relative z-10 flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
         <AnimatePresence mode="wait">
           <motion.div
             key="legislativo-content"
@@ -175,9 +177,9 @@ export default function HeroDualSplit({
           >
             {/* ============= PANEL IZQUIERDO - Congreso Actual ============= */}
             <div className="relative w-full md:w-1/2 flex overflow-hidden group border-r border-white/10">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
-              <div className="relative z-10 flex flex-col justify-end w-full h-full text-white p-4 md:p-8 min-h-[300px] md:min-h-[400px] py-6 md:py-10">
+              <div className="relative z-10 flex flex-col justify-end w-full text-white p-4 md:p-8 py-6 md:py-10 pb-8 md:pb-12">
                 <div className="md:max-w-md ml-auto text-center md:text-right flex flex-col items-center md:items-end">
                   <div className="w-12 h-12 md:w-14 md:h-14 mb-4 rounded-xl flex items-center justify-center bg-white/10 border border-white/20 backdrop-blur-sm">
                     <Users className="w-6 h-6 md:w-7 md:h-7 text-white" />
@@ -214,9 +216,9 @@ export default function HeroDualSplit({
 
             {/* ============= PANEL DERECHO - Nuevo Congreso 2026 ============= */}
             <div className="relative w-full md:w-1/2 flex overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-success/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-success/10 to-transparent pointer-events-none" />
 
-              <div className="relative z-10 flex flex-col justify-end w-full h-full text-white p-4 md:p-8 min-h-[300px] md:min-h-[400px] py-6 md:py-10">
+              <div className="relative z-10 flex flex-col justify-end w-full text-white p-4 md:p-8 py-6 md:py-10 pb-8 md:pb-12">
                 <div className="md:max-w-md mr-auto text-center md:text-left flex flex-col items-center md:items-start">
                   <div className="w-12 h-12 md:w-14 md:h-14 mb-4 rounded-xl flex items-center justify-center bg-warning/20 border border-warning/30 backdrop-blur-sm">
                     <Columns className="w-6 h-6 md:w-7 md:h-7 text-warning" />
