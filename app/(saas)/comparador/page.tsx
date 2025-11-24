@@ -1,11 +1,197 @@
-import UnderConstruction from "@/components/under-construction";
+import { SearchParams } from "nuqs";
+import {
+  searchParamsCache,
+  isCandidateMode,
+  ComparatorParamsSchema,
+} from "./_lib/validation";
+import { getComparisonData, getEntitiesByIds } from "./_lib/data";
+import { extractEntitiesFromComparison } from "./_lib/helpers";
+import { searchEntities } from "./_lib/actions";
+import { ComparatorProvider } from "@/components/context/comparator";
+import ComparatorLayout from "./_components/comparator-layout";
+import { EntityType, SearchableEntity } from "@/interfaces/ui-types";
+import { ChamberType } from "@/interfaces/politics";
+import { ComparisonResponse } from "@/interfaces/comparator";
 
-export default function ComparatorPage() {
+interface PageProps {
+  searchParams: Promise<SearchParams>;
+}
+
+// ============================================
+// TIPOS PARA EXTRAS DE BÚSQUEDA
+// ============================================
+
+interface LegislatorSearchExtras {
+  has_metrics_only: boolean;
+  chamber?: ChamberType;
+  active_only?: boolean;
+}
+
+interface CandidateSearchExtras {
+  has_metrics_only: boolean;
+  process_id: string;
+  candidacy_type?: string;
+  party?: string;
+  district?: string;
+}
+
+type SearchExtras = LegislatorSearchExtras | CandidateSearchExtras;
+
+// ============================================
+// COMPONENTE PRINCIPAL
+// ============================================
+
+export default async function ComparatorPage(props: PageProps) {
+  const resolvedParams = await props.searchParams;
+  const search = searchParamsCache.parse(
+    resolvedParams,
+  ) as ComparatorParamsSchema;
+
+  const currentMode = search.mode;
+
+  // ============================================
+  // CARGA DE DATOS PRINCIPAL
+  // ============================================
+
+  let initialEntities: SearchableEntity[] = [];
+  let comparisonData: ComparisonResponse = null;
+
+  // CASO 1: Hay IDs para comparar (2+)
+  if (search.ids.length >= 2) {
+    comparisonData = await getComparisonData(search);
+
+    if (comparisonData) {
+      initialEntities = extractEntitiesFromComparison(
+        comparisonData,
+        currentMode,
+      );
+    } else {
+      console.log("⚠️ Comparison failed, falling back to individual fetch");
+      initialEntities = await getEntitiesByIds(search.ids, currentMode);
+    }
+  }
+  // CASO 2: Solo 1 ID (vista previa)
+  else if (search.ids.length === 1) {
+    console.log("👤 Loading single entity");
+    initialEntities = await getEntitiesByIds(search.ids, currentMode);
+  }
+  // CASO 3: Sin IDs (página vacía)
+  else {
+    console.log("🆕 Empty comparator");
+    initialEntities = [];
+  }
+
+  // 🔥 VALIDACIÓN FINAL: Filtrar entidades sin métricas
+  if (search.has_metrics_only) {
+    const beforeCount = initialEntities.length;
+    initialEntities = initialEntities.filter((e) => e.has_metrics);
+    const afterCount = initialEntities.length;
+
+    if (beforeCount > afterCount) {
+      console.warn(
+        `⚠️ Filtered out ${beforeCount - afterCount} entities without metrics`,
+      );
+    }
+  }
+
+  // ============================================
+  // SERVER ACTION PARA BÚSQUEDA
+  // ============================================
+
+  async function performSearch(query: string): Promise<SearchableEntity[]> {
+    "use server";
+
+    try {
+      let extras: SearchExtras;
+
+      // Construir extras según el modo
+      if (currentMode === "legislator") {
+        const legislatorExtras: LegislatorSearchExtras = {
+          has_metrics_only: false,
+        };
+
+        if (search.chamber) {
+          legislatorExtras.chamber = search.chamber;
+        }
+        if (search.active_only !== undefined) {
+          legislatorExtras.active_only = search.active_only;
+        }
+
+        extras = legislatorExtras;
+      } else if (isCandidateMode(currentMode)) {
+        if (!search.process_id) {
+          console.error("❌ process_id required for candidate search");
+          return [];
+        }
+
+        const candidateExtras: CandidateSearchExtras = {
+          has_metrics_only: false,
+          process_id: search.process_id,
+          candidacy_type: search.candidacy_type,
+          party: search.party || undefined, // ✅ Desde URL
+          district: search.district || undefined, // ✅ Desde URL
+        };
+
+        if (search.candidacy_type) {
+          candidateExtras.candidacy_type = search.candidacy_type;
+        }
+        if (search.party) {
+          candidateExtras.party = search.party;
+        }
+        if (search.district) {
+          candidateExtras.district = search.district;
+        }
+
+        extras = candidateExtras;
+      } else {
+        console.error("❌ Invalid mode:", currentMode);
+        return [];
+      }
+
+      const results = await searchEntities(query, currentMode, extras);
+      return results;
+    } catch (error) {
+      console.error("💥 Server search error:", error);
+      return [];
+    }
+  }
+
+  // ============================================
+  // RENDER
+  // ============================================
   return (
-    <UnderConstruction
-      title="Comparativo personalizado"
-      description="Esta funcionalidad estará disponible próximamente."
-      showBackButton={false}
-    />
+    <ComparatorProvider
+      initialEntities={initialEntities}
+      mode={currentMode}
+      selectedIds={search.ids}
+    >
+      <ComparatorLayout data={comparisonData} searchAction={performSearch} />
+    </ComparatorProvider>
   );
+}
+
+// ============================================
+// METADATA
+// ============================================
+
+export async function generateMetadata(props: PageProps) {
+  const resolvedParams = await props.searchParams;
+  const search = searchParamsCache.parse(resolvedParams);
+
+  const titles: Record<EntityType, string> = {
+    legislator: "Comparador de Congresistas",
+    "senator-candidate": "Comparador de Candidatos a Senador 2026",
+    "deputy-candidate": "Comparador de Candidatos a Diputado 2026",
+    "president-candidate": "Comparador de Candidatos Presidenciales 2026",
+    "vicepresident-candidate":
+      "Comparador de Candidatos Vicepresidenciales 2026",
+  };
+
+  const entityLabel =
+    search.mode === "legislator" ? "congresistas" : "candidatos";
+
+  return {
+    title: titles[search.mode as EntityType] || "Comparador Político",
+    description: `Compara propuestas, trayectorias y votaciones de ${search.ids.length} ${entityLabel}`,
+  };
 }

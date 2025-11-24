@@ -1,0 +1,95 @@
+import { ComparisonDataStatus } from "./comparator";
+import {
+  ParliamentaryGroupBasic,
+  ParliamentaryMembershipWithGroup,
+} from "./parliamentary-membership";
+import { PersonBasicInfo, PersonWithActivePeriod } from "./person";
+import {
+  CandidacyStatus,
+  CandidacyType,
+  ChamberType,
+  ElectoralDistrictBase,
+  ElectoralDistrictBasic,
+  LegislatorCondition,
+  PoliticalPartyBase,
+} from "./politics";
+
+export interface CandidateBase {
+  id: string;
+  electoral_process_id: string;
+  political_party_id: string;
+  type: CandidacyType;
+  list_number: number | null;
+  status: CandidacyStatus;
+  votes_obtained: number | null;
+  was_elected: boolean;
+}
+
+export interface AllianceBase {
+  id?: string | number; // Opcional, algunas alianzas pueden no tener ID
+  name: string;
+  acronym?: string | null;
+  color_hex: string | null;
+  logo_url?: string | null;
+}
+
+export interface CandidateBasicInfo {
+  id: string;
+  person: PersonBasicInfo;
+  political_party: PoliticalPartyBase | null;
+  alliance: AllianceBase | null;
+  electoral_district: ElectoralDistrictBase | null;
+  electoral_process_id: string | number;
+}
+
+export interface CandidateCard extends CandidateBase {
+  person: PersonBasicInfo;
+  political_party: PoliticalPartyBase;
+  electoral_district: ElectoralDistrictBasic | null;
+  has_metrics: boolean;
+}
+
+export interface CandidateMetrics {
+  [key: string]: number | boolean | string | null | undefined;
+  candidate_id: string;
+
+  // Formación académica
+  max_academic_level_score: number;
+  has_postgraduate: boolean;
+
+  // Experiencia política
+  political_experience_years: number;
+  times_elected: number;
+  total_parties_belonged: number;
+
+  // Transparencia patrimonial
+  declared_income_annual: number;
+  declared_assets_value: number;
+
+  // Antecedentes legales
+  has_penal_sentences: boolean;
+  has_alimentary_debts: boolean;
+  total_legal_records: number;
+
+  last_updated: string;
+}
+
+export interface CandidateWithMetrics {
+  candidate: CandidateBasicInfo;
+  metrics: CandidateMetrics;
+}
+
+export interface CandidateCompareItem {
+  candidate_id: string;
+  candidate_name: string | null;
+  status: ComparisonDataStatus;
+  data: CandidateWithMetrics | null;
+  message: string | null;
+}
+
+export interface CandidateComparison {
+  total_requested: number;
+  total_available: number;
+  comparison_date: string;
+  items: CandidateCompareItem[];
+}

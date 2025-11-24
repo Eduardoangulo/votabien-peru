@@ -2,12 +2,7 @@
 
 import { serverApi } from "@/lib/server-api";
 import { revalidatePath } from "next/cache";
-import {
-  CreatePersonRequest,
-  UpdatePersonRequest,
-  CreateLegislatorPeriodRequest,
-  UpdateLegislatorPeriodRequest,
-} from "@/interfaces/admin";
+
 import {
   BulkUpdateLegislatorsRequest,
   BulkUpdateLegislatorsResponse,
@@ -17,6 +12,11 @@ import {
   CreateParliamentaryMembership,
   UpdateParliamentaryMembership,
 } from "@/interfaces/parliamentary-membership";
+import { CreatePersonRequest, UpdatePersonRequest } from "@/interfaces/person";
+import {
+  CreateLegislatorPeriodRequest,
+  UpdateLegislatorPeriodRequest,
+} from "@/interfaces/legislator";
 
 // ============= PERSONAS =============
 

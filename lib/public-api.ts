@@ -2,11 +2,11 @@ import {
   ChamberType,
   FiltersPerson,
   FiltersCandidates,
-  PersonWithActivePeriod,
-  FiltersLegislators,
   FiltersRegulars,
 } from "@/interfaces/politics";
 import { API_BASE_URL } from "./config";
+import { PersonWithActivePeriod } from "@/interfaces/person";
+import { FiltersLegislators } from "@/interfaces/legislator";
 
 // ============= INTERFACES DE PARAMETROS =============
 
@@ -137,14 +137,14 @@ class PublicApiClient {
     );
   }
 
-  // ============= ENDPOINTS DE versus =============
+  // ============= ENDPOINTS DE METRICAS DE LEGISLADORES =============
 
   /**
    * Obtener lista de legisladores versus simple
    */
   async getVersusLegislators(params?: FiltersRegulars) {
     const query = this.buildQueryParams(params as Record<string, unknown>);
-    return this.get(`/api/v1/politics/legislators-versus${query}`);
+    return this.get(`/api/v1/public/legislators/versus-list${query}`);
   }
 
   // ============= ENDPOINTS DE ESCAÑOS =============

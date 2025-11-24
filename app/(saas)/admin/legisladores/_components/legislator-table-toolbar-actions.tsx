@@ -5,7 +5,7 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 
 import { exportTableToCSV } from "../_lib/export";
 import { Button } from "@/components/ui/button";
-import { AdminLegislator } from "@/interfaces/admin";
+import { AdminLegislator } from "@/interfaces/legislator";
 
 // import { DeleteTasksDialog } from "./delete-tasks-dialog"
 

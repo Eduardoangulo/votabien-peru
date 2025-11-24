@@ -1,6 +1,6 @@
 import { type Table } from "@tanstack/react-table";
 import { formatterDate } from "@/lib/utils/date";
-import { AdminLegislator } from "@/interfaces/admin";
+import { AdminLegislator } from "@/interfaces/legislator";
 
 export function exportTableToCSV<TData extends AdminLegislator>(
   /**

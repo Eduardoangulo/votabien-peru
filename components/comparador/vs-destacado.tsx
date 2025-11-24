@@ -10,12 +10,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Image from "next/image";
-import {
-  AlertasStats,
-  AttendanceStats,
-  BillsStats,
-  LegislatorVersusCard,
-} from "@/interfaces/versus";
+import { LegislatorVersusCard } from "@/interfaces/legislator-metrics";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -37,17 +32,9 @@ export function ComparadorContent({
 }: ComparadorContentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const statsA = {
-    asistencia: legisladorA.asistencia,
-    proyectos: legisladorA.proyectos,
-    alertas: legisladorA.alertas,
-  };
+  const statsA = legisladorA.stats;
 
-  const statsB = {
-    asistencia: legisladorB.asistencia,
-    proyectos: legisladorB.proyectos,
-    alertas: legisladorB.alertas,
-  };
+  const statsB = legisladorB.stats;
 
   const colorA =
     legisladorA.current_parliamentary_group?.color_hex || "#6b7280";
@@ -171,27 +158,9 @@ export function ComparadorContent({
   );
 }
 
-// Componente para cada lado del split
 interface LegisladorSideProps {
   legislador: LegislatorVersusCard;
-  stats: {
-    asistencia: AttendanceStats;
-    proyectos: BillsStats;
-    alertas: AlertasStats;
-  };
-  side: "left" | "right";
-  color: string;
-}
-
-// Overlay más dramático
-
-interface LegisladorSideProps {
-  legislador: LegislatorVersusCard;
-  stats: {
-    asistencia: AttendanceStats;
-    proyectos: BillsStats;
-    alertas: AlertasStats;
-  };
+  stats: LegislatorVersusCard["stats"];
   side: "left" | "right";
   color: string;
 }
@@ -445,8 +414,8 @@ export function LegisladorSide({
           <StatBar
             icon={<TrendingUp className="w-3 h-3 md:w-4 md:h-4" />}
             label="Asistencia"
-            value={stats.asistencia.porcentaje}
-            total={stats.asistencia.total_sesiones}
+            value={stats.attendance_percentage}
+            total={stats.total_sessions}
             color={color}
             side={side}
             showPercentage
@@ -455,9 +424,9 @@ export function LegisladorSide({
           <StatBar
             icon={<FileCheck className="w-3 h-3 md:w-4 md:h-4" />}
             label="Proyectos de Ley"
-            value={stats.proyectos.total}
+            value={stats.total_bills}
             maxValue={50}
-            subtitle={`${stats.proyectos.aprobados} aprobados`}
+            subtitle={`${stats.bills_approved} aprobados`}
             color={color}
             side={side}
           />
@@ -465,11 +434,11 @@ export function LegisladorSide({
           <StatBar
             icon={<AlertCircle className="w-3 h-3 md:w-4 md:h-4" />}
             label="Alertas"
-            value={stats.alertas.total}
+            value={stats.active_legal_cases}
             maxValue={10}
-            color={stats.alertas.total > 0 ? "#ef4444" : color}
+            color={stats.active_legal_cases > 0 ? "#ef4444" : color}
             side={side}
-            alert={stats.alertas.total > 0}
+            alert={stats.active_legal_cases > 0}
           />
         </div>
       </div>
@@ -563,16 +532,8 @@ function StatBar({
 }
 
 interface ComparisonStatsProps {
-  statsA: {
-    asistencia: AttendanceStats;
-    proyectos: BillsStats;
-    alertas: AlertasStats;
-  };
-  statsB: {
-    asistencia: AttendanceStats;
-    proyectos: BillsStats;
-    alertas: AlertasStats;
-  };
+  statsA: LegislatorVersusCard["stats"];
+  statsB: LegislatorVersusCard["stats"];
   colorA: string;
   colorB: string;
 }
@@ -589,25 +550,25 @@ function ComparisonStats({
       icon: <TrendingUp className="w-3.5 h-3.5 text-white/90" />,
       label: "Asistencia",
       valueA:
-        statsA.asistencia.porcentaje !== null
-          ? `${statsA.asistencia.porcentaje}%`
+        statsA.attendance_percentage !== null
+          ? `${statsA.attendance_percentage}%`
           : "—",
       valueB:
-        statsB.asistencia.porcentaje !== null
-          ? `${statsB.asistencia.porcentaje}%`
+        statsB.attendance_percentage !== null
+          ? `${statsB.attendance_percentage}%`
           : "—",
     },
     {
       icon: <FileCheck className="w-3.5 h-3.5 text-white/90" />,
       label: "Proyectos",
-      valueA: statsA.proyectos.total,
-      valueB: statsB.proyectos.total,
+      valueA: statsA.total_bills,
+      valueB: statsB.total_bills,
     },
     {
       icon: <AlertCircle className="w-3.5 h-3.5 text-white/90" />,
       label: "Alertas",
-      valueA: statsA.alertas.total,
-      valueB: statsB.alertas.total,
+      valueA: statsA.total_legal_records,
+      valueB: statsB.total_legal_records,
       alertColor: true,
     },
   ];
@@ -621,7 +582,7 @@ function ComparisonStats({
               className="flex flex-col items-center justify-center transition-all duration-700"
               style={{
                 color:
-                  item.alertColor && statsA.alertas.total > 0
+                  item.alertColor && statsA.total_legal_records > 0
                     ? "#ef4444"
                     : colorA,
               }}
@@ -642,7 +603,7 @@ function ComparisonStats({
               className="flex flex-col items-center justify-center transition-all duration-700"
               style={{
                 color:
-                  item.alertColor && statsB.alertas.total > 0
+                  item.alertColor && statsB.total_legal_records > 0
                     ? "#ef4444"
                     : colorB,
               }}

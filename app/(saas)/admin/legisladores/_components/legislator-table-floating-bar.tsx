@@ -26,9 +26,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Kbd } from "@/components/kbd";
-import { AdminLegislator } from "@/interfaces/admin";
 import { bulkUpdateLegislators } from "../_lib/actions";
 import { toast } from "sonner";
+import { AdminLegislator } from "@/interfaces/legislator";
 
 interface LegislatorsTableFloatingBarProps {
   table: Table<AdminLegislator>;

@@ -9,7 +9,8 @@ import { getColumns } from "./legislator-table-columns";
 import type { DataTableFilterField, DataTableRowAction } from "@/lib/types";
 import { LegislatorsTableFloatingBar } from "./legislator-table-floating-bar";
 import { LegislatorsTableToolbarActions } from "./legislator-table-toolbar-actions";
-import { AdminLegislator } from "@/interfaces/admin";
+import { AdminLegislator } from "@/interfaces/legislator";
+
 import { ChamberType, LegislatorCondition } from "@/interfaces/politics";
 import {
   ChamberCounts,

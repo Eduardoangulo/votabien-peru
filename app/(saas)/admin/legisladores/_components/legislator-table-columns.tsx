@@ -16,7 +16,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
-import { AdminLegislator } from "@/interfaces/admin";
 import { booleanToText } from "@/lib/utils";
 import {
   formatConditionText,
@@ -26,6 +25,7 @@ import {
   getConditionIcon,
 } from "@/lib/utils/color-enums";
 import { Separator } from "@/components/ui/separator";
+import { AdminLegislator } from "@/interfaces/legislator";
 
 interface GetColumnsProps {
   setRowAction: React.Dispatch<

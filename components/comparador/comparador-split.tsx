@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LegislatorVersusCard } from "@/interfaces/versus";
+import { LegislatorVersusCard } from "@/interfaces/legislator-metrics";
 import { ComparadorContent } from "./vs-destacado";
 
 interface ComparadorProps {

@@ -33,9 +33,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { Button } from "@/components/ui/button";
-import { PreviousCase, PersonDetail, Bill } from "@/interfaces/politics";
+import { PreviousCase, Bill } from "@/interfaces/politics";
 import { formatFechaJsonable } from "@/lib/utils/date";
 import { NoDataMessage } from "@/components/no-data-message";
+import { PersonDetail } from "@/interfaces/person";
 
 export default function DetailLegislador({
   persona,

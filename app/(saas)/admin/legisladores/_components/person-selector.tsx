@@ -8,7 +8,7 @@ import { PersonQuickCreateDialog } from "./person-quick-create-dialog";
 import { publicApi } from "@/lib/public-api";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { PersonWithActivePeriod } from "@/interfaces/politics";
+import { PersonWithActivePeriod } from "@/interfaces/person";
 interface PersonSelectorProps {
   onSelect: (person: PersonWithActivePeriod | null) => void;
   selectedPerson: PersonWithActivePeriod | null;

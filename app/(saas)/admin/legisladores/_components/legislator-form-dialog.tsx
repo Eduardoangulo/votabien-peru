@@ -25,12 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  ChamberType,
-  LegislatorCondition,
-  PersonWithActivePeriod,
-} from "@/interfaces/politics";
-import { AdminLegislator } from "@/interfaces/admin";
+import { ChamberType, LegislatorCondition } from "@/interfaces/politics";
 import {
   createLegislatorPeriod,
   updateLegislatorPeriod,
@@ -49,6 +44,8 @@ import {
   CredenzaTitle,
 } from "@/components/ui/credenza";
 import { CalendarDatePicker } from "@/components/date-picker";
+import { AdminLegislator } from "@/interfaces/legislator";
+import { PersonWithActivePeriod } from "@/interfaces/person";
 
 const legislatorPeriodSchema = z
   .object({

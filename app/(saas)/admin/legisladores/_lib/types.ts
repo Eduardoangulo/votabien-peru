@@ -1,9 +1,9 @@
-import { AdminLegislator } from "@/interfaces/admin";
+import { AdminLegislator } from "@/interfaces/legislator";
+import { PersonBase } from "@/interfaces/person";
 import {
   ChamberType,
   ElectoralDistrictBase,
   LegislatorCondition,
-  PersonBase,
   PoliticalPartyBase,
 } from "@/interfaces/politics";
 

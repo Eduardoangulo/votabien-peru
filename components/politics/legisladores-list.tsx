@@ -30,10 +30,10 @@ import { FilterField, FilterPanel } from "@/components/ui/filter-panel";
 import {
   ElectoralDistrictBase,
   FiltersPerson,
-  LegislatorCard,
   LegislatorCondition,
 } from "@/interfaces/politics";
 import { ParliamentaryGroupBasic } from "@/interfaces/parliamentary-membership";
+import { LegislatorCard } from "@/interfaces/legislator";
 
 interface LegisladoresListProps {
   legisladores: LegislatorCard[];

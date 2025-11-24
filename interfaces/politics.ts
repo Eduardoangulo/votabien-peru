@@ -1,6 +1,8 @@
 // ============= ENUMS =============
 
+import { LegislatorDetail, LegislatorInSeat } from "./legislator";
 import { ParliamentaryGroupBasic } from "./parliamentary-membership";
+import { PersonBase, PersonBasicInfo } from "./person";
 
 export enum ChamberType {
   CONGRESO = "Congreso",
@@ -97,6 +99,11 @@ export interface PoliticalPartyBase {
   foundation_date: string | null;
 }
 
+export interface ElectoralDistrictBasic {
+  id: string;
+  name: string;
+}
+
 export interface ElectoralDistrictBase {
   id: string;
   name: string;
@@ -156,84 +163,6 @@ export interface PoliticalPartyListPaginated {
   offset: number;
 }
 // ============= PERSONA Y LEGISLADOR =============
-
-export interface PersonBasicInfo {
-  id: string;
-  fullname: string;
-  image_url: string | null;
-  profession: string | null;
-}
-
-export interface PersonBase {
-  id: string;
-  name: string;
-  lastname: string;
-  fullname: string;
-  image_url: string | null;
-  profession: string | null;
-  birth_date: Date | null;
-  detailed_biography: BiographyDetail[] | [];
-  technical_education: string | null;
-  university_education: string | null;
-  academic_degree: string | null;
-  professional_title: string | null;
-  postgraduate_education: string | null;
-  resume_url: string | null;
-  work_experience: WorkExperience[] | [];
-  previous_cases: PreviousCase[] | [];
-  facebook_url: string | null;
-  twitter_url: string | null;
-  instagram_url: string | null;
-  tiktok_url: string | null;
-  created_at: Date;
-}
-
-export interface LegislatorDetail {
-  id: string;
-  chamber: ChamberType;
-  start_date: string;
-  end_date: string;
-  active: boolean;
-  institutional_email: string | null;
-  parliamentary_group: string | null;
-  elected_by_party: PoliticalPartyBase;
-
-  electoral_district: ElectoralDistrictBase;
-  bills: Bill[];
-  attendances: Attendance[];
-  created_at: Date;
-}
-
-export interface LegislatorInSeat {
-  id: string;
-  person_id: string;
-  chamber: ChamberType;
-  condition: LegislatorCondition;
-  active: boolean;
-  elected_by_party: PoliticalPartyBase;
-  current_parliamentary_group: ParliamentaryGroupBasic | null;
-}
-export interface PersonWithActivePeriod extends PersonBase {
-  active_period: LegislatorDetail;
-}
-
-export interface PersonDetail extends PersonBase {
-  legislative_periods: LegislatorDetail[];
-  candidacies: CandidateList[];
-}
-
-export interface LegislatorCard {
-  id: string;
-  chamber: ChamberType;
-  condition: LegislatorCondition;
-  current_parliamentary_group: ParliamentaryGroupBasic | null;
-  active: boolean;
-  start_date: string;
-  end_date: string;
-  person: PersonBasicInfo;
-  elected_by_party: PoliticalPartyBase | null;
-  electoral_district: ElectoralDistrictBase;
-}
 
 // ============= BANCADAS =============
 
@@ -315,17 +244,6 @@ export interface SeatParliamentary {
 }
 
 // ============= FILTROS Y OPCIONES =============
-
-export interface FiltersLegislators {
-  active_only?: boolean;
-  chamber?: ChamberType | string;
-  groups?: string | string[];
-  districts?: string | string[];
-  search?: string;
-  skip?: number;
-  limit?: number;
-  [key: string]: unknown;
-}
 
 export interface FiltersPerson {
   is_legislator_active?: boolean;
