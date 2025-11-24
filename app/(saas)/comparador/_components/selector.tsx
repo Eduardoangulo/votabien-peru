@@ -45,6 +45,13 @@ import {
   Flag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Credenza,
+  CredenzaBody,
+  CredenzaContent,
+  CredenzaHeader,
+  CredenzaTitle,
+} from "@/components/ui/credenza";
 
 // ============================================
 // CONFIGURACIÓN DE LABELS POR TIPO
@@ -204,7 +211,6 @@ export default function AsyncEntitySelector({
 
   // 🔥 LIMPIAR SELECCIÓN CUANDO CAMBIAN FILTROS CRÍTICOS
   useEffect(() => {
-    console.log("🔄 Filters changed - clearing selection");
     setSelectedItems([]);
     setResults([]);
     setQuery("");
@@ -230,24 +236,15 @@ export default function AsyncEntitySelector({
   // --- Búsqueda con Debounce ---
   const performSearch = useDebouncedCallback(async (searchTerm: string) => {
     try {
-      console.log(`🔍 Searching ${mode}:`, searchTerm, {
-        chamber,
-        district,
-        party,
-        processId,
-        activeOnly,
-      });
-
       const data = await onSearch(searchTerm);
 
-      // 🔥 VALIDACIÓN CRÍTICA: Asegurar que data sea un array
+      // Asegurar que data sea un array
       if (!data || !Array.isArray(data)) {
         console.warn("⚠️ Search returned invalid data:", data);
         setResults([]);
         return;
       }
 
-      console.log(`✅ Found ${data.length} results`);
       setResults(data);
     } catch (error) {
       console.error("💥 Search error:", error);
@@ -297,8 +294,6 @@ export default function AsyncEntitySelector({
     }
 
     const newSelection = [...selectedItems, item];
-    console.log("✅ Selected:", item.fullname, "| Total:", newSelection.length);
-
     // Actualizar estado local
     setSelectedItems(newSelection);
 
@@ -318,7 +313,6 @@ export default function AsyncEntitySelector({
 
   const handleRemove = (id: string, name: string) => {
     const newSelection = selectedItems.filter((i) => i.id !== id);
-    console.log("🗑️ Removed:", name, "| Remaining:", newSelection.length);
     setSelectedItems(newSelection);
     updateUrl(newSelection);
     toast.info(`${name} eliminado`);
@@ -337,7 +331,6 @@ export default function AsyncEntitySelector({
     }
 
     const newUrl = `${pathname}?${params.toString()}`;
-    console.log("📍 URL Updated:", newUrl);
     router.replace(newUrl, { scroll: false });
   };
 
@@ -367,7 +360,6 @@ export default function AsyncEntitySelector({
     params.set("ids", validIds.join(","));
 
     const compareUrl = `${pathname}?${params.toString()}`;
-    console.log("🚀 Navigating to comparison:", compareUrl);
 
     router.push(compareUrl);
   };
@@ -492,7 +484,7 @@ export default function AsyncEntitySelector({
       </div>
 
       {/* Search Modal */}
-      <Dialog
+      <Credenza
         open={isOpen}
         onOpenChange={(open) => {
           setIsOpen(open);
@@ -503,15 +495,14 @@ export default function AsyncEntitySelector({
           }
         }}
       >
-        <DialogContent className="sm:max-w-[550px] p-0 gap-0 overflow-hidden">
-          <DialogHeader className="px-4 py-3 border-b bg-muted/20">
-            <DialogTitle className="text-base font-medium flex items-center gap-2">
+        <CredenzaContent className="sm:max-w-[550px] p-0 gap-0 overflow-hidden">
+          <CredenzaHeader className="px-4 py-3 border-b bg-muted/20">
+            <CredenzaTitle className="text-base font-medium flex items-center gap-2">
               <Search className="w-4 h-4" />
               Buscar {mode === "legislator" ? "Congresista" : "Candidato"}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="p-4 space-y-4">
+            </CredenzaTitle>
+          </CredenzaHeader>
+          <CredenzaBody>
             <Input
               placeholder={config.placeholder}
               value={query}
@@ -560,9 +551,9 @@ export default function AsyncEntitySelector({
                 </div>
               )}
             </ScrollArea>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </CredenzaBody>
+        </CredenzaContent>
+      </Credenza>
     </div>
   );
 }

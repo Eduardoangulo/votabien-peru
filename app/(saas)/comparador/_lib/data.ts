@@ -83,7 +83,6 @@ export async function getComparisonData(
   params: ComparatorParamsSchema,
 ): Promise<ComparisonResponse> {
   if (params.ids.length < 2) {
-    console.log("⚠️ Need at least 2 IDs for comparison");
     return null;
   }
 
@@ -114,15 +113,7 @@ export async function getComparisonData(
       };
     }
 
-    console.log("📤 Calling comparison endpoint:", endpoint);
-    console.log("📤 Payload:", payload);
-
     const result = await publicApi.post<ComparisonResponse>(endpoint, payload);
-
-    console.log(
-      "📥 Comparison result:",
-      result ? "✅ Data received" : "❌ Null/empty",
-    );
 
     // ✅ Normalizar respuesta vacía a null
     if (

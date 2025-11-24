@@ -34,15 +34,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 // ============================================
 // TIPOS
@@ -59,14 +61,13 @@ type EntityCategory = {
 };
 
 type Subtype = {
-  mode: string; // "legislator" | "president-candidate" | etc
+  mode: string;
   label: string;
   icon: LucideIcon;
-  chamber?: string; // "Congreso" | "Senado" | "Diputados"
-  needsRefinement: boolean; // ✅ Nueva propiedad
+  chamber?: string;
+  needsRefinement: boolean;
 };
 
-// ✅ TIPO ESTRICTO PARA FILTROS (debe coincidir con lo que retorna nuqs)
 export interface FilterState {
   mode: string | null;
   chamber: string | null;
@@ -103,21 +104,21 @@ const LEGISLATOR_SUBTYPES: Subtype[] = [
     label: "Congreso",
     icon: Users,
     chamber: "Congreso",
-    needsRefinement: true, // ✅ Permite distrito
+    needsRefinement: true,
   },
   {
     mode: "legislator",
     label: "Senado (Histórico)",
     icon: Building2,
     chamber: "Senado",
-    needsRefinement: true, // ✅ Permite distrito
+    needsRefinement: true,
   },
   {
     mode: "legislator",
     label: "Diputados (Histórico)",
     icon: Scale,
     chamber: "Diputados",
-    needsRefinement: true, // ✅ Permite distrito
+    needsRefinement: true,
   },
 ];
 
@@ -126,25 +127,25 @@ const CANDIDATE_SUBTYPES: Subtype[] = [
     mode: "president-candidate",
     label: "Presidente",
     icon: Trophy,
-    needsRefinement: false, // ❌ NO permite filtros
+    needsRefinement: false,
   },
   {
     mode: "vicepresident-candidate",
     label: "Vicepresidente",
     icon: UserCheck,
-    needsRefinement: false, // ❌ NO permite filtros
+    needsRefinement: false,
   },
   {
     mode: "senator-candidate",
     label: "Senador",
     icon: Building2,
-    needsRefinement: true, // ✅ Permite distrito y partido
+    needsRefinement: true,
   },
   {
     mode: "deputy-candidate",
     label: "Diputado",
     icon: Scale,
-    needsRefinement: true, // ✅ Permite distrito y partido
+    needsRefinement: true,
   },
 ];
 
@@ -186,19 +187,16 @@ const filterParsers = {
 export default function FilterSystem() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // ✅ INTEGRACIÓN CON NUQS (tipado estricto)
   const [filters, setFilters] = useQueryStates(filterParsers, {
     history: "replace",
     shallow: false,
   });
 
-  // Derivar category del mode
   const category: CategoryId | null = useMemo(() => {
     if (!filters.mode) return null;
     return filters.mode.includes("candidate") ? "candidate" : "legislator";
   }, [filters.mode]);
 
-  // Encontrar el subtipo actual
   const currentSubtype = useMemo(() => {
     if (!filters.mode) return null;
 
@@ -214,7 +212,6 @@ export default function FilterSystem() {
     );
   }, [filters.mode, filters.chamber, category]);
 
-  // Contar filtros activos
   const activeFiltersCount = useMemo(() => {
     return [
       filters.chamber && filters.chamber !== "",
@@ -231,7 +228,6 @@ export default function FilterSystem() {
   // ============================================
 
   const handleCategoryChange = (newCategory: CategoryId) => {
-    // Limpiar todos los filtros y establecer valores por defecto
     setFilters({
       mode: newCategory === "legislator" ? "legislator" : null,
       chamber: null,
@@ -243,13 +239,11 @@ export default function FilterSystem() {
   };
 
   const handleSubtypeChange = (subtype: Subtype) => {
-    // Actualizar mode y chamber
     const updates: Partial<FilterState> = {
       mode: subtype.mode,
       chamber: subtype.chamber || null,
     };
 
-    // Si el subtipo NO necesita refinamiento, limpiar filtros avanzados
     if (!subtype.needsRefinement) {
       updates.district = null;
       updates.party = null;
@@ -294,7 +288,7 @@ export default function FilterSystem() {
 
       {/* Mobile Version */}
       <div className="lg:hidden">
-        <MobileFilterPanel
+        <MobileFilterDrawer
           {...panelProps}
           open={mobileOpen}
           onOpenChange={setMobileOpen}
@@ -331,9 +325,6 @@ function DesktopFilterPanel({
   activeFiltersCount,
   isComplete,
 }: PanelProps) {
-  const showRefinement = currentSubtype?.needsRefinement ?? false;
-  const isCandidate = category === "candidate";
-
   return (
     <Card className="sticky top-6">
       <CardHeader className="pb-3">
@@ -363,112 +354,176 @@ function DesktopFilterPanel({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Paso 1: Categoría */}
-        <div className="space-y-2">
-          <Label className="text-xs font-semibold text-muted-foreground uppercase">
-            Paso 1: Tipo
-          </Label>
-          <div className="grid grid-cols-1 gap-2">
-            {ENTITY_CATEGORIES.map((cat) => {
-              const Icon = cat.icon;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => onCategoryChange(cat.id)}
-                  className={cn(
-                    "p-3 rounded-lg border-2 transition-all text-left",
-                    "hover:border-primary/50 hover:bg-primary/5",
-                    category === cat.id
-                      ? "border-primary bg-primary/10"
-                      : "border-border",
-                  )}
-                >
-                  <div className="flex items-start gap-2">
-                    <div
-                      className={cn(
-                        "p-1.5 rounded-md",
-                        cat.color,
-                        "text-white",
-                      )}
-                    >
-                      <Icon className="h-3.5 w-3.5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">{cat.label}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {cat.description}
-                      </p>
-                    </div>
+        <FilterContent
+          category={category}
+          currentSubtype={currentSubtype}
+          filters={filters}
+          setFilters={setFilters}
+          onCategoryChange={onCategoryChange}
+          onSubtypeChange={onSubtypeChange}
+          activeFiltersCount={activeFiltersCount}
+          isComplete={isComplete}
+        />
+      </CardContent>
+    </Card>
+  );
+}
+
+// ============================================
+// CONTENIDO COMPARTIDO DE FILTROS
+// ============================================
+
+interface FilterContentProps {
+  category: CategoryId | null;
+  currentSubtype: Subtype | null;
+  filters: FilterState;
+  setFilters: (updates: Partial<FilterState>) => void;
+  onCategoryChange: (category: CategoryId) => void;
+  onSubtypeChange: (subtype: Subtype) => void;
+  activeFiltersCount: number;
+  isComplete: boolean;
+}
+
+function FilterContent({
+  category,
+  currentSubtype,
+  filters,
+  setFilters,
+  onCategoryChange,
+  onSubtypeChange,
+  isComplete,
+}: FilterContentProps) {
+  const showRefinement = currentSubtype?.needsRefinement ?? false;
+  const isCandidate = category === "candidate";
+
+  return (
+    <div className="space-y-4">
+      {/* Paso 1: Categoría */}
+      <div className="space-y-2">
+        <Label className="text-xs font-semibold text-muted-foreground uppercase">
+          Paso 1: Tipo
+        </Label>
+        <div className="grid grid-cols-1 gap-2">
+          {ENTITY_CATEGORIES.map((cat) => {
+            const Icon = cat.icon;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => onCategoryChange(cat.id)}
+                className={cn(
+                  "p-3 rounded-lg border-2 transition-all text-left",
+                  "hover:border-primary/50 hover:bg-primary/5",
+                  category === cat.id
+                    ? "border-primary bg-primary/10"
+                    : "border-border",
+                )}
+              >
+                <div className="flex items-start gap-2">
+                  <div
+                    className={cn("p-1.5 rounded-md", cat.color, "text-white")}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
                   </div>
-                </button>
-              );
-            })}
-          </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm">{cat.label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {cat.description}
+                    </p>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
+      </div>
 
-        {category && (
-          <>
-            <Separator />
+      {category && (
+        <>
+          <Separator />
 
-            {/* Paso 2: Subtipo */}
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold text-muted-foreground uppercase">
-                Paso 2: Cargo
-              </Label>
-              <div className="grid grid-cols-1 gap-2">
-                {(category === "legislator"
-                  ? LEGISLATOR_SUBTYPES
-                  : CANDIDATE_SUBTYPES
-                ).map((subtype) => {
-                  const Icon = subtype.icon;
-                  const isSelected =
-                    filters.mode === subtype.mode &&
-                    (!subtype.chamber || filters.chamber === subtype.chamber);
+          {/* Paso 2: Subtipo */}
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase">
+              Paso 2: Cargo
+            </Label>
+            <div className="grid grid-cols-1 gap-2">
+              {(category === "legislator"
+                ? LEGISLATOR_SUBTYPES
+                : CANDIDATE_SUBTYPES
+              ).map((subtype) => {
+                const Icon = subtype.icon;
+                const isSelected =
+                  filters.mode === subtype.mode &&
+                  (!subtype.chamber || filters.chamber === subtype.chamber);
 
-                  return (
-                    <button
-                      key={`${subtype.mode}-${subtype.label}`}
-                      onClick={() => onSubtypeChange(subtype)}
-                      className={cn(
-                        "p-2.5 rounded-lg border transition-all text-left flex items-center gap-2",
-                        "hover:border-primary/50 hover:bg-primary/5",
-                        isSelected
-                          ? "border-primary bg-primary/10"
-                          : "border-border",
-                      )}
-                    >
-                      <Icon className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">
-                        {subtype.label}
-                      </span>
-                      {isSelected && (
-                        <ChevronRight className="h-3 w-3 ml-auto text-primary" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+                return (
+                  <button
+                    key={`${subtype.mode}-${subtype.label}`}
+                    onClick={() => onSubtypeChange(subtype)}
+                    className={cn(
+                      "p-2.5 rounded-lg border transition-all text-left flex items-center gap-2",
+                      "hover:border-primary/50 hover:bg-primary/5",
+                      isSelected
+                        ? "border-primary bg-primary/10"
+                        : "border-border",
+                    )}
+                  >
+                    <Icon className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">{subtype.label}</span>
+                    {isSelected && (
+                      <ChevronRight className="h-3 w-3 ml-auto text-primary" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
+          </div>
 
-            {/* Paso 3: Refinamiento (Condicional) */}
-            {showRefinement && filters.mode && (
-              <>
-                <Separator />
-                <div className="space-y-3">
-                  <Label className="text-xs font-semibold text-muted-foreground uppercase">
-                    Paso 3: Refinar
+          {/* Paso 3: Refinamiento (Condicional) */}
+          {showRefinement && filters.mode && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <Label className="text-xs font-semibold text-muted-foreground uppercase">
+                  Paso 3: Refinar
+                </Label>
+
+                {/* Distrito Electoral */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    Distrito Electoral
                   </Label>
+                  <Select
+                    value={filters.district || "all"}
+                    onValueChange={(val: string) =>
+                      setFilters({ district: val === "all" ? null : val })
+                    }
+                  >
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="Todos" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="Lima">Lima</SelectItem>
+                      <SelectItem value="Junín">Junín</SelectItem>
+                      <SelectItem value="Cusco">Cusco</SelectItem>
+                      <SelectItem value="Arequipa">Arequipa</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  {/* Distrito Electoral */}
+                {/* Partido Político (solo candidatos) */}
+                {isCandidate && (
                   <div className="space-y-1.5">
                     <Label className="text-xs flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      Distrito Electoral
+                      <Flag className="h-3 w-3" />
+                      Partido Político
                     </Label>
                     <Select
-                      value={filters.district || "all"}
+                      value={filters.party || "all"}
                       onValueChange={(val: string) =>
-                        setFilters({ district: val === "all" ? null : val })
+                        setFilters({ party: val === "all" ? null : val })
                       }
                     >
                       <SelectTrigger className="h-9">
@@ -476,65 +531,38 @@ function DesktopFilterPanel({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Todos</SelectItem>
-                        <SelectItem value="Lima">Lima</SelectItem>
-                        <SelectItem value="Junín">Junín</SelectItem>
-                        <SelectItem value="Cusco">Cusco</SelectItem>
-                        <SelectItem value="Arequipa">Arequipa</SelectItem>
+                        <SelectItem value="fuerza-popular">
+                          Fuerza Popular
+                        </SelectItem>
+                        <SelectItem value="peru-libre">Perú Libre</SelectItem>
+                        <SelectItem value="renovacion-popular">
+                          Renovación Popular
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+                )}
+              </div>
+            </>
+          )}
+        </>
+      )}
 
-                  {/* Partido Político (solo candidatos) */}
-                  {isCandidate && (
-                    <div className="space-y-1.5">
-                      <Label className="text-xs flex items-center gap-1">
-                        <Flag className="h-3 w-3" />
-                        Partido Político
-                      </Label>
-                      <Select
-                        value={filters.party || "all"}
-                        onValueChange={(val: string) =>
-                          setFilters({ party: val === "all" ? null : val })
-                        }
-                      >
-                        <SelectTrigger className="h-9">
-                          <SelectValue placeholder="Todos" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Todos</SelectItem>
-                          <SelectItem value="fuerza-popular">
-                            Fuerza Popular
-                          </SelectItem>
-                          <SelectItem value="peru-libre">Perú Libre</SelectItem>
-                          <SelectItem value="renovacion-popular">
-                            Renovación Popular
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </>
-        )}
-
-        {isComplete && (
-          <div className="pt-2">
-            <div className="p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-lg">
-              <p className="text-xs text-green-700 dark:text-green-400 font-medium">
-                ✓ Filtros configurados
-              </p>
-              <p className="text-xs text-green-600 dark:text-green-500 mt-1">
-                {showRefinement
-                  ? "Puedes refinar tu búsqueda con distrito y partido"
-                  : "Ahora busca y selecciona hasta 4 entidades"}
-              </p>
-            </div>
+      {isComplete && (
+        <div className="pt-2">
+          <div className="p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-lg">
+            <p className="text-xs text-green-700 dark:text-green-400 font-medium">
+              ✓ Filtros configurados
+            </p>
+            <p className="text-xs text-green-600 dark:text-green-500 mt-1">
+              {showRefinement
+                ? "Puedes refinar tu búsqueda con distrito y partido"
+                : "Ahora busca y selecciona hasta 4 entidades"}
+            </p>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -547,7 +575,7 @@ interface MobilePanelProps extends PanelProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function MobileFilterPanel({
+function MobileFilterDrawer({
   category,
   currentSubtype,
   filters,
@@ -561,8 +589,8 @@ function MobileFilterPanel({
   onOpenChange,
 }: MobilePanelProps) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetTrigger asChild>
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerTrigger asChild>
         <Button variant="outline" className="w-full justify-between h-11">
           <span className="flex items-center gap-2">
             <Filter className="h-4 w-4" />
@@ -579,50 +607,64 @@ function MobileFilterPanel({
             </Badge>
           )}
         </Button>
-      </SheetTrigger>
-      <SheetContent side="bottom" className="h-[85vh] p-0">
-        <div className="h-full flex flex-col">
-          <SheetHeader className="px-4 py-3 border-b">
-            <div className="flex items-center justify-between">
-              <div>
-                <SheetTitle>Configurar Comparación</SheetTitle>
-                <SheetDescription>
-                  Selecciona tipo y aplica filtros
-                </SheetDescription>
-              </div>
-              {activeFiltersCount > 0 && (
-                <Button variant="ghost" size="sm" onClick={onReset}>
-                  Limpiar
-                </Button>
-              )}
+      </DrawerTrigger>
+
+      <DrawerContent className="max-h-[85vh]">
+        <DrawerHeader className="text-left border-b">
+          <div className="flex items-start justify-between">
+            <div>
+              <DrawerTitle>Configurar Comparación</DrawerTitle>
+              <DrawerDescription>
+                Selecciona tipo y aplica filtros
+              </DrawerDescription>
             </div>
-          </SheetHeader>
-
-          <div className="flex-1 overflow-y-auto px-4 py-4">
-            <DesktopFilterPanel
-              category={category}
-              currentSubtype={currentSubtype}
-              filters={filters}
-              setFilters={setFilters}
-              onCategoryChange={onCategoryChange}
-              onSubtypeChange={onSubtypeChange}
-              onReset={onReset}
-              activeFiltersCount={activeFiltersCount}
-              isComplete={isComplete}
-            />
+            {activeFiltersCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onReset}
+                className="h-8 px-2"
+              >
+                <X className="h-4 w-4 mr-1" />
+                Limpiar
+              </Button>
+            )}
           </div>
+        </DrawerHeader>
 
-          <div className="p-4 border-t bg-background">
-            <Button
-              className="w-full"
-              onClick={() => onOpenChange(false)}
-              disabled={!isComplete}
-            >
-              Aplicar Filtros
-            </Button>
-          </div>
+        <div className="overflow-y-auto px-4 py-6">
+          <FilterContent
+            category={category}
+            currentSubtype={currentSubtype}
+            filters={filters}
+            setFilters={setFilters}
+            onCategoryChange={onCategoryChange}
+            onSubtypeChange={onSubtypeChange}
+            activeFiltersCount={activeFiltersCount}
+            isComplete={isComplete}
+          />
         </div>
-      </SheetContent>
-    </Sheet>
+
+        <DrawerFooter className="border-t pt-4">
+          <Button
+            className="w-full h-11"
+            onClick={() => onOpenChange(false)}
+            disabled={!isComplete}
+          >
+            Aplicar Filtros
+            {activeFiltersCount > 0 && (
+              <Badge variant="secondary" className="ml-2 bg-white text-primary">
+                {activeFiltersCount}
+              </Badge>
+            )}
+          </Button>
+          <DrawerClose asChild>
+            <Button variant="outline" className="w-full">
+              Cancelar
+            </Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

@@ -66,18 +66,15 @@ export default async function ComparatorPage(props: PageProps) {
         currentMode,
       );
     } else {
-      console.log("⚠️ Comparison failed, falling back to individual fetch");
       initialEntities = await getEntitiesByIds(search.ids, currentMode);
     }
   }
   // CASO 2: Solo 1 ID (vista previa)
   else if (search.ids.length === 1) {
-    console.log("👤 Loading single entity");
     initialEntities = await getEntitiesByIds(search.ids, currentMode);
   }
   // CASO 3: Sin IDs (página vacía)
   else {
-    console.log("🆕 Empty comparator");
     initialEntities = [];
   }
 
