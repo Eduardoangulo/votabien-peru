@@ -74,17 +74,31 @@ const ENTITY_CONFIG: Record<
     emptyStateText: "Agregar Congresista",
     placeholder: "Ej. Susel Paredes, Keiko Fujimori...",
   },
+  "senator-legislator": {
+    title: "Senadores",
+    subtitle: "Analiza productividad, asistencia e integridad.",
+    icon: Users,
+    emptyStateText: "Agregar Congresista",
+    placeholder: "Ej. Susel Paredes, Keiko Fujimori...",
+  },
+  "deputy-legislator": {
+    title: "Diputados",
+    subtitle: "Analiza productividad, asistencia e integridad.",
+    icon: Users,
+    emptyStateText: "Agregar Congresista",
+    placeholder: "Ej. Susel Paredes, Keiko Fujimori...",
+  },
   "senator-candidate": {
     title: "Candidatos a Senador 2026",
     subtitle: "Evalúa propuestas, trayectoria y antecedentes.",
-    icon: Building2,
+    icon: Users,
     emptyStateText: "Agregar Candidato",
     placeholder: "Ej. Antauro Humala, Rafael López Aliaga...",
   },
   "deputy-candidate": {
     title: "Candidatos a Diputado 2026",
     subtitle: "Compara hojas de vida y planes de trabajo.",
-    icon: Scale,
+    icon: Users,
     emptyStateText: "Agregar Candidato",
     placeholder: "Buscar por nombre, partido o distrito...",
   },
@@ -372,8 +386,8 @@ export default function AsyncEntitySelector({
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <IconComponent className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Comparador de {config.title}
+            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Compara {config.title}
             </h1>
           </div>
           <p className="text-muted-foreground text-sm md:text-base">

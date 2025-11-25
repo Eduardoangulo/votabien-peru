@@ -107,15 +107,15 @@ const LEGISLATOR_SUBTYPES: Subtype[] = [
     needsRefinement: true,
   },
   {
-    mode: "legislator",
-    label: "Senado (Histórico)",
+    mode: "senator-legislator",
+    label: "Senado",
     icon: Building2,
     chamber: "Senado",
     needsRefinement: true,
   },
   {
-    mode: "legislator",
-    label: "Diputados (Histórico)",
+    mode: "deputy-legislator",
+    label: "Diputados",
     icon: Scale,
     chamber: "Diputados",
     needsRefinement: true,
@@ -229,7 +229,7 @@ export default function FilterSystem() {
 
   const handleCategoryChange = (newCategory: CategoryId) => {
     setFilters({
-      mode: newCategory === "legislator" ? "legislator" : null,
+      mode: newCategory === "legislator" ? "legislator" : "candidate",
       chamber: null,
       district: null,
       party: null,
@@ -485,7 +485,7 @@ function FilterContent({
               <Separator />
               <div className="space-y-3">
                 <Label className="text-xs font-semibold text-muted-foreground uppercase">
-                  Paso 3: Refinar
+                  Paso 3: Ajustar Filtros
                 </Label>
 
                 {/* Distrito Electoral */}
