@@ -19,8 +19,8 @@ interface SearchExtras {
   // Para candidatos
   // process_id?: string;
   candidacy_type?: string;
-  party?: string;
-  district?: string;
+  parties?: string[];
+  districts?: string[];
 
   // Filtro universal
   has_metrics_only?: boolean;
@@ -43,6 +43,7 @@ export async function searchEntities(
       const response = await publicApi.getLegisladoresCards({
         search: searchTerm,
         chamber: extras?.chamber || undefined,
+        districts: extras?.districts || [],
         // active_only: extras?.active_only ?? true,
         limit: 30,
       });
@@ -73,8 +74,8 @@ export async function searchEntities(
         search: searchTerm,
         electoral_process_id: procesoActivo.id,
         candidacy_type: candidacyType || undefined,
-        party: extras?.party || undefined,
-        district: extras?.district || undefined,
+        party: extras?.parties || undefined,
+        district: extras?.districts || undefined,
         limit: 30,
       });
 

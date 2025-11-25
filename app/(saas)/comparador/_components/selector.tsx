@@ -639,11 +639,11 @@ export default function AsyncEntitySelector({
 function SelectedSlot({
   item,
   onRemove,
-  disabled = false, // Nuevo prop
+  disabled = false,
 }: {
   item: SearchableEntity;
   onRemove: () => void;
-  disabled?: boolean; // Nuevo prop
+  disabled?: boolean;
 }) {
   return (
     <motion.div

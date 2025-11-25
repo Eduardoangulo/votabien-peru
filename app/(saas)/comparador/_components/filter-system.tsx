@@ -1,8 +1,8 @@
 "use client";
 
 import { useQueryStates } from "nuqs";
-import { useState, useMemo } from "react";
-import { LucideIcon } from "lucide-react";
+import { useState, useMemo, useContext } from "react";
+import { ChevronDown, LucideIcon } from "lucide-react";
 import {
   Users,
   Trophy,
@@ -11,7 +11,6 @@ import {
   Filter,
   X,
   ChevronRight,
-  MapPin,
   Flag,
 } from "lucide-react";
 
@@ -19,13 +18,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
@@ -38,6 +30,10 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { Popover, PopoverContent } from "@/components/ui/popover";
+import { PopoverTrigger } from "@radix-ui/react-popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ComparatorContext } from "@/components/context/comparator";
 
 // ============================================
 // TIPOS
@@ -66,8 +62,8 @@ export interface FilterState {
   mode: string | null;
   chamber: string | null;
   type: string | null;
-  district: string | null;
-  party: string | null;
+  districts: string[] | null;
+  parties: string[] | null;
   // process_id: string | null;
   // active_only: boolean | null;
 }
@@ -99,21 +95,21 @@ const LEGISLATOR_SUBTYPES: Subtype[] = [
     label: "Congreso",
     icon: Users,
     chamber: "Congreso",
-    needsRefinement: true,
+    needsRefinement: false,
   },
   {
     mode: "legislator",
     label: "Senado",
     icon: Building2,
     chamber: "Senado",
-    needsRefinement: true,
+    needsRefinement: false,
   },
   {
     mode: "legislator",
     label: "Diputados",
     icon: Scale,
     chamber: "Diputados",
-    needsRefinement: true,
+    needsRefinement: false,
   },
 ];
 
@@ -123,14 +119,14 @@ const CANDIDATE_SUBTYPES: Subtype[] = [
     label: "Senador",
     icon: Users,
     type: "Senador",
-    needsRefinement: true,
+    needsRefinement: false,
   },
   {
     mode: "candidate",
     label: "Diputado",
     icon: Users,
     type: "Diputado",
-    needsRefinement: true,
+    needsRefinement: false,
   },
   {
     mode: "candidate",
@@ -165,13 +161,15 @@ const filterParsers = {
     parse: (v: string | null): string => v || "",
     serialize: (v: string): string => v,
   },
-  district: {
-    parse: (v: string | null): string => v || "",
-    serialize: (v: string): string => v,
+  districts: {
+    type: "multi" as const,
+    parse: (v: readonly string[]): string[] => Array.from(v) || [],
+    serialize: (v: string[]): string[] => v,
   },
-  party: {
-    parse: (v: string | null): string => v || "",
-    serialize: (v: string): string => v,
+  parties: {
+    type: "multi" as const,
+    parse: (v: readonly string[]): string[] => Array.from(v) || [],
+    serialize: (v: string[]): string[] => v,
   },
   // process_id: {
   //   parse: (v: string | null): string => v || "elecciones-2026",
@@ -229,8 +227,8 @@ export default function FilterSystem() {
   const activeFiltersCount = useMemo(() => {
     return [
       filters.chamber && filters.chamber !== "",
-      filters.district && filters.district !== "",
-      filters.party && filters.party !== "",
+      filters.districts && filters.districts && filters.districts.length > 0,
+      filters.parties && filters.parties && filters.parties.length > 0,
       filters.type && filters.type !== "",
       // filters.active_only !== null && !filters.active_only,
     ].filter(Boolean).length;
@@ -246,8 +244,8 @@ export default function FilterSystem() {
     setFilters({
       mode: newCategory === "legislator" ? "legislator" : "candidate",
       chamber: null,
-      district: null,
-      party: null,
+      districts: null,
+      parties: null,
       type: null,
       // process_id: newCategory === "candidate" ? "elecciones-2026" : null,
       // active_only: true,
@@ -262,8 +260,8 @@ export default function FilterSystem() {
     };
 
     if (!subtype.needsRefinement) {
-      updates.district = null;
-      updates.party = null;
+      updates.districts = null;
+      updates.parties = null;
     }
 
     setFilters(updates);
@@ -273,8 +271,8 @@ export default function FilterSystem() {
     setFilters({
       mode: "legislator",
       chamber: "Congreso",
-      district: null,
-      party: null,
+      districts: [],
+      parties: [],
       type: null,
       // process_id: null,
       // active_only: true,
@@ -411,11 +409,26 @@ function FilterContent({
   onSubtypeChange,
   isComplete,
 }: FilterContentProps) {
+  const { districts, parties } = useContext(ComparatorContext);
+  const [openPopover, setOpenPopover] = useState<string | null>(null);
   const showRefinement = currentSubtype?.needsRefinement ?? false;
-  console.log("showRefinement", showRefinement);
 
   const isCandidate = category === "candidate";
+  const handleMultiSelectChange = (
+    fieldKey: "districts" | "parties",
+    value: string,
+    checked: boolean,
+  ) => {
+    const currentValues = filters[fieldKey] || [];
 
+    const newValues = checked
+      ? [...currentValues, value]
+      : currentValues.filter((v) => v !== value);
+
+    setFilters({
+      [fieldKey]: newValues.length > 0 ? newValues : null,
+    });
+  };
   return (
     <div className="space-y-4">
       {/* Paso 1: Categoría */}
@@ -515,27 +528,79 @@ function FilterContent({
 
                 {/* Distrito Electoral */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    Distrito Electoral
-                  </Label>
-                  <Select
-                    value={filters.district || "all"}
-                    onValueChange={(val: string) =>
-                      setFilters({ district: val === "all" ? null : val })
+                  <Popover
+                    open={openPopover === "districts"}
+                    onOpenChange={(open) =>
+                      setOpenPopover(open ? "districts" : null)
                     }
                   >
-                    <SelectTrigger className="h-9">
-                      <SelectValue placeholder="Todos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="Lima">Lima</SelectItem>
-                      <SelectItem value="Junín">Junín</SelectItem>
-                      <SelectItem value="Cusco">Cusco</SelectItem>
-                      <SelectItem value="Arequipa">Arequipa</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className={cn(
+                          "w-full justify-between font-normal bg-background",
+                          (!filters.districts ||
+                            filters.districts.length === 0) &&
+                            "text-muted-foreground",
+                        )}
+                      >
+                        {filters.districts && filters.districts.length > 0
+                          ? `Distritos (${filters.districts.length})`
+                          : "Seleccionar distritos"}
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-2" align="start">
+                      <div className="max-h-[300px] overflow-y-auto p-1">
+                        {districts.map((district) => (
+                          <div
+                            key={district.id}
+                            className="flex items-center gap-2 p-2 hover:bg-accent rounded-sm cursor-pointer"
+                            onClick={() =>
+                              handleMultiSelectChange(
+                                "districts",
+                                district.name,
+                                !filters.districts?.includes(district.name),
+                              )
+                            }
+                          >
+                            <Checkbox
+                              checked={
+                                filters.districts?.includes(district.name) ||
+                                false
+                              }
+                              onCheckedChange={(checked) =>
+                                handleMultiSelectChange(
+                                  "districts",
+                                  district.name,
+                                  checked as boolean,
+                                )
+                              }
+                            />
+                            <label className="text-sm flex-1 cursor-pointer">
+                              {district.name}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                      {filters.districts && filters.districts.length > 0 && (
+                        <div className="mt-2 pt-2 border-t">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="w-full text-xs"
+                            onClick={() => {
+                              setFilters({ districts: [] });
+                              setOpenPopover(null);
+                            }}
+                          >
+                            Limpiar selección
+                          </Button>
+                        </div>
+                      )}
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
                 {/* Partido Político (solo candidatos) */}
@@ -545,26 +610,77 @@ function FilterContent({
                       <Flag className="h-3 w-3" />
                       Partido Político
                     </Label>
-                    <Select
-                      value={filters.party || "all"}
-                      onValueChange={(val: string) =>
-                        setFilters({ party: val === "all" ? null : val })
+                    <Popover
+                      open={openPopover === "party"}
+                      onOpenChange={(open) =>
+                        setOpenPopover(open ? "party" : null)
                       }
                     >
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="Todos" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todos</SelectItem>
-                        <SelectItem value="fuerza-popular">
-                          Fuerza Popular
-                        </SelectItem>
-                        <SelectItem value="peru-libre">Perú Libre</SelectItem>
-                        <SelectItem value="renovacion-popular">
-                          Renovación Popular
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-full justify-between font-normal bg-background h-9",
+                            filters.parties?.length === 0 &&
+                              "text-muted-foreground",
+                          )}
+                        >
+                          {filters.parties?.length &&
+                          filters.parties?.length > 0
+                            ? `Partidos (${filters.parties.length})`
+                            : "Todos los partidos"}
+                          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-2" align="start">
+                        <div className="max-h-[300px] overflow-y-auto p-1">
+                          {parties.map((party) => (
+                            <div
+                              key={party.id}
+                              className="flex items-center gap-2 p-2 hover:bg-accent rounded-sm cursor-pointer"
+                              onClick={() =>
+                                handleMultiSelectChange(
+                                  "parties",
+                                  party.name,
+                                  !filters.parties?.includes(party.name),
+                                )
+                              }
+                            >
+                              <Checkbox
+                                checked={filters.parties?.includes(party.name)}
+                                onCheckedChange={(checked) =>
+                                  handleMultiSelectChange(
+                                    "parties",
+                                    party.name,
+                                    checked as boolean,
+                                  )
+                                }
+                              />
+                              <label className="text-sm flex-1 cursor-pointer">
+                                {party.name}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                        {filters.parties?.length &&
+                          filters.parties.length > 0 && (
+                            <div className="mt-2 pt-2 border-t">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full text-xs"
+                                onClick={() => {
+                                  setFilters({ parties: [] });
+                                  setOpenPopover(null);
+                                }}
+                              >
+                                Limpiar selección
+                              </Button>
+                            </div>
+                          )}
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 )}
               </div>

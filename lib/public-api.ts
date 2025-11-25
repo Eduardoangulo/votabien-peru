@@ -190,9 +190,15 @@ class PublicApiClient {
   }
 
   // ============= ENDPOINTS DE PARTIDOS =============
-
   /**
-   * Obtener lista de partidos políticos
+   * Obtener lista simple de partidos políticos
+   */
+  async getPartidosList(active?: boolean) {
+    const query = active !== undefined ? `?active=${active}` : "";
+    return this.get(`/api/v1/politics/partidos-list${query}`);
+  }
+  /**
+   * Obtener lista paginada de partidos políticos
    */
   async getPartidos(params?: FiltersRegulars) {
     const query = this.buildQueryParams(params as Record<string, unknown>);

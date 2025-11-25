@@ -10,8 +10,13 @@ import { searchEntities } from "./_lib/actions";
 import { ComparatorProvider } from "@/components/context/comparator";
 import ComparatorLayout from "./_components/comparator-layout";
 import { SearchableEntity } from "@/interfaces/ui-types";
-import { ChamberType } from "@/interfaces/politics";
+import {
+  ChamberType,
+  ElectoralDistrictBase,
+  PoliticalPartyBase,
+} from "@/interfaces/politics";
 import { ComparisonResponse } from "@/interfaces/comparator";
+import { publicApi } from "@/lib/public-api";
 
 interface PageProps {
   searchParams: Promise<SearchParams>;
@@ -24,6 +29,8 @@ interface PageProps {
 interface LegislatorSearchExtras {
   has_metrics_only: boolean;
   chamber?: ChamberType;
+  parties?: string[];
+  districts?: string[];
   // active_only?: boolean;
 }
 
@@ -31,8 +38,8 @@ interface CandidateSearchExtras {
   has_metrics_only: boolean;
   // process_id: string;
   candidacy_type?: string;
-  party?: string;
-  district?: string;
+  parties?: string[];
+  districts?: string[];
 }
 
 type SearchExtras = LegislatorSearchExtras | CandidateSearchExtras;
@@ -110,6 +117,12 @@ export default async function ComparatorPage(props: PageProps) {
         if (search.chamber) {
           legislatorExtras.chamber = search.chamber;
         }
+        if (search.parties) {
+          legislatorExtras.parties = search.parties;
+        }
+        if (search.districts) {
+          legislatorExtras.districts = search.districts;
+        }
         // if (search.active_only !== undefined) {
         //   legislatorExtras.active_only = search.active_only;
         // }
@@ -125,18 +138,18 @@ export default async function ComparatorPage(props: PageProps) {
           has_metrics_only: false,
           // process_id: search.process_id,
           candidacy_type: search.candidacy_type,
-          party: search.party || undefined, // ✅ Desde URL
-          district: search.district || undefined, // ✅ Desde URL
+          parties: search.parties || [], // ✅ Desde URL
+          districts: search.districts || [], // ✅ Desde URL
         };
 
         if (search.candidacy_type) {
           candidateExtras.candidacy_type = search.candidacy_type;
         }
-        if (search.party) {
-          candidateExtras.party = search.party;
+        if (search.parties) {
+          candidateExtras.parties = search.parties;
         }
-        if (search.district) {
-          candidateExtras.district = search.district;
+        if (search.districts) {
+          candidateExtras.districts = search.districts;
         }
 
         extras = candidateExtras;
@@ -152,13 +165,18 @@ export default async function ComparatorPage(props: PageProps) {
       return [];
     }
   }
-
+  const [districts, parties] = await Promise.all([
+    publicApi.getDistritos() as Promise<ElectoralDistrictBase[]>,
+    publicApi.getPartidosList(true) as Promise<PoliticalPartyBase[]>,
+  ]);
   // ============================================
   // RENDER
   // ============================================
   return (
     <ComparatorProvider
       initialEntities={initialEntities}
+      districts={districts}
+      parties={parties}
       mode={currentMode}
       selectedIds={search.ids}
     >

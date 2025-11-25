@@ -21,7 +21,11 @@ export const publicNavGroups: NavGroup[] = [
       { href: "/legisladores", label: "Congresistas", icon: BookHeadphones },
       { href: "/partidos", label: "Partidos", icon: Flag },
       { href: "/candidatos", label: "Candidatos 2026", icon: UserCheck },
-      { href: "/comparador", label: "Comparador", icon: GitCompare },
+      {
+        href: "/comparador?mode=legislator&chamber=Congreso",
+        label: "Comparador",
+        icon: GitCompare,
+      },
       { href: "/nosotros", label: "Nosotros", icon: Info },
     ],
   },

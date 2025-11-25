@@ -65,14 +65,14 @@ export default function FilterBadgeSummary({
   }
 
   // Badge de distrito
-  if (filters.district) {
+  if (filters.districts) {
     badges.push(
       <Badge key="district" variant="secondary" className="gap-1.5 pr-1">
         <MapPin className="h-3 w-3" />
-        {filters.district}
+        {filters.districts}
         {onRemoveFilter && (
           <button
-            onClick={() => onRemoveFilter("district")}
+            onClick={() => onRemoveFilter("districts")}
             className="ml-1 hover:bg-secondary-foreground/20 rounded-sm p-0.5"
           >
             <X className="h-2.5 w-2.5" />
@@ -83,14 +83,14 @@ export default function FilterBadgeSummary({
   }
 
   // Badge de partido
-  if (filters.party) {
+  if (filters.parties) {
     badges.push(
-      <Badge key="party" variant="secondary" className="gap-1.5 pr-1">
+      <Badge key="parties" variant="secondary" className="gap-1.5 pr-1">
         <Flag className="h-3 w-3" />
-        {filters.party}
+        {filters.parties}
         {onRemoveFilter && (
           <button
-            onClick={() => onRemoveFilter("party")}
+            onClick={() => onRemoveFilter("parties")}
             className="ml-1 hover:bg-secondary-foreground/20 rounded-sm p-0.5"
           >
             <X className="h-2.5 w-2.5" />

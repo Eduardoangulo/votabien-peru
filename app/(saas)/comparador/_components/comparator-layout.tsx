@@ -46,8 +46,8 @@ const filterParsers = {
   },
   chamber: { parse: (v: string) => v || "", serialize: (v: string) => v },
   type: { parse: (v: string) => v || "", serialize: (v: string) => v },
-  district: { parse: (v: string) => v || "", serialize: (v: string) => v },
-  party: { parse: (v: string) => v || "", serialize: (v: string) => v },
+  districts: { parse: (v: string) => v || "", serialize: (v: string) => v },
+  parties: { parse: (v: string) => v || "", serialize: (v: string) => v },
   // process_id: {
   //   parse: (v: string) => v || "elecciones-2026",
   //   serialize: (v: string) => v,
@@ -196,8 +196,8 @@ export default function ComparatorLayout({
                 showMetricsWarning={true}
                 chamber={(filters.chamber as ChamberType) || undefined}
                 type={(filters.type as CandidateConfigKeys) || undefined}
-                district={filters.district || undefined}
-                party={filters.party || undefined}
+                district={filters.districts || undefined}
+                party={filters.parties || undefined}
               />
             </section>
           ) : (

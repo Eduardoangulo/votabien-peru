@@ -15,12 +15,12 @@ export const searchParamsCache = createSearchParamsCache({
   ids: parseAsArrayOf(parseAsString).withDefault([]),
   q: parseAsString.withDefault(""),
   chamber: parseAsString.withDefault(""),
-  district: parseAsString.withDefault(""),
+  districts: parseAsArrayOf(parseAsString).withDefault([]),
   parliamentary_group: parseAsString.withDefault(""),
   // active_only: parseAsBoolean.withDefault(true),
   // process_id: parseAsString.withDefault(""),
   candidacy_type: parseAsString.withDefault(""),
-  party: parseAsString.withDefault(""),
+  parties: parseAsArrayOf(parseAsString).withDefault([]),
   has_metrics_only: parseAsBoolean.withDefault(true),
 });
 
@@ -30,12 +30,12 @@ export type ComparatorParamsSchema = {
   ids: string[];
   q: string;
   chamber: ChamberType;
-  district: string;
+  districts: string[];
+  parties: string[];
   parliamentary_group: string;
   // active_only: boolean;
   // process_id: string;
   candidacy_type: string;
-  party: string;
   has_metrics_only: boolean;
 };
 
