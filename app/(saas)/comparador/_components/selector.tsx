@@ -4,7 +4,11 @@ import * as React from "react";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { SearchableEntity, EntityType } from "@/interfaces/ui-types";
+import {
+  SearchableEntity,
+  EntityType,
+  CandidateConfigKeys,
+} from "@/interfaces/ui-types";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 
 // UI Components
@@ -12,12 +16,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
@@ -38,11 +36,11 @@ import {
   ArrowRight,
   AlertCircle,
   Users,
-  Scale,
   Trophy,
-  Building2,
   MapPin,
   Flag,
+  Building2,
+  Scale,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -52,13 +50,15 @@ import {
   CredenzaHeader,
   CredenzaTitle,
 } from "@/components/ui/credenza";
+import { ChamberType } from "@/interfaces/politics";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // ============================================
 // CONFIGURACIÓN DE LABELS POR TIPO
 // ============================================
 
-const ENTITY_CONFIG: Record<
-  EntityType,
+const LEGISLATOR_CONFIG: Record<
+  ChamberType,
   {
     title: string;
     subtitle: string;
@@ -67,49 +67,61 @@ const ENTITY_CONFIG: Record<
     placeholder: string;
   }
 > = {
-  legislator: {
+  Congreso: {
     title: "Congresistas",
     subtitle: "Analiza productividad, asistencia e integridad.",
     icon: Users,
     emptyStateText: "Agregar Congresista",
     placeholder: "Ej. Susel Paredes, Keiko Fujimori...",
   },
-  "senator-legislator": {
+  Senado: {
     title: "Senadores",
     subtitle: "Analiza productividad, asistencia e integridad.",
-    icon: Users,
-    emptyStateText: "Agregar Congresista",
-    placeholder: "Ej. Susel Paredes, Keiko Fujimori...",
+    icon: Building2,
+    emptyStateText: "Agregar Senador",
+    placeholder: "Ej. Juan Pérez, María González...",
   },
-  "deputy-legislator": {
+  Diputados: {
     title: "Diputados",
     subtitle: "Analiza productividad, asistencia e integridad.",
-    icon: Users,
-    emptyStateText: "Agregar Congresista",
-    placeholder: "Ej. Susel Paredes, Keiko Fujimori...",
+    icon: Scale,
+    emptyStateText: "Agregar Diputado",
+    placeholder: "Ej. Carlos López, Ana Silva...",
   },
-  "senator-candidate": {
+};
+
+const CANDIDATE_CONFIG: Record<
+  CandidateConfigKeys,
+  {
+    title: string;
+    subtitle: string;
+    icon: React.ComponentType<{ className?: string }>;
+    emptyStateText: string;
+    placeholder: string;
+  }
+> = {
+  Senador: {
     title: "Candidatos a Senador 2026",
     subtitle: "Evalúa propuestas, trayectoria y antecedentes.",
     icon: Users,
     emptyStateText: "Agregar Candidato",
     placeholder: "Ej. Antauro Humala, Rafael López Aliaga...",
   },
-  "deputy-candidate": {
+  Diputado: {
     title: "Candidatos a Diputado 2026",
     subtitle: "Compara hojas de vida y planes de trabajo.",
     icon: Users,
     emptyStateText: "Agregar Candidato",
     placeholder: "Buscar por nombre, partido o distrito...",
   },
-  "president-candidate": {
+  Presidente: {
     title: "Candidatos Presidenciales 2026",
     subtitle: "Analiza planes de gobierno y trayectoria.",
     icon: Trophy,
     emptyStateText: "Agregar Candidato",
     placeholder: "Ej. Julio Guzmán, Verónika Mendoza...",
   },
-  "vicepresident-candidate": {
+  Vicepresidente: {
     title: "Candidatos Vicepresidenciales 2026",
     subtitle: "Revisa perfiles y experiencia política.",
     icon: Users,
@@ -118,6 +130,22 @@ const ENTITY_CONFIG: Record<
   },
 };
 
+const getEntityConfig = (
+  mode: EntityType,
+  chamber?: ChamberType,
+  type?: CandidateConfigKeys,
+) => {
+  if (mode === "legislator" && chamber) {
+    return LEGISLATOR_CONFIG[chamber];
+  }
+
+  if (mode === "candidate" && type) {
+    return CANDIDATE_CONFIG[type];
+  }
+
+  // Fallback por defecto
+  return LEGISLATOR_CONFIG.Congreso;
+};
 // ============================================
 // PROPS DEL COMPONENTE
 // ============================================
@@ -129,11 +157,11 @@ interface AsyncSelectorProps {
   maxSlots?: number;
   showMetricsWarning?: boolean;
   // ✅ NUEVOS PROPS: Filtros desde URL
-  chamber?: string;
+  chamber?: ChamberType;
+  type?: CandidateConfigKeys;
   district?: string;
   party?: string;
-  processId?: string;
-  activeOnly?: boolean;
+  // activeOnly?: boolean;
 }
 
 export default function AsyncEntitySelector({
@@ -143,19 +171,29 @@ export default function AsyncEntitySelector({
   maxSlots = 4,
   showMetricsWarning = true,
   chamber,
+  type,
   district,
   party,
-  processId,
-  activeOnly,
+  // activeOnly,
 }: AsyncSelectorProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   // --- Config basada en el modo ---
-  const config = ENTITY_CONFIG[mode] || ENTITY_CONFIG["legislator"];
+  // const config = ENTITY_CONFIG[mode] || ENTITY_CONFIG["legislator"];
+  const config = getEntityConfig(mode, chamber, type);
   const IconComponent = config.icon;
-
+  // DETERMINAR SI ESTÁ DESHABILITADO (FALTA CHAMBER O TYPE)
+  const isDisabled = useMemo(() => {
+    if (mode === "legislator") {
+      return !chamber; // Necesita chamber
+    }
+    if (mode === "candidate") {
+      return !type; // Necesita type
+    }
+    return false;
+  }, [mode, chamber, type]);
   // --- State ---
   const [isOpen, setIsOpen] = useState(false);
   const [selectedItems, setSelectedItems] =
@@ -183,6 +221,13 @@ export default function AsyncEntitySelector({
         icon: <Users className="h-3 w-3" />,
       });
     }
+    if (type) {
+      filters.push({
+        label: "Tipo",
+        value: type,
+        icon: <Users className="h-3 w-3" />,
+      });
+    }
     if (district) {
       filters.push({
         label: "Distrito",
@@ -199,9 +244,9 @@ export default function AsyncEntitySelector({
     }
 
     return filters;
-  }, [chamber, district, party]);
+  }, [chamber, type, district, party]);
 
-  // 🔥 SINCRONIZACIÓN CON SERVER STATE
+  // SINCRONIZACIÓN CON SERVER STATE
   const initialSelectedIds = useMemo(
     () =>
       initialSelected
@@ -228,7 +273,7 @@ export default function AsyncEntitySelector({
     setSelectedItems([]);
     setResults([]);
     setQuery("");
-  }, [mode, chamber, district, party]); // ✅ Incluye filtros
+  }, [mode, chamber, type, district, party]); // ✅ Incluye filtros
 
   // --- Derived State ---
   const stats = useMemo(() => {
@@ -287,6 +332,10 @@ export default function AsyncEntitySelector({
 
   // --- Handlers de Selección ---
   const handleSelect = (item: SearchableEntity) => {
+    if (isDisabled) {
+      toast.warning("Por favor selecciona un cargo primero");
+      return;
+    }
     // Validación 1: Ya está seleccionado
     if (selectedItems.some((i) => i.id === item.id)) {
       toast.info(`${item.fullname} ya está seleccionado`);
@@ -299,7 +348,7 @@ export default function AsyncEntitySelector({
       return;
     }
 
-    // 🔥 Validación 3: Sin métricas (warning pero permite)
+    //  Validación 3: Sin métricas (warning pero permite)
     if (!item.has_metrics && showMetricsWarning) {
       toast.warning(
         `${item.fullname} no tiene métricas calculadas. No podrá ser comparado.`,
@@ -335,7 +384,7 @@ export default function AsyncEntitySelector({
   const updateUrl = (items: SearchableEntity[]) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    // 🔥 CRÍTICO: Solo incluir IDs con métricas en la URL
+    // CRÍTICO: Solo incluir IDs con métricas en la URL
     const validIds = items.filter((i) => i.has_metrics).map((i) => i.id);
 
     if (validIds.length > 0) {
@@ -461,7 +510,18 @@ export default function AsyncEntitySelector({
           </Button>
         </div>
       </div>
-
+      {isDisabled && (
+        <Alert
+          variant="default"
+          className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20"
+        >
+          <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+          <AlertDescription className="text-amber-800 dark:text-amber-200">
+            <strong>Selecciona un cargo en el Paso 2</strong> para comenzar a
+            agregar {mode === "legislator" ? "legisladores" : "candidatos"}
+          </AlertDescription>
+        </Alert>
+      )}
       {/* Grid de Slots */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <AnimatePresence mode="popLayout">
@@ -470,6 +530,7 @@ export default function AsyncEntitySelector({
               key={item.id}
               item={item}
               onRemove={() => handleRemove(item.id, item.fullname)}
+              disabled={isDisabled}
             />
           ))}
           {stats.emptySlots.map((_, i) => (
@@ -483,6 +544,7 @@ export default function AsyncEntitySelector({
               <Button
                 variant="ghost"
                 onClick={() => setIsOpen(true)}
+                disabled={isDisabled}
                 className="h-full w-full rounded-xl border-2 border-dashed border-muted-foreground/20 hover:border-primary/50 hover:bg-primary/5 flex flex-col gap-3 items-center justify-center group"
               >
                 <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -509,23 +571,22 @@ export default function AsyncEntitySelector({
           }
         }}
       >
-        <CredenzaContent className="sm:max-w-[550px] p-0 gap-0 overflow-hidden">
-          <CredenzaHeader className="px-4 py-3 border-b bg-muted/20">
-            <CredenzaTitle className="text-base font-medium flex items-center gap-2">
-              <Search className="w-4 h-4" />
-              Buscar {mode === "legislator" ? "Congresista" : "Candidato"}
-            </CredenzaTitle>
+        <CredenzaContent className="p-0 overflow-hidden">
+          <CredenzaHeader className="px-2 py-3 border-b">
+            <CredenzaTitle className="hidden">Buscar</CredenzaTitle>
+            <div className="relative flex items-center">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Input
+                placeholder={config.placeholder}
+                value={query}
+                onChange={handleInputChange}
+                className="h-10 text-base pl-10 sm:mr-6"
+                autoFocus
+              />
+            </div>
           </CredenzaHeader>
-          <CredenzaBody>
-            <Input
-              placeholder={config.placeholder}
-              value={query}
-              onChange={handleInputChange}
-              className="h-11 text-lg"
-              autoFocus
-            />
-
-            <ScrollArea className="h-[320px] w-full pr-4">
+          <CredenzaBody className="">
+            <ScrollArea className="h-[320px] w-full sm:px-2">
               {isSearching ? (
                 <div className="space-y-3 mt-2">
                   {[1, 2, 3].map((i) => (
@@ -575,13 +636,14 @@ export default function AsyncEntitySelector({
 // ============================================
 // SUB-COMPONENTES
 // ============================================
-
 function SelectedSlot({
   item,
   onRemove,
+  disabled = false, // Nuevo prop
 }: {
   item: SearchableEntity;
   onRemove: () => void;
+  disabled?: boolean; // Nuevo prop
 }) {
   return (
     <motion.div
@@ -597,12 +659,19 @@ function SelectedSlot({
           !item.has_metrics
             ? "border-amber-200 bg-amber-50/30 dark:bg-amber-950/20"
             : "hover:border-primary/40 hover:shadow-md",
+          disabled && "opacity-50 cursor-not-allowed", // Estilo cuando está deshabilitado
         )}
       >
         {/* Remove Button */}
         <button
           onClick={onRemove}
-          className="absolute top-2 right-2 z-20 h-7 w-7 rounded-full bg-background/80 hover:bg-destructive hover:text-white flex items-center justify-center transition-colors shadow-sm border"
+          disabled={disabled} // Deshabilitar botón
+          className={cn(
+            "absolute top-2 right-2 z-20 h-7 w-7 rounded-full bg-background/80 flex items-center justify-center transition-colors shadow-sm border",
+            disabled
+              ? "cursor-not-allowed opacity-50"
+              : "hover:bg-destructive hover:text-white",
+          )}
           aria-label={`Eliminar ${item.fullname}`}
         >
           <X className="h-3.5 w-3.5" />
@@ -642,6 +711,7 @@ function SelectedSlot({
             className={cn(
               "h-24 w-24 border-4 shadow-md",
               !item.has_metrics && "grayscale opacity-70",
+              disabled && "grayscale opacity-50", // Avatar deshabilitado
             )}
           >
             <AvatarImage src={item.image_url || ""} alt={item.fullname} />
@@ -689,7 +759,7 @@ function SearchResultItem({
     <div
       onClick={() => !isDisabled && !isSelected && onSelect()}
       className={cn(
-        "flex items-center gap-3 p-3 rounded-lg border transition-all",
+        "grid grid-cols-[auto_1fr_auto] items-center gap-3 p-3 rounded-lg border transition-all",
         isSelected && "bg-primary/5 border-primary/30",
         !isDisabled &&
           !isSelected &&
@@ -697,43 +767,48 @@ function SearchResultItem({
         isDisabled && "opacity-50 cursor-not-allowed bg-muted/20",
       )}
     >
-      <Avatar className="h-10 w-10 border flex-shrink-0">
+      {/* Avatar */}
+      <Avatar className="h-10 w-10 border">
         <AvatarImage src={item.image_url || ""} alt={item.fullname} />
         <AvatarFallback>
           {item.fullname.substring(0, 2).toUpperCase()}
         </AvatarFallback>
       </Avatar>
 
-      <div className="flex-1 min-w-0 text-left">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-sm truncate">
+      {/* Contenido central ADAPTABLE */}
+      <div className="min-w-0">
+        <div className="flex items-start gap-2">
+          <span className="font-semibold text-sm break-words leading-tight">
             {item.fullname}
           </span>
+
           {!item.has_metrics && (
             <Badge
               variant="secondary"
-              className="text-[9px] h-4 px-1 text-amber-600 bg-amber-50 dark:bg-amber-950"
+              className="text-[9px] h-4 px-1 mt-0.5 flex-shrink-0 text-amber-600 bg-amber-50 dark:bg-amber-950"
             >
               Sin datos
             </Badge>
           )}
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+
+        <div className="flex items-center flex-wrap gap-2 text-xs text-muted-foreground">
           <span
             className="inline-block w-2 h-2 rounded-full flex-shrink-0"
             style={{ background: item.group_color || "#ccc" }}
           />
-          <span className="truncate">{item.group_name}</span>
+          <span>{item.group_name}</span>
           <span>•</span>
-          <span className="truncate">{item.description}</span>
+          <span>{item.description}</span>
         </div>
       </div>
 
-      <div className="flex-shrink-0">
+      {/* Icono siempre visible */}
+      <div className="w-6 h-6 flex items-center justify-center">
         {isSelected ? (
           <CheckCircle2 className="h-5 w-5 text-primary" />
         ) : !isDisabled ? (
-          <div className="h-5 w-5 rounded-full border-2 border-muted group-hover:border-primary/50" />
+          <div className="h-5 w-5 rounded-full border-2 border-muted" />
         ) : (
           <Ban className="h-4 w-4 text-muted-foreground" />
         )}

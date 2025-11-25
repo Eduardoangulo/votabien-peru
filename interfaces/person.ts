@@ -1,10 +1,7 @@
+import { BackgroundBase } from "./background";
+import { CandidateToPerson } from "./candidate";
 import { LegislatorDetail } from "./legislator";
-import {
-  BiographyDetail,
-  CandidateList,
-  PreviousCase,
-  WorkExperience,
-} from "./politics";
+import { BiographyDetail, PreviousCase, WorkExperience } from "./politics";
 
 export interface PersonBasicInfo {
   id: string;
@@ -29,7 +26,7 @@ export interface PersonBase {
   postgraduate_education: string | null;
   resume_url: string | null;
   work_experience: WorkExperience[] | [];
-  previous_cases: PreviousCase[] | [];
+  // previous_cases: PreviousCase[] | [];
   facebook_url: string | null;
   twitter_url: string | null;
   instagram_url: string | null;
@@ -42,8 +39,9 @@ export interface PersonWithActivePeriod extends PersonBase {
 }
 
 export interface PersonDetail extends PersonBase {
+  backgrounds: BackgroundBase[] | null;
   legislative_periods: LegislatorDetail[];
-  candidacies: CandidateList[];
+  candidacies: CandidateToPerson[];
 }
 
 export interface CreatePersonRequest {

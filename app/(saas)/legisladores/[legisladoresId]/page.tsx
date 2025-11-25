@@ -15,6 +15,7 @@ export default async function LegisladorDetailPage({ params }: PageProps) {
       legisladoresId,
     )) as PersonDetail;
     if (!legislador) notFound();
+    console.log("leg", legislador);
     return <DetailLegislador persona={legislador} />;
   } catch (error) {
     console.error("Error al obtener datos del legislador:", error);

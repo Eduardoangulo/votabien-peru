@@ -11,19 +11,19 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import CandidatoDialog from "@/components/politics/candidato-dialog";
+// import CandidatoDialog from "@/components/politics/candidato-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   CandidacyType,
-  CandidateDetail,
   ElectoralDistrictBase,
   FiltersCandidates,
 } from "@/interfaces/politics";
 import { cn } from "@/lib/utils";
+import { CandidateCard } from "@/interfaces/candidate";
 
 interface CandidatosListProps {
-  candidaturas: CandidateDetail[];
+  candidaturas: CandidateCard[];
   distritos: ElectoralDistrictBase[];
   procesoId: string;
   currentFilters: FiltersCandidates;
@@ -56,9 +56,9 @@ const CandidatosList = ({
   infiniteScroll = true,
 }: CandidatosListProps) => {
   const [candidatos, setCandidatos] =
-    useState<CandidateDetail[]>(initialCandidaturas);
+    useState<CandidateCard[]>(initialCandidaturas);
   const [selectedCandidato, setSelectedCandidato] =
-    useState<CandidateDetail | null>(null);
+    useState<CandidateCard | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Carga Scroll
@@ -108,7 +108,7 @@ const CandidatosList = ({
         throw new Error("Error al cargar candidatos");
       }
 
-      const newCandidtos: CandidateDetail[] = await response.json();
+      const newCandidtos: CandidateCard[] = await response.json();
 
       if (newCandidtos.length === 0) {
         setHasMore(false);
@@ -203,7 +203,7 @@ const CandidatosList = ({
     districts: [],
   };
 
-  const handleOpenDialog = (candidato: CandidateDetail) => {
+  const handleOpenDialog = (candidato: CandidateCard) => {
     setSelectedCandidato(candidato);
     setIsDialogOpen(true);
   };
@@ -353,7 +353,7 @@ const CandidatosList = ({
           )}
         </>
       )}
-      {selectedCandidato && (
+      {/* {selectedCandidato && (
         <CandidatoDialog
           candidato={selectedCandidato}
           isOpen={isDialogOpen}
@@ -362,7 +362,7 @@ const CandidatosList = ({
             setSelectedCandidato(null);
           }}
         />
-      )}
+      )} */}
     </div>
   );
 };

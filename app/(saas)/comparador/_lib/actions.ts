@@ -5,6 +5,7 @@ import { EntityType, SearchableEntity } from "@/interfaces/ui-types";
 import { publicApi } from "@/lib/public-api";
 import { isCandidateMode, extractCandidacyType } from "./validation";
 import { adaptLegislatorFromSearch, adaptCandidateFromSearch } from "./helpers";
+import { ElectoralProcess } from "@/interfaces/politics";
 
 // ============================================
 // BÚSQUEDA PRINCIPAL
@@ -13,10 +14,10 @@ import { adaptLegislatorFromSearch, adaptCandidateFromSearch } from "./helpers";
 interface SearchExtras {
   // Para legisladores
   chamber?: string;
-  active_only?: boolean;
+  // active_only?: boolean;
 
   // Para candidatos
-  process_id?: string;
+  // process_id?: string;
   candidacy_type?: string;
   party?: string;
   district?: string;
@@ -42,7 +43,7 @@ export async function searchEntities(
       const response = await publicApi.getLegisladoresCards({
         search: searchTerm,
         chamber: extras?.chamber || undefined,
-        active_only: extras?.active_only ?? true,
+        // active_only: extras?.active_only ?? true,
         limit: 30,
       });
 
@@ -60,16 +61,20 @@ export async function searchEntities(
     if (isCandidateMode(mode)) {
       const candidacyType = extractCandidacyType(mode);
 
-      if (!extras?.process_id) {
-        return [];
-      }
+      // if (!extras?.process_id) {
+      //   return [];
+      // }
+      const procesosActivos = (await publicApi.getProcesosElectorales(
+        true,
+      )) as ElectoralProcess[];
+      const procesoActivo = procesosActivos[0];
 
       const response = await publicApi.getCandidaturas({
         search: searchTerm,
-        electoral_process_id: extras.process_id,
+        electoral_process_id: procesoActivo.id,
         candidacy_type: candidacyType || undefined,
-        party: extras.party || undefined,
-        district: extras.district || undefined,
+        party: extras?.party || undefined,
+        district: extras?.district || undefined,
         limit: 30,
       });
 

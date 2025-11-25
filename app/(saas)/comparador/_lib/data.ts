@@ -36,7 +36,7 @@ export async function getEntitiesByIds(
       const response = await publicApi.getLegisladoresCards({
         ids: ids.join(","),
         limit: ids.length,
-        active_only: false,
+        // active_only: false,
       });
 
       if (!Array.isArray(response)) {
@@ -102,9 +102,9 @@ export async function getComparisonData(
       if (candidacyType) {
         candidatePayload.candidacy_type = candidacyType;
       }
-      if (params.process_id) {
-        candidatePayload.process_id = params.process_id;
-      }
+      // if (params.process_id) {
+      //   candidatePayload.process_id = params.process_id;
+      // }
 
       payload = candidatePayload;
     } else {

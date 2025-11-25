@@ -10,9 +10,18 @@ import {
   ChamberType,
   ElectoralDistrictBase,
   ElectoralDistrictBasic,
+  ElectoralProcess,
   LegislatorCondition,
   PoliticalPartyBase,
 } from "./politics";
+
+export interface AllianceBase {
+  id?: string | number; // Opcional, algunas alianzas pueden no tener ID
+  name: string;
+  acronym?: string | null;
+  color_hex: string | null;
+  logo_url?: string | null;
+}
 
 export interface CandidateBase {
   id: string;
@@ -25,14 +34,11 @@ export interface CandidateBase {
   was_elected: boolean;
 }
 
-export interface AllianceBase {
-  id?: string | number; // Opcional, algunas alianzas pueden no tener ID
-  name: string;
-  acronym?: string | null;
-  color_hex: string | null;
-  logo_url?: string | null;
+export interface CandidateToPerson extends CandidateBase {
+  political_party: PoliticalPartyBase;
+  electoral_district: ElectoralDistrictBase | null;
+  electoral_process: ElectoralProcess;
 }
-
 export interface CandidateBasicInfo {
   id: string;
   person: PersonBasicInfo;

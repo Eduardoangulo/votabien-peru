@@ -75,10 +75,11 @@ export interface BiographyDetail {
 }
 
 export interface WorkExperience {
-  positon: string;
+  position: string;
   organization: string;
   period: string;
-  description: string;
+  source: string | null;
+  source_url: string | null;
 }
 
 export interface PartyHistory {
@@ -120,7 +121,6 @@ export interface ElectoralProcess {
   year: number;
   election_date: string;
   active: boolean;
-  created_at: string;
 }
 // ============= PARTIDO ==========================
 export interface SeatsByDistrict {
@@ -179,36 +179,6 @@ export interface Executive extends ExecutiveBase {
   person: PersonBasicInfo;
 }
 // ============= CANDIDATURAS =============
-
-export interface CandidateBase {
-  id: string;
-  type: CandidacyType;
-  list_number: number | null;
-  status: CandidacyStatus;
-  votes_obtained: number | null;
-  was_elected: boolean;
-}
-
-export interface CandidateList extends CandidateBase {
-  person: PersonBase;
-  political_party: PoliticalPartyBase;
-  electoral_district: ElectoralDistrictBase | null;
-  electoral_process: ElectoralProcess;
-}
-
-export interface CandidateDetail extends CandidateBase {
-  person: PersonBase;
-  legislative_periods: LegislatorDetail[] | [];
-  political_party: PoliticalPartyBase;
-  electoral_district: ElectoralDistrictBase | null;
-  electoral_process: ElectoralProcess;
-
-  // Propuestas y documentos
-  proposals: string | null;
-  government_plan_url: string | null;
-
-  created_at: Date;
-}
 
 // ============= PROYECTOS DE LEY =============
 

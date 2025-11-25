@@ -9,7 +9,7 @@ import { extractEntitiesFromComparison } from "./_lib/helpers";
 import { searchEntities } from "./_lib/actions";
 import { ComparatorProvider } from "@/components/context/comparator";
 import ComparatorLayout from "./_components/comparator-layout";
-import { EntityType, SearchableEntity } from "@/interfaces/ui-types";
+import { SearchableEntity } from "@/interfaces/ui-types";
 import { ChamberType } from "@/interfaces/politics";
 import { ComparisonResponse } from "@/interfaces/comparator";
 
@@ -24,12 +24,12 @@ interface PageProps {
 interface LegislatorSearchExtras {
   has_metrics_only: boolean;
   chamber?: ChamberType;
-  active_only?: boolean;
+  // active_only?: boolean;
 }
 
 interface CandidateSearchExtras {
   has_metrics_only: boolean;
-  process_id: string;
+  // process_id: string;
   candidacy_type?: string;
   party?: string;
   district?: string;
@@ -110,20 +110,20 @@ export default async function ComparatorPage(props: PageProps) {
         if (search.chamber) {
           legislatorExtras.chamber = search.chamber;
         }
-        if (search.active_only !== undefined) {
-          legislatorExtras.active_only = search.active_only;
-        }
+        // if (search.active_only !== undefined) {
+        //   legislatorExtras.active_only = search.active_only;
+        // }
 
         extras = legislatorExtras;
       } else if (isCandidateMode(currentMode)) {
-        if (!search.process_id) {
-          console.error("❌ process_id required for candidate search");
-          return [];
-        }
+        // if (!search.process_id) {
+        //   console.error("❌ process_id required for candidate search");
+        //   return [];
+        // }
 
         const candidateExtras: CandidateSearchExtras = {
           has_metrics_only: false,
-          process_id: search.process_id,
+          // process_id: search.process_id,
           candidacy_type: search.candidacy_type,
           party: search.party || undefined, // ✅ Desde URL
           district: search.district || undefined, // ✅ Desde URL
@@ -165,30 +165,4 @@ export default async function ComparatorPage(props: PageProps) {
       <ComparatorLayout data={comparisonData} searchAction={performSearch} />
     </ComparatorProvider>
   );
-}
-
-// ============================================
-// METADATA
-// ============================================
-
-export async function generateMetadata(props: PageProps) {
-  const resolvedParams = await props.searchParams;
-  const search = searchParamsCache.parse(resolvedParams);
-
-  const titles: Record<EntityType, string> = {
-    legislator: "Comparador de Congresistas",
-    "senator-candidate": "Comparador de Candidatos a Senador 2026",
-    "deputy-candidate": "Comparador de Candidatos a Diputado 2026",
-    "president-candidate": "Comparador de Candidatos Presidenciales 2026",
-    "vicepresident-candidate":
-      "Comparador de Candidatos Vicepresidenciales 2026",
-  };
-
-  const entityLabel =
-    search.mode === "legislator" ? "congresistas" : "candidatos";
-
-  return {
-    title: titles[search.mode as EntityType] || "Comparador Político",
-    description: `Compara propuestas, trayectorias y votaciones de ${search.ids.length} ${entityLabel}`,
-  };
 }

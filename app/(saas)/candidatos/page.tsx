@@ -1,12 +1,9 @@
 import { publicApi } from "@/lib/public-api";
 import CandidatosList from "@/components/politics/candidatos-list";
-import {
-  CandidateDetail,
-  ElectoralDistrictBase,
-  ElectoralProcess,
-} from "@/interfaces/politics";
+import { ElectoralDistrictBase, ElectoralProcess } from "@/interfaces/politics";
 import Link from "next/link";
 import StickyElectoralBanner from "@/components/sticky-banner";
+import { CandidateCard } from "@/interfaces/candidate";
 
 interface PageProps {
   searchParams: {
@@ -84,7 +81,7 @@ const CandidatosPage = async ({ searchParams }: PageProps) => {
       limit: limit,
     };
     const [candidaturas, distritos] = await Promise.all([
-      publicApi.getCandidaturas(apiParams) as Promise<CandidateDetail[]>,
+      publicApi.getCandidaturas(apiParams) as Promise<CandidateCard[]>,
       publicApi.getDistritos() as Promise<ElectoralDistrictBase[]>,
     ]);
 

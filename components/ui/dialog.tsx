@@ -45,7 +45,6 @@ function DialogOverlay({
     />
   );
 }
-
 function DialogContent({
   className,
   children,
@@ -57,18 +56,52 @@ function DialogContent({
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
+
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-4 shadow-lg duration-200 sm:max-w-lg",
+          `
+          fixed top-[50%] left-[50%] z-50
+          w-full max-w-[calc(100%-2rem)]
+
+          transform -translate-x-1/2 -translate-y-1/2
+          
+          bg-background border rounded-xl shadow-xl
+
+          /* Layout */
+          flex flex-col
+          max-h-[90vh]
+          overflow-hidden
+          sm:max-w-2xl
+
+          /* Animaciones */
+          data-[state=open]:animate-in
+          data-[state=closed]:animate-out
+          data-[state=closed]:fade-out-0
+          data-[state=open]:fade-in-0
+          data-[state=closed]:zoom-out-95
+          data-[state=open]:zoom-in-95
+          
+          p-4
+        `,
           className,
         )}
-        // onPointerDownOutside={(e) => e.preventDefault()}
         {...props}
       >
+        {/* Contenido pasado por props */}
         {children}
+
+        {/* Botón de cerrar */}
         {showCloseButton && (
-          <DialogPrimitive.Close className="absolute hover:bg-destructive hover:text-destructive-foreground right-1 top-1 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+          <DialogPrimitive.Close
+            className="
+              absolute right-2 top-2
+              rounded-sm opacity-70 hover:opacity-100
+              hover:bg-destructive hover:text-destructive-foreground
+              transition
+              focus:outline-none focus:ring-2 focus:ring-ring
+            "
+          >
             <XIcon className="size-5" />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>

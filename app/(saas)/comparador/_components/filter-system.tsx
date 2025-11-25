@@ -8,7 +8,6 @@ import {
   Trophy,
   Building2,
   Scale,
-  UserCheck,
   Filter,
   X,
   ChevronRight,
@@ -16,13 +15,7 @@ import {
   Flag,
 } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -65,16 +58,18 @@ type Subtype = {
   label: string;
   icon: LucideIcon;
   chamber?: string;
+  type?: string;
   needsRefinement: boolean;
 };
 
 export interface FilterState {
   mode: string | null;
   chamber: string | null;
+  type: string | null;
   district: string | null;
   party: string | null;
-  process_id: string | null;
-  active_only: boolean | null;
+  // process_id: string | null;
+  // active_only: boolean | null;
 }
 
 // ============================================
@@ -85,7 +80,7 @@ const ENTITY_CATEGORIES: EntityCategory[] = [
   {
     id: "legislator",
     label: "Legisladores",
-    description: "Congresistas actuales e históricos",
+    description: "Congresistas actuales",
     icon: Users,
     color: "bg-blue-500",
   },
@@ -107,14 +102,14 @@ const LEGISLATOR_SUBTYPES: Subtype[] = [
     needsRefinement: true,
   },
   {
-    mode: "senator-legislator",
+    mode: "legislator",
     label: "Senado",
     icon: Building2,
     chamber: "Senado",
     needsRefinement: true,
   },
   {
-    mode: "deputy-legislator",
+    mode: "legislator",
     label: "Diputados",
     icon: Scale,
     chamber: "Diputados",
@@ -124,28 +119,32 @@ const LEGISLATOR_SUBTYPES: Subtype[] = [
 
 const CANDIDATE_SUBTYPES: Subtype[] = [
   {
-    mode: "president-candidate",
+    mode: "candidate",
+    label: "Senador",
+    icon: Users,
+    type: "Senador",
+    needsRefinement: true,
+  },
+  {
+    mode: "candidate",
+    label: "Diputado",
+    icon: Users,
+    type: "Diputado",
+    needsRefinement: true,
+  },
+  {
+    mode: "candidate",
     label: "Presidente",
     icon: Trophy,
+    type: "Presidente",
     needsRefinement: false,
   },
   {
-    mode: "vicepresident-candidate",
+    mode: "candidate",
     label: "Vicepresidente",
-    icon: UserCheck,
+    icon: Users,
+    type: "Vicepresidente",
     needsRefinement: false,
-  },
-  {
-    mode: "senator-candidate",
-    label: "Senador",
-    icon: Building2,
-    needsRefinement: true,
-  },
-  {
-    mode: "deputy-candidate",
-    label: "Diputado",
-    icon: Scale,
-    needsRefinement: true,
   },
 ];
 
@@ -162,6 +161,10 @@ const filterParsers = {
     parse: (v: string | null): string => v || "",
     serialize: (v: string): string => v,
   },
+  type: {
+    parse: (v: string | null): string => v || "",
+    serialize: (v: string): string => v,
+  },
   district: {
     parse: (v: string | null): string => v || "",
     serialize: (v: string): string => v,
@@ -170,14 +173,14 @@ const filterParsers = {
     parse: (v: string | null): string => v || "",
     serialize: (v: string): string => v,
   },
-  process_id: {
-    parse: (v: string | null): string => v || "elecciones-2026",
-    serialize: (v: string): string => v,
-  },
-  active_only: {
-    parse: (v: string | null): boolean => v === "true",
-    serialize: (v: boolean): string => String(v),
-  },
+  // process_id: {
+  //   parse: (v: string | null): string => v || "elecciones-2026",
+  //   serialize: (v: string): string => v,
+  // },
+  // active_only: {
+  //   parse: (v: string | null): boolean => v === "true",
+  //   serialize: (v: boolean): string => String(v),
+  // },
 };
 
 // ============================================
@@ -204,20 +207,32 @@ export default function FilterSystem() {
       category === "legislator" ? LEGISLATOR_SUBTYPES : CANDIDATE_SUBTYPES;
 
     return (
-      allSubtypes.find(
-        (s) =>
-          s.mode === filters.mode &&
-          (s.chamber === undefined || s.chamber === filters.chamber),
-      ) || null
+      allSubtypes.find((s) => {
+        // Primero verificar que el mode coincida
+        if (s.mode !== filters.mode) return false;
+
+        // Para legisladores: verificar chamber
+        if (category === "legislator") {
+          return s.chamber === filters.chamber;
+        }
+
+        // Para candidatos: verificar type
+        if (category === "candidate") {
+          return s.type === filters.type;
+        }
+
+        return false;
+      }) || null
     );
-  }, [filters.mode, filters.chamber, category]);
+  }, [filters.mode, filters.chamber, filters.type, category]);
 
   const activeFiltersCount = useMemo(() => {
     return [
       filters.chamber && filters.chamber !== "",
       filters.district && filters.district !== "",
       filters.party && filters.party !== "",
-      filters.active_only !== null && !filters.active_only,
+      filters.type && filters.type !== "",
+      // filters.active_only !== null && !filters.active_only,
     ].filter(Boolean).length;
   }, [filters]);
 
@@ -233,8 +248,9 @@ export default function FilterSystem() {
       chamber: null,
       district: null,
       party: null,
-      process_id: newCategory === "candidate" ? "elecciones-2026" : null,
-      active_only: true,
+      type: null,
+      // process_id: newCategory === "candidate" ? "elecciones-2026" : null,
+      // active_only: true,
     });
   };
 
@@ -242,6 +258,7 @@ export default function FilterSystem() {
     const updates: Partial<FilterState> = {
       mode: subtype.mode,
       chamber: subtype.chamber || null,
+      type: subtype.type || null,
     };
 
     if (!subtype.needsRefinement) {
@@ -255,11 +272,12 @@ export default function FilterSystem() {
   const resetFilters = () => {
     setFilters({
       mode: "legislator",
-      chamber: null,
+      chamber: "Congreso",
       district: null,
       party: null,
-      process_id: null,
-      active_only: true,
+      type: null,
+      // process_id: null,
+      // active_only: true,
     });
   };
 
@@ -327,7 +345,7 @@ function DesktopFilterPanel({
 }: PanelProps) {
   return (
     <Card className="sticky top-6">
-      <CardHeader className="pb-3">
+      <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-muted-foreground" />
@@ -350,7 +368,7 @@ function DesktopFilterPanel({
             </Button>
           )}
         </div>
-        <CardDescription>Configura tu comparación</CardDescription>
+        {/* <CardDescription>Configura tu comparación</CardDescription> */}
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -394,6 +412,8 @@ function FilterContent({
   isComplete,
 }: FilterContentProps) {
   const showRefinement = currentSubtype?.needsRefinement ?? false;
+  console.log("showRefinement", showRefinement);
+
   const isCandidate = category === "candidate";
 
   return (
@@ -454,7 +474,12 @@ function FilterContent({
                 const Icon = subtype.icon;
                 const isSelected =
                   filters.mode === subtype.mode &&
-                  (!subtype.chamber || filters.chamber === subtype.chamber);
+                  (category === "legislator" && subtype.chamber
+                    ? filters.chamber === subtype.chamber
+                    : true) &&
+                  (category === "candidate" && subtype.type
+                    ? filters.type === subtype.type
+                    : true);
 
                 return (
                   <button
@@ -556,8 +581,8 @@ function FilterContent({
             </p>
             <p className="text-xs text-green-600 dark:text-green-500 mt-1">
               {showRefinement
-                ? "Puedes refinar tu búsqueda con distrito y partido"
-                : "Ahora busca y selecciona hasta 4 entidades"}
+                ? "Puedes mejorar tu búsqueda con distrito y partido"
+                : "Ahora busca y selecciona hasta 4 legisladores/candidatos"}
             </p>
           </div>
         </div>

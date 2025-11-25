@@ -1,3 +1,5 @@
+import { BillBase } from "./bill";
+import { BillAuthorBasic } from "./bill-author";
 import {
   ParliamentaryGroupBasic,
   ParliamentaryMembershipWithGroup,
@@ -5,7 +7,6 @@ import {
 import { PersonBasicInfo, PersonWithActivePeriod } from "./person";
 import {
   Attendance,
-  Bill,
   ChamberType,
   ElectoralDistrictBase,
   ElectoralDistrictBasic,
@@ -24,23 +25,19 @@ export interface LegislatorBasicInfo {
 }
 export interface LegislatorBase {
   id: string;
-  person_id: string;
-}
-
-export interface LegislatorDetail {
-  id: string;
   chamber: ChamberType;
+  condition: LegislatorCondition;
   start_date: string;
-  end_date: string;
+  end_date: string | null;
   active: boolean;
   institutional_email: string | null;
-  parliamentary_group: string | null;
-  elected_by_party: PoliticalPartyBase;
+}
 
+export interface LegislatorDetail extends LegislatorBase {
+  elected_by_party: PoliticalPartyBase;
   electoral_district: ElectoralDistrictBase;
-  bills: Bill[];
+  bill_authorships: BillAuthorBasic[];
   attendances: Attendance[];
-  created_at: Date;
 }
 
 export interface LegislatorInSeat {

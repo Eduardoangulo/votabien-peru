@@ -3,7 +3,11 @@
 import { useContext, useMemo } from "react";
 import { useQueryStates } from "nuqs";
 import { ComparatorContext } from "@/components/context/comparator";
-import { SearchableEntity, EntityType } from "@/interfaces/ui-types";
+import {
+  SearchableEntity,
+  EntityType,
+  CandidateConfigKeys,
+} from "@/interfaces/ui-types";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ComparisonResponse,
@@ -24,6 +28,7 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BarChart3, AlertCircle } from "lucide-react";
 import AsyncEntitySelector from "./selector";
+import { ChamberType } from "@/interfaces/politics";
 
 interface ComparatorLayoutProps {
   data: ComparisonResponse;
@@ -40,16 +45,17 @@ const filterParsers = {
     serialize: (v: string) => v,
   },
   chamber: { parse: (v: string) => v || "", serialize: (v: string) => v },
+  type: { parse: (v: string) => v || "", serialize: (v: string) => v },
   district: { parse: (v: string) => v || "", serialize: (v: string) => v },
   party: { parse: (v: string) => v || "", serialize: (v: string) => v },
-  process_id: {
-    parse: (v: string) => v || "elecciones-2026",
-    serialize: (v: string) => v,
-  },
-  active_only: {
-    parse: (v: string) => v === "true",
-    serialize: (v: boolean) => String(v),
-  },
+  // process_id: {
+  //   parse: (v: string) => v || "elecciones-2026",
+  //   serialize: (v: string) => v,
+  // },
+  // active_only: {
+  //   parse: (v: string) => v === "true",
+  //   serialize: (v: boolean) => String(v),
+  // },
 };
 
 // ============================================
@@ -167,7 +173,7 @@ export default function ComparatorLayout({
   }, [data, filters.mode]);
 
   return (
-    <div className="container mx-auto max-w-7xl py-6 px-4 md:px-6 space-y-6">
+    <div className="container mx-auto w-full py-6 px-4 md:px-6 space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
         {/* ============================================
             SIDEBAR: FilterSystem
@@ -188,11 +194,10 @@ export default function ComparatorLayout({
                 onSearch={enhancedSearchAction}
                 maxSlots={4}
                 showMetricsWarning={true}
-                chamber={filters.chamber || undefined}
+                chamber={(filters.chamber as ChamberType) || undefined}
+                type={(filters.type as CandidateConfigKeys) || undefined}
                 district={filters.district || undefined}
                 party={filters.party || undefined}
-                processId={filters.process_id || undefined}
-                activeOnly={filters.active_only ?? undefined}
               />
             </section>
           ) : (
@@ -203,7 +208,7 @@ export default function ComparatorLayout({
                   Configura los filtros
                 </AlertTitle>
                 <AlertDescription className="text-amber-700 dark:text-amber-200">
-                  Selecciona el tipo de entidades y cargo que deseas comparar.
+                  Selecciona el tipo y cargo que deseas comparar.
                 </AlertDescription>
               </Alert>
             </section>
