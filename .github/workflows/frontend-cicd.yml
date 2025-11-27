@@ -146,15 +146,7 @@ jobs:
             NEXT_PUBLIC_ENVIRONMENT=production
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/votabien_frontend:latest
           cache-to: type=inline
-      - cleanup:
-          needs: deploy-production
-          if: always()
-          runs-on: ubuntu-latest
-          steps:
-            - name: Clean old Docker images
-              run: |
-                # Script para eliminar imágenes antiguas de DockerHub
-                # o limpiar deployments antiguos de Dokploy
+
       - name: Deploy to Dokploy (Production)
         run: |
           echo "🚀 Deploying to PRODUCTION..."
