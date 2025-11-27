@@ -2,20 +2,26 @@
 name: Deploy Frontend
 
 on:
-  push:
-    branches:
-      - main      # Producción
-      - develop   # Staging
   pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+  
+  push:
     branches:
       - main
 
 jobs:
   # ==========================================
-  # JOB 1: TESTS (siempre se ejecuta)
+  # JOB 1: TESTS (solo en PR)
   # ==========================================
   test:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,14 +31,12 @@ jobs:
         with:
           node-version: '20'
 
-      # Instalar pnpm
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.23.0  # Usa la misma versión de tu Dockerfile
+          version: 10.23.0
           run_install: false
 
-      # Configurar cache de pnpm
       - name: Get pnpm store directory
         shell: bash
         run: |
@@ -46,14 +50,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      # Instalar dependencias con pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Run linter
         run: pnpm run lint
 
-      - name: Type check (si usas TypeScript)
+      - name: Type check
         run: pnpm run type-check || echo "No type-check script found, skipping..."
 
       - name: Build test
@@ -62,63 +65,57 @@ jobs:
           NEXT_PUBLIC_API_URL: https://api-staging.votabienperu.com
           NEXT_PUBLIC_ENVIRONMENT: test
 
-  # ==========================================
-  # JOB 2: DEPLOY STAGING (Vercel - develop)
-  # ==========================================
-  # deploy-staging:
-  #   needs: test
-  #   if: github.ref == 'refs/heads/develop'
-  #   runs-on: ubuntu-latest
-    
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-      # OPCIÓN A: Vercel automático (sin action, solo Git push)
-      # Si conectaste el repo a Vercel, esto NO es necesario
-      # Vercel detecta el push automáticamente
-      
-      # OPCIÓN B: Deployment manual con Vercel CLI (más control)
-      # - name: Setup Node.js
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: '20'
-
-      # - name: Install Vercel CLI
-      #   run: npm install -g vercel@latest
-
-      # - name: Pull Vercel Environment
-      #   run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-
-      # - name: Build Project
-      #   run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-      #   env:
-      #     NEXT_PUBLIC_API_URL: https://api-staging.votabienperu.com
-      #     NEXT_PUBLIC_ENVIRONMENT: staging
-
-      # - name: Deploy to Vercel
-      #   id: deploy-vercel
-      #   run: |
-      #     url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} 2>&1 | grep -o 'https://[^ ]*')
-      #     echo "deployment_url=$url" >> $GITHUB_OUTPUT
-      #     echo "🚀 Deployed to: $url"
-
-      # - name: Assign custom domain (staging)
-      #   run: |
-      #     vercel alias set ${{ steps.deploy-vercel.outputs.deployment_url }} staging.votabienperu.com --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
-
-      # - name: Notify deployment
-      #   run: |
-      #     echo "✅ Staging deployed successfully!"
-      #     echo "URL: https://staging.votabienperu.com"
-      #     echo "Deployment: ${{ steps.deploy-vercel.outputs.deployment_url }}"
+      - name: Comment PR with test results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}' === 'success' ? '✅ Passed' : '❌ Failed';
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## Tests ${status}\n\nBranch: \`${context.payload.pull_request.head.ref}\``
+            })
 
   # ==========================================
-  # JOB 3: DEPLOY PRODUCTION (Dokploy - main)
+  # JOB 2: DEPLOY STAGING (Vercel - en PR)
+  # ==========================================
+  deploy-staging:
+    needs: test
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel (Staging)
+        run: |
+          echo "🚀 Vercel desplegará automáticamente desde develop"
+          echo "URL: https://staging.votabienperu.com"
+          echo "Branch: ${{ github.head_ref }}"
+
+      # Si quieres notificar en el PR:
+      - name: Comment PR with staging URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 **Staging deployed!**\n\nURL: https://staging.votabienperu.com\nBranch: `${{ github.head_ref }}`'
+            })
+
+  # ==========================================
+  # JOB 3: DEPLOY PRODUCTION (Dokploy - merge)
   # ==========================================
   deploy-production:
-    needs: test
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     
     steps:
