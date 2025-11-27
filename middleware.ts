@@ -138,7 +138,7 @@ class JWTUtils {
   private static isValidEncodedField(field: string): boolean {
     // Validar que sea string no vacío
     if (!field || typeof field !== "string") {
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
         console.warn("Encoded field is not a string or is empty");
       }
       return false;
@@ -149,7 +149,7 @@ class JWTUtils {
     const base85Regex = /^[0-9A-Za-z!#$%&()*+\-;<=>?@^_`{|}~]+$/;
 
     if (!base85Regex.test(field)) {
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
         console.warn(
           `Invalid Base85 field (invalid chars): "${field.substring(0, 20)}..."`,
         );
@@ -162,7 +162,7 @@ class JWTUtils {
     // Int: 1-10 chars → Base85: ~2-8 chars
     // CUID: 25 chars → Base85: ~20 chars
     if (field.length < 2 || field.length > 100) {
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
         console.warn(
           `Base85 field length out of range: ${field.length} (expected 2-100)`,
         );
@@ -182,14 +182,14 @@ class JWTUtils {
     // 50 bytes → ~66-68 caracteres en base64url
 
     if (!accessKey || typeof accessKey !== "string") {
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
         console.warn("access_key is not a string or is empty");
       }
       return false;
     }
 
     // Log del access_key recibido para debugging
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
       console.log(`🔑 access_key length: ${accessKey.length}`);
       console.log(`🔑 access_key sample: "${accessKey.substring(0, 20)}..."`);
     }
@@ -197,7 +197,7 @@ class JWTUtils {
     // token_urlsafe(50 bytes) → ~66-68 chars
     // Permitir rango amplio: 40-100 caracteres
     if (accessKey.length < 40 || accessKey.length > 100) {
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
         console.warn(
           `❌ access_key length ${accessKey.length} is out of range (40-100)`,
         );
@@ -209,7 +209,7 @@ class JWTUtils {
     // NO incluye '+', '/', '=' (esos son de base64 estándar)
     const isValid = /^[a-zA-Z0-9_-]+$/.test(accessKey);
 
-    if (!isValid && process.env.NODE_ENV === "development") {
+    if (!isValid && process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
       console.warn(`❌ access_key contains invalid characters`);
       // Mostrar qué caracteres inválidos se encontraron
       const invalidChars = accessKey.match(/[^a-zA-Z0-9_-]/g);
@@ -255,7 +255,7 @@ class JWTUtils {
 
       // 'sub' (user_id codificado)
       if (!this.isValidEncodedField(parsedPayload.sub)) {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
           console.warn("JWT: Invalid sub field");
         }
         return null;
@@ -263,7 +263,7 @@ class JWTUtils {
 
       // 'a' (access_key)
       if (!this.isValidAccessKey(parsedPayload.a)) {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
           console.warn("JWT: Invalid access_key field");
         }
         return null;
@@ -271,7 +271,7 @@ class JWTUtils {
 
       // 'r' (user_token_id codificado)
       if (!this.isValidEncodedField(parsedPayload.r)) {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
           console.warn("JWT: Invalid r field");
         }
         return null;
@@ -279,7 +279,7 @@ class JWTUtils {
 
       // 'iat'
       if (!parsedPayload.iat || typeof parsedPayload.iat !== "number") {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
           console.warn("JWT: Invalid or missing iat");
         }
         return null;
@@ -290,7 +290,7 @@ class JWTUtils {
         parsedPayload.exp !== undefined &&
         typeof parsedPayload.exp !== "number"
       ) {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
           console.warn("JWT: Invalid exp field");
         }
         return null;
@@ -299,7 +299,7 @@ class JWTUtils {
       // Validar que iat no sea futuro (clock skew de max 2 minutos)
       const now = Math.floor(Date.now() / 1000);
       if (parsedPayload.iat > now + 120) {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
           console.warn("JWT: iat is in the future");
         }
         return null;
@@ -307,7 +307,7 @@ class JWTUtils {
 
       return parsedPayload;
     } catch (error) {
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
         console.error("Failed to decode JWT:", error);
       }
       return null;
@@ -385,7 +385,7 @@ class SecurityManager {
     };
 
     // Solo agregar HSTS en producción
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NEXT_PUBLIC_ENVIRONMENT === "production") {
       baseHeaders["Strict-Transport-Security"] =
         "max-age=63072000; includeSubDomains; preload";
     }
@@ -396,7 +396,8 @@ class SecurityManager {
         const apiUrl =
           process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
         const apiOrigin = new URL(apiUrl).origin;
-        const isProduction = process.env.NODE_ENV === "production";
+        const isProduction =
+          process.env.NEXT_PUBLIC_ENVIRONMENT === "production";
 
         const scriptSrc = isProduction
           ? "script-src 'self' 'unsafe-inline'"
@@ -409,8 +410,9 @@ class SecurityManager {
           ? `connect-src 'self' ${apiOrigin}`
           : `connect-src 'self' ${apiOrigin} http://192.168.1.35:8000 http://localhost:8000 ws://192.168.1.35:3000 ws://localhost:3000`;
 
+        // ✅ SOLUCIÓN: Agregar TODOS los dominios de imágenes
         const imgSrc = isProduction
-          ? "img-src 'self' data: blob: https://p16-sign-sg.tiktokcdn.com https://*.tiktokcdn.com https://*.tiktokcdn-us.com https://i.ytimg.com https://*.googleusercontent.com"
+          ? `img-src 'self' data: blob: https://res.cloudinary.com https://www.congreso.gob.pe https://sroppublico.jne.gob.pe https://img.youtube.com https://i.ytimg.com https://p16-sign-sg.tiktokcdn.com https://*.tiktokcdn.com https://*.tiktokcdn-us.com https://*.googleusercontent.com https://commons.wikimedia.org https://upload.wikimedia.org https://live.staticflickr.com`
           : "img-src 'self' data: https: blob:";
 
         baseHeaders["Content-Security-Policy"] = [
@@ -427,7 +429,7 @@ class SecurityManager {
           "upgrade-insecure-requests",
         ].join("; ");
       } catch (error) {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
           console.warn("Invalid API_BASE_URL for CSP:", error);
         }
       }
@@ -449,7 +451,7 @@ class SecurityManager {
 // ============= MIDDLEWARE PRINCIPAL =============
 export function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
     console.log(`🧭 Ruta detectada: ${pathname}`);
     console.log({
       isPublic: RouteChecker.isPublic(pathname),
@@ -459,7 +461,7 @@ export function middleware(request: NextRequest) {
     });
   }
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
     console.log(`🔍 [${new Date().toISOString()}] ${pathname}`);
   }
 
@@ -487,7 +489,7 @@ export function middleware(request: NextRequest) {
         RouteChecker.isProtected(pathname) &&
         !RouteChecker.isAuth(pathname)
       ) {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
           console.log(
             `🔄 Token expired, redirecting to refresh (reason: ${tokenValidation.reason})`,
           );
@@ -501,7 +503,7 @@ export function middleware(request: NextRequest) {
   }
   if (!accessToken && refreshToken) {
     if (RouteChecker.isProtected(pathname) && !RouteChecker.isAuth(pathname)) {
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
         console.log(
           `🔄 No access_token but refresh_token exists → Redirecting to refresh`,
         );
@@ -514,7 +516,7 @@ export function middleware(request: NextRequest) {
   }
   if (!accessToken && !refreshToken) {
     if (RouteChecker.isProtected(pathname)) {
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
         console.log(`🚫 No tokens, redirecting to login`);
       }
 
@@ -533,7 +535,7 @@ export function middleware(request: NextRequest) {
   }
   // 6. Usuario autenticado en rutas de auth → redirect a dashboard
   if (RouteChecker.isAuth(pathname) && isAuthenticated) {
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NEXT_PUBLIC_ENVIRONMENT === "development") {
       console.log("✅ Authenticated user on auth page → Redirect to dashboard");
     }
 
@@ -567,6 +569,18 @@ export function middleware(request: NextRequest) {
     Object.entries(protectedHeaders).forEach(([key, value]) => {
       response.headers.set(key, value);
     });
+  }
+  // Headers de cache para imágenes en producción
+  if (
+    process.env.NEXT_PUBLIC_ENVIRONMENT === "production" &&
+    (pathname.startsWith("/_next/image") ||
+      pathname.startsWith("/_next/static") ||
+      pathname.match(/\.(jpg|jpeg|png|webp|avif|gif|svg)$/i))
+  ) {
+    response.headers.set(
+      "Cache-Control",
+      "public, max-age=31536000, immutable",
+    );
   }
 
   return response;
