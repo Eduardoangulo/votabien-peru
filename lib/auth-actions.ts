@@ -12,7 +12,7 @@ import {
 
 const getCookieOptions = (maxAge: number) => ({
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: process.env.NEXT_PUBLIC_ENVIRONMENT === "production",
   sameSite: "lax" as const,
   maxAge,
   path: "/",

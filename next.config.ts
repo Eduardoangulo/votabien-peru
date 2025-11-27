@@ -1,7 +1,18 @@
 import type { NextConfig } from "next";
 
+const isProduction = process.env.NEXT_PUBLIC_ENVIRONMENT === "production";
+
 const nextConfig: NextConfig = {
+  // Para Docker/Dokploy
+  output: "standalone",
+
   images: {
+    // Optimización de Next.js desactivada en producción
+    // (Cloudflare lo manejará)
+    unoptimized: isProduction,
+
+    // Formatos modernos de imagen
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",
