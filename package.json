@@ -14,7 +14,7 @@
     "lint": "eslint",
     "type-check": "tsc --noEmit",
     "test": "pnpm run lint && pnpm run type-check",
-    "prepare": "lefthook install",
+    "prepare": "if [ \"$NODE_ENV\" = \"production\" ]; then exit 0; else lefthook install; fi",
     "commit": "git-cz"
   },
   "dependencies": {
