@@ -1,106 +1,106 @@
-# .github/workflows/cleanup-dockerhub.yml
-name: Cleanup Docker Hub Images
+# # .github/workflows/cleanup-dockerhub.yml
+# name: Cleanup Docker Hub Images
 
-on:
-  # Se ejecuta después de cada deploy exitoso
-  # workflow_run:
-  #   workflows: ["Deploy Frontend"]
-  #   types:
-  #     - completed
+# on:
+#   # Se ejecuta después de cada deploy exitoso
+#   # workflow_run:
+#   #   workflows: ["Deploy Frontend"]
+#   #   types:
+#   #     - completed
   
-  # También puedes ejecutarlo manualmente
-  workflow_dispatch:
+#   # También puedes ejecutarlo manualmente
+#   workflow_dispatch:
   
-  # O programarlo semanalmente
-  schedule:
-    - cron: '0 2 * * 0'  # Cada domingo a las 2 AM
+#   # O programarlo semanalmente
+#   schedule:
+#     - cron: '0 2 * * 0'  # Cada domingo a las 2 AM
 
-jobs:
-  cleanup:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
+# jobs:
+#   cleanup:
+#     runs-on: ubuntu-latest
+#     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
     
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
 
-      - name: Docker Hub login
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#       - name: Docker Hub login
+#         uses: docker/login-action@v3
+#         with:
+#           username: ${{ secrets.DOCKERHUB_USERNAME }}
+#           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Delete old images (keep last 10 versions)
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          IMAGE_NAME: votabien_frontend
-          KEEP_LAST: 3
-        run: |
-          echo "🧹 Starting cleanup for ${IMAGE_NAME}..."
+#       - name: Delete old images (keep last 10 versions)
+#         env:
+#           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+#           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+#           IMAGE_NAME: votabien_frontend
+#           KEEP_LAST: 3
+#         run: |
+#           echo "🧹 Starting cleanup for ${IMAGE_NAME}..."
           
-          # Obtener token de autenticación
-          TOKEN=$(curl -s -H "Content-Type: application/json" \
-            -X POST \
-            -d "{\"username\": \"${DOCKERHUB_USERNAME}\", \"password\": \"${DOCKERHUB_TOKEN}\"}" \
-            https://hub.docker.com/v2/users/login/ | jq -r .token)
+#           # Obtener token de autenticación
+#           TOKEN=$(curl -s -H "Content-Type: application/json" \
+#             -X POST \
+#             -d "{\"username\": \"${DOCKERHUB_USERNAME}\", \"password\": \"${DOCKERHUB_TOKEN}\"}" \
+#             https://hub.docker.com/v2/users/login/ | jq -r .token)
           
-          if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
-            echo "❌ Failed to authenticate with Docker Hub"
-            exit 1
-          fi
+#           if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+#             echo "❌ Failed to authenticate with Docker Hub"
+#             exit 1
+#           fi
           
-          echo "✅ Authenticated successfully"
+#           echo "✅ Authenticated successfully"
           
-          # Obtener todas las tags (excluyendo 'latest')
-          TAGS=$(curl -s -H "Authorization: JWT ${TOKEN}" \
-            "https://hub.docker.com/v2/repositories/${DOCKERHUB_USERNAME}/${IMAGE_NAME}/tags/?page_size=100" \
-            | jq -r '.results[] | select(.name != "latest") | .name' \
-            | sort -V -r)
+#           # Obtener todas las tags (excluyendo 'latest')
+#           TAGS=$(curl -s -H "Authorization: JWT ${TOKEN}" \
+#             "https://hub.docker.com/v2/repositories/${DOCKERHUB_USERNAME}/${IMAGE_NAME}/tags/?page_size=100" \
+#             | jq -r '.results[] | select(.name != "latest") | .name' \
+#             | sort -V -r)
           
-          if [ -z "$TAGS" ]; then
-            echo "⚠️ No tags found to clean up"
-            exit 0
-          fi
+#           if [ -z "$TAGS" ]; then
+#             echo "⚠️ No tags found to clean up"
+#             exit 0
+#           fi
           
-          TOTAL_TAGS=$(echo "$TAGS" | wc -l)
-          echo "📊 Found ${TOTAL_TAGS} tags (excluding 'latest')"
+#           TOTAL_TAGS=$(echo "$TAGS" | wc -l)
+#           echo "📊 Found ${TOTAL_TAGS} tags (excluding 'latest')"
           
-          # Mantener solo las últimas N versiones
-          TAGS_TO_DELETE=$(echo "$TAGS" | tail -n +$((KEEP_LAST + 1)))
+#           # Mantener solo las últimas N versiones
+#           TAGS_TO_DELETE=$(echo "$TAGS" | tail -n +$((KEEP_LAST + 1)))
           
-          if [ -z "$TAGS_TO_DELETE" ]; then
-            echo "✅ Nothing to delete, keeping last ${KEEP_LAST} versions"
-            exit 0
-          fi
+#           if [ -z "$TAGS_TO_DELETE" ]; then
+#             echo "✅ Nothing to delete, keeping last ${KEEP_LAST} versions"
+#             exit 0
+#           fi
           
-          DELETE_COUNT=$(echo "$TAGS_TO_DELETE" | wc -l)
-          echo "🗑️  Will delete ${DELETE_COUNT} old tags..."
+#           DELETE_COUNT=$(echo "$TAGS_TO_DELETE" | wc -l)
+#           echo "🗑️  Will delete ${DELETE_COUNT} old tags..."
           
-          # Eliminar tags antiguas
-          echo "$TAGS_TO_DELETE" | while read -r tag; do
-            echo "  Deleting: ${tag}"
-            curl -s -X DELETE \
-              -H "Authorization: JWT ${TOKEN}" \
-              "https://hub.docker.com/v2/repositories/${DOCKERHUB_USERNAME}/${IMAGE_NAME}/tags/${tag}/"
+#           # Eliminar tags antiguas
+#           echo "$TAGS_TO_DELETE" | while read -r tag; do
+#             echo "  Deleting: ${tag}"
+#             curl -s -X DELETE \
+#               -H "Authorization: JWT ${TOKEN}" \
+#               "https://hub.docker.com/v2/repositories/${DOCKERHUB_USERNAME}/${IMAGE_NAME}/tags/${tag}/"
             
-            # Verificar si se eliminó correctamente
-            if [ $? -eq 0 ]; then
-              echo "    ✅ Deleted successfully"
-            else
-              echo "    ❌ Failed to delete"
-            fi
-          done
+#             # Verificar si se eliminó correctamente
+#             if [ $? -eq 0 ]; then
+#               echo "    ✅ Deleted successfully"
+#             else
+#               echo "    ❌ Failed to delete"
+#             fi
+#           done
           
-          echo ""
-          echo "🎉 Cleanup completed!"
-          echo "📈 Kept: ${KEEP_LAST} most recent versions"
-          echo "🗑️  Deleted: ${DELETE_COUNT} old versions"
+#           echo ""
+#           echo "🎉 Cleanup completed!"
+#           echo "📈 Kept: ${KEEP_LAST} most recent versions"
+#           echo "🗑️  Deleted: ${DELETE_COUNT} old versions"
 
-      - name: Summary
-        run: |
-          echo "### 🧹 Docker Hub Cleanup Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Repository:** votabien_frontend" >> $GITHUB_STEP_SUMMARY
-          echo "- **Retention policy:** Keep last 10 versions" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status:** ✅ Completed" >> $GITHUB_STEP_SUMMARY
+#       - name: Summary
+#         run: |
+#           echo "### 🧹 Docker Hub Cleanup Summary" >> $GITHUB_STEP_SUMMARY
+#           echo "" >> $GITHUB_STEP_SUMMARY
+#           echo "- **Repository:** votabien_frontend" >> $GITHUB_STEP_SUMMARY
+#           echo "- **Retention policy:** Keep last 10 versions" >> $GITHUB_STEP_SUMMARY
+#           echo "- **Status:** ✅ Completed" >> $GITHUB_STEP_SUMMARY

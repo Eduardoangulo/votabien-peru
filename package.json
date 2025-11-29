@@ -12,7 +12,9 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "prepare": "lefthook install",
+    "type-check": "tsc --noEmit",
+    "test": "pnpm run lint && pnpm run type-check",
+    "prepare": "[ \"$VERCEL\" = \"1\" ] || lefthook install",
     "commit": "git-cz"
   },
   "dependencies": {
