@@ -15,18 +15,18 @@ export default async function Navbar() {
 
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* <Link href="/" className="flex items-center space-x-2 group">
+          <Link href="/" className="flex items-center space-x-2 group">
             <div className="flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-              <Image
+              {/* <Image
                 src="/logo_completo.png"
                 alt="Vota Bien Perú"
                 width={140}
                 height={40}
                 priority
                 className="drop-shadow-md"
-              />
+              /> */}
             </div>
-          </Link> */}
+          </Link>
 
           <NavbarDesktop user={user} />
 
