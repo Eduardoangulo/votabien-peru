@@ -14,7 +14,7 @@
     "lint": "eslint",
     "type-check": "tsc --noEmit",
     "test": "pnpm run lint && pnpm run type-check",
-    "prepare": "if [ \"$NODE_ENV\" = \"production\" ]; then exit 0; else lefthook install; fi",
+    "prepare": "[ \"$VERCEL\" = \"1\" ] || lefthook install",
     "commit": "git-cz"
   },
   "dependencies": {
