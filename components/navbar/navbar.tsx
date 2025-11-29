@@ -15,7 +15,7 @@ export default async function Navbar() {
 
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center space-x-2 group">
+          {/* <Link href="/" className="flex items-center space-x-2 group">
             <div className="flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
               <Image
                 src="/logo_completo.png"
@@ -26,7 +26,7 @@ export default async function Navbar() {
                 className="drop-shadow-md"
               />
             </div>
-          </Link>
+          </Link> */}
 
           <NavbarDesktop user={user} />
 

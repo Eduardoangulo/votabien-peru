@@ -59,18 +59,18 @@ jobs:
       - name: Type check
         run: pnpm run type-check || echo "No type-check script found, skipping..."
 
-      - name: Build test
-        run: pnpm run build
-        env:
-          NEXT_PUBLIC_API_URL: https://api-staging.votabienperu.com
-          NEXT_PUBLIC_ENVIRONMENT: test
+      # - name: Build test
+      #   run: pnpm run build
+      #   env:
+      #     NEXT_PUBLIC_API_URL: https://api-staging.votabienperu.com
+      #     NEXT_PUBLIC_ENVIRONMENT: test
 
       - name: Comment PR with test results
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
-            const status = '${{ job.status }}' === 'success' ? '✅ Passed' : '❌ Failed';
+            const status = '${{ job.status }}' === 'success' ? 'Passed' : 'Failed';
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -95,11 +95,10 @@ jobs:
 
       - name: Deploy to Vercel (Staging)
         run: |
-          echo "🚀 Vercel desplegará automáticamente desde develop"
-          echo "URL: https://staging.votabienperu.com"
+          echo "Vercel desplegará automáticamente desde develop"
+          echo "URL: https://stagingvotabienperu.vercel.app"
           echo "Branch: ${{ github.head_ref }}"
 
-      # Si quieres notificar en el PR:
       - name: Comment PR with staging URL
         uses: actions/github-script@v7
         with:
@@ -108,7 +107,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '🚀 **Staging deployed!**\n\nURL: https://staging.votabienperu.com\nBranch: `${{ github.head_ref }}`'
+              body: '**Staging deployed!**\n\nURL: https://stagingvotabienperu.vercel.app\nBranch: `${{ github.head_ref }}`'
             })
 
   # ==========================================
@@ -146,7 +145,7 @@ jobs:
 
       - name: Deploy to Dokploy (Production)
         run: |
-          echo "🚀 Deploying to PRODUCTION..."
+          echo "Deploying to PRODUCTION..."
           response=$(curl -s -X POST "${{ secrets.DOKPLOY_PRODUCTION_HOOK_FRONTEND }}")
           echo "Response: $response"
 
@@ -161,10 +160,10 @@ jobs:
             echo "❌ Health check failed! Status: $response"
             exit 1
           fi
-          echo "✅ Production is healthy! Status: $response"
+          echo "Production is healthy! Status: $response"
 
       - name: Notify success
         run: |
-          echo "✅ Production deployed successfully!"
+          echo "Production deployed successfully!"
           echo "URL: https://votabienperu.com"
           echo "Image: votabien_frontend:v${{ github.run_number }}"

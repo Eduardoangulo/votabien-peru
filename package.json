@@ -12,6 +12,8 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
+    "type-check": "tsc --noEmit",
+    "test": "pnpm run lint && pnpm run type-check",
     "prepare": "lefthook install",
     "commit": "git-cz"
   },
