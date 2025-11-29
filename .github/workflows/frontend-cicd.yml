@@ -21,7 +21,6 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      issues: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -59,55 +58,69 @@ jobs:
       - name: Type check
         run: pnpm run type-check || echo "No type-check script found, skipping..."
 
-      # - name: Build test
-      #   run: pnpm run build
-      #   env:
-      #     NEXT_PUBLIC_API_URL: https://api-staging.votabienperu.com
-      #     NEXT_PUBLIC_ENVIRONMENT: test
-
       - name: Comment PR with test results
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
-            const status = '${{ job.status }}' === 'success' ? 'Passed' : 'Failed';
+            const status = '${{ job.status }}' === 'success' ? '✅ Passed' : '❌ Failed';
+            const emoji = '${{ job.status }}' === 'success' ? '🎉' : '⚠️';
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `## Tests ${status}\n\nBranch: \`${context.payload.pull_request.head.ref}\``
+              body: `${emoji} **Tests ${status}**\n\n**Branch:** \`${context.payload.pull_request.head.ref}\`\n**Commit:** \`${context.sha.substring(0, 7)}\``
             })
 
   # ==========================================
-  # JOB 2: DEPLOY STAGING (Vercel - en PR)
+  # JOB 2: DEPLOY STAGING (Vercel manual - en PR)
   # ==========================================
   deploy-staging:
     needs: test
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && needs.test.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
-      issues: write
+      deployments: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to Vercel (Staging)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          NEXT_PUBLIC_API_URL: https://api-staging.votabienperu.com
+          NEXT_PUBLIC_ENVIRONMENT: staging
+
+      - name: Deploy to Vercel (Preview)
+        id: deploy
         run: |
-          echo "Vercel desplegará automáticamente desde develop"
-          echo "URL: https://stagingvotabienperu.vercel.app"
-          echo "Branch: ${{ github.head_ref }}"
+          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> $GITHUB_OUTPUT
+          echo "Deployed to: $url"
 
       - name: Comment PR with staging URL
         uses: actions/github-script@v7
         with:
           script: |
+            const url = '${{ steps.deploy.outputs.url }}';
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '**Staging deployed!**\n\nURL: https://stagingvotabienperu.vercel.app\nBranch: `${{ github.head_ref }}`'
+              body: `## 🚀 Staging Deployed!\n\n**Preview URL:** ${url}\n**Branch:** \`${{ github.head_ref }}\`\n**Commit:** \`${{ github.sha.substring(0, 7) }}\`\n\n_Tests passed successfully!_`
             })
 
   # ==========================================
@@ -145,7 +158,7 @@ jobs:
 
       - name: Deploy to Dokploy (Production)
         run: |
-          echo "Deploying to PRODUCTION..."
+          echo "🚀 Deploying to PRODUCTION..."
           response=$(curl -s -X POST "${{ secrets.DOKPLOY_PRODUCTION_HOOK_FRONTEND }}")
           echo "Response: $response"
 
@@ -160,10 +173,11 @@ jobs:
             echo "❌ Health check failed! Status: $response"
             exit 1
           fi
-          echo "Production is healthy! Status: $response"
+          echo "✅ Production is healthy! Status: $response"
 
       - name: Notify success
+        if: success()
         run: |
-          echo "Production deployed successfully!"
-          echo "URL: https://votabienperu.com"
-          echo "Image: votabien_frontend:v${{ github.run_number }}"
+          echo "🎉 Production deployed successfully!"
+          echo "🌐 URL: https://votabienperu.com"
+          echo "🐳 Image: votabien_frontend:v${{ github.run_number }}"
