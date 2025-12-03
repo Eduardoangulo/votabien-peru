@@ -87,7 +87,12 @@ const METRIC_CONFIGS: Record<"legislator" | "candidate", MetricCategory[]> = {
       color: "text-blue-600",
       metrics: [
         { label: "Total Proyectos", key: "total_bills" },
-        { label: "Autor Principal", key: "bills_as_author" },
+        { label: "Rechazados", key: "bills_rechazado", inverse: true },
+        {
+          label: "Retirado Por Autor",
+          key: "bills_retirado_por_autor",
+          inverse: true,
+        },
         { label: "Tasa Aprobación", key: "approval_rate", suffix: "%" },
       ],
     },
