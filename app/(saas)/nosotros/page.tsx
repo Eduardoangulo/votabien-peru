@@ -1,402 +1,554 @@
-"use client";
-
-import { useState } from "react";
+import Link from "next/link";
 import {
   Search,
-  Users,
-  Scale,
+  Database,
   Shield,
-  BookOpen,
   CheckCircle2,
-  Target,
-  Heart,
+  Scale,
+  Users,
   FileText,
+  TrendingUp,
+  UserX,
+  AlertTriangle,
+  Mail,
 } from "lucide-react";
-import Link from "next/link";
 
 export default function AboutPage() {
-  const [activeTab, setActiveTab] = useState<"mission" | "features" | "values">(
-    "mission",
-  );
-
-  const features = [
-    {
-      icon: Users,
-      title: "Comparador de Congresistas",
-      description:
-        "Compara perfiles, votaciones, asistencias y propuestas legislativas de manera visual e intuitiva.",
-      color: "bg-info",
-    },
-    {
-      icon: Scale,
-      title: "Hemiciclo Actualizado",
-      description:
-        "Visualiza la distribución actual de escaños por bancadas y partidos originales de forma interactiva.",
-      color: "bg-primary",
-    },
-    {
-      icon: Shield,
-      title: "Antecedentes Verificados",
-      description:
-        "Accede a información sobre casos penales, éticos, civiles y administrativos con referencias a fuentes oficiales o periodísticas reconocidas.",
-      color: "bg-destructive",
-    },
-    {
-      icon: BookOpen,
-      title: "Biografías Completas",
-      description:
-        "Historial político, académico, laboral y controversias documentadas de cada legislador.",
-      color: "bg-success",
-    },
-    {
-      icon: FileText,
-      title: "Fuentes Verificables",
-      description:
-        "Todas las referencias incluyen enlaces a fuentes periodísticas oficiales y documentos públicos.",
-      color: "bg-warning",
-    },
-  ];
-
-  const values = [
-    {
-      icon: Scale,
-      title: "Neutralidad",
-      description:
-        "Presentamos información sin sesgos políticos ni editorializaciones.",
-    },
-    {
-      icon: Shield,
-      title: "Transparencia",
-      description:
-        "Todas nuestras fuentes son verificables y están públicamente disponibles.",
-    },
-    {
-      icon: Heart,
-      title: "Servicio Ciudadano",
-      description:
-        "Creado por peruanos, para peruanos que quieren informarse mejor.",
-    },
-    {
-      icon: CheckCircle2,
-      title: "Veracidad",
-      description: "Información contrastada y actualizada constantemente.",
-    },
-  ];
-
-  const stats = [
-    { number: "130", label: "Congresistas", sublabel: "Perfiles completos" },
-    { number: "100%", label: "Open Source", sublabel: "Código abierto" },
-    {
-      number: "Frecuente",
-      label: "Actualización",
-      sublabel: "Datos revisados constantemente",
-    },
-    { number: "0", label: "Publicidad", sublabel: "Completamente libre" },
+  const sources = [
+    "Andina",
+    "BBC",
+    "Canal N",
+    "CNN",
+    "Congreso",
+    "Contraloría",
+    "Convoca",
+    "El Comercio",
+    "El Foco",
+    "El País",
+    "El Peruano",
+    "Epicentro TV",
+    "Gestión",
+    "Hildebrandt en sus trece",
+    "IDL-Reporteros",
+    "Infobae",
+    "Infogob",
+    "JNE",
+    "La Encerrona",
+    "La Mula",
+    "La República",
+    "Latina",
+    "Ministerio Público",
+    "Ojo Público",
+    "ONPE",
+    "PCM",
+    "Perú21",
+    "Poder Judicial",
+    "RPP",
+    "Salud con Lupa",
+    "Sunat",
+    "LP Derechos",
   ];
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent" />
-        <div
-          className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
-            backgroundSize: "40px 40px",
-          }}
-        />
-
-        <div className="container mx-auto px-4 py-16 md:py-24 relative">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-              Sobre <span className="text-[var(--brand)]">VotaBienPerú</span>
+      {/* Header */}
+      <header className="border-b border-border bg-card">
+        <div className="container mx-auto px-4 py-12 md:py-16 max-w-6xl">
+          <div className="space-y-4">
+            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+              Proyecto Independiente
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+              Sobre VotaBienPerú
             </h1>
-
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
-              Una plataforma ciudadana para conocer más a quiénes nos
-              representan y nos representarán
+            <p className="text-xl text-muted-foreground max-w-3xl">
+              Plataforma independiente de información verificable sobre
+              congresistas, partidos políticos y candidatos en el Perú.
             </p>
-
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="#features"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:opacity-90 text-primary-foreground font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                <Search className="w-5 h-5" />
-                Explorar Funciones
-              </Link>
-            </div>
           </div>
         </div>
-      </section>
+      </header>
 
-      <section className="py-12 bg-card border-y border-border">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, idx) => (
-              <div key={idx} className="text-center">
-                <div
-                  className={`text-3xl md:text-4xl font-bold mb-2 ${idx === 0 ? "text-[var(--brand)]" : "text-primary"}`}
-                >
-                  {stat.number}
-                </div>
-                <div className="text-sm md:text-base font-semibold text-foreground">
-                  {stat.label}
-                </div>
-                <div className="text-xs md:text-sm text-muted-foreground">
-                  {stat.sublabel}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-card rounded-2xl shadow-2xl p-8 md:p-12 border border-border">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-[var(--brand)] rounded-xl flex items-center justify-center">
-                  <Target className="w-6 h-6 text-white" />
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                  Nuestro Origen
-                </h2>
-              </div>
-
-              <div className="prose prose-lg max-w-none space-y-6 text-muted-foreground">
-                <p className="text-lg leading-relaxed">
-                  VotaBienPerú nació de una{" "}
-                  <span className="font-semibold text-[var(--brand)]">
-                    necesidad ciudadana real
-                  </span>
-                  : conocer de forma simple y rápida quiénes son las personas
-                  que nos representan en el Congreso.
-                </p>
-
-                <p className="text-lg leading-relaxed">
-                  En un contexto donde la información política está{" "}
-                  <span className="font-semibold text-foreground">
-                    dispersa, fragmentada o difícil de acceder
-                  </span>
-                  , creamos una plataforma que centraliza y presenta datos
-                  verificables sobre nuestros legisladores de manera clara y
-                  neutral.
-                </p>
-
-                <div className="bg-primary/10 rounded-xl p-6 border-l-4 border-[var(--brand)]">
-                  <p className="text-lg leading-relaxed font-medium text-foreground mb-0">
-                    Creemos que una democracia informada es una democracia más
-                    fuerte. Por eso, ponemos el poder de la información en manos
-                    de la ciudadanía.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 md:py-24 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Nuestro Propósito
-              </h2>
-            </div>
-
-            <div className="flex justify-center gap-4 mb-8">
-              <button
-                onClick={() => setActiveTab("mission")}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                  activeTab === "mission"
-                    ? "bg-primary text-primary-foreground shadow-lg"
-                    : "bg-card text-muted-foreground hover:bg-accent"
-                }`}
-              >
-                Misión
-              </button>
-              <button
-                onClick={() => setActiveTab("features")}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                  activeTab === "features"
-                    ? "bg-primary text-primary-foreground shadow-lg"
-                    : "bg-card text-muted-foreground hover:bg-accent"
-                }`}
-              >
-                Objetivo
-              </button>
-              <button
-                onClick={() => setActiveTab("values")}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                  activeTab === "values"
-                    ? "bg-primary text-primary-foreground shadow-lg"
-                    : "bg-card text-muted-foreground hover:bg-accent"
-                }`}
-              >
-                Valores
-              </button>
-            </div>
-
-            <div className="bg-card rounded-2xl shadow-2xl p-8 md:p-12 border border-border">
-              {activeTab === "mission" && (
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-bold text-foreground">
-                    Nuestra Misión
-                  </h3>
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    Democratizar el acceso a información política verificable y
-                    presentarla de manera comprensible para todos los peruanos,
-                    sin importar su nivel de conocimiento político.
-                  </p>
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    Facilitamos que cualquier ciudadano pueda conocer en minutos
-                    los antecedentes, biografía, educación, experiencia laboral
-                    e historial de votaciones de sus representantes en el
-                    Congreso.
-                  </p>
-                </div>
-              )}
-
-              {activeTab === "features" && (
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-bold text-foreground">
-                    Nuestro Objetivo
-                  </h3>
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    Informar de forma{" "}
-                    <span className="font-semibold text-primary">
-                      neutral pero verídica
-                    </span>{" "}
-                    sobre el entorno político peruano.
-                  </p>
-                  <ul className="space-y-4">
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="w-6 h-6 text-success flex-shrink-0 mt-1" />
-                      <span className="text-lg text-muted-foreground">
-                        <strong className="text-foreground">
-                          Antecedentes completos:
-                        </strong>{" "}
-                        Casos penales, éticos, civiles y administrativos
-                        documentados
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="w-6 h-6 text-success flex-shrink-0 mt-1" />
-                      <span className="text-lg text-muted-foreground">
-                        <strong className="text-foreground">
-                          Biografía detallada:
-                        </strong>{" "}
-                        Historial político, académico, laboral y controversias
-                        relevantes
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="w-6 h-6 text-success flex-shrink-0 mt-1" />
-                      <span className="text-lg text-muted-foreground">
-                        <strong className="text-foreground">
-                          Referencias verificables:
-                        </strong>{" "}
-                        Todos los datos incluyen enlaces a fuentes periodísticas
-                        u oficiales
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-              )}
-
-              {activeTab === "values" && (
-                <div className="grid md:grid-cols-2 gap-6">
-                  {values.map((value, idx) => (
-                    <div
-                      key={idx}
-                      className="flex gap-4 p-6 bg-muted/50 rounded-xl hover:shadow-lg transition-shadow duration-300 border border-border"
-                    >
-                      <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-                        <value.icon className="w-6 h-6 text-primary-foreground" />
-                      </div>
-                      <div>
-                        <h4 className="text-lg font-bold text-foreground mb-2">
-                          {value.title}
-                        </h4>
-                        <p className="text-muted-foreground">
-                          {value.description}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="features" className="py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Funcionalidades
+      {/* Introducción */}
+      <section className="py-12 md:py-16">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="prose prose-lg max-w-none">
+            <h2 className="text-3xl font-bold text-foreground mb-6">
+              ¿Qué es VotaBienPerú?
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Herramientas diseñadas para que la ciudadanía tenga acceso directo
-              y claro a la información política
-            </p>
-          </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {features.map((feature, idx) => (
+            <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
+              <p>
+                VotaBienPerú es una plataforma que centraliza y presenta
+                información verificable sobre el panorama político peruano.
+                Reunimos datos de fuentes oficiales y periodísticas reconocidas
+                para facilitar el acceso ciudadano a información política
+                confiable.
+              </p>
+
+              <p>
+                La plataforma incluye perfiles detallados de congresistas con
+                métricas de desempeño legislativo, información sobre partidos
+                políticos, y próximamente candidatos a elecciones. Todo
+                respaldado con referencias verificables.
+              </p>
+            </div>
+
+            <div className="bg-muted border-l-4 border-primary p-6 my-8">
+              <p className="text-foreground font-semibold text-lg mb-0">
+                Objetivo: Democratizar el acceso a información política mediante
+                datos verificables y presentación clara, contribuyendo a una
+                ciudadanía mejor informada.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Qué información tenemos */}
+      <section className="py-12 md:py-16 border-y border-border bg-muted/20">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <h2 className="text-3xl font-bold text-foreground mb-8">
+            Alcance de la Plataforma
+          </h2>
+
+          <div className="space-y-6">
+            <div className="flex items-start gap-4 pb-6 border-b border-border">
+              <Users className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Congresistas
+                </h3>
+                <p className="text-muted-foreground mb-3">
+                  Perfiles completos de los 130 congresistas con información
+                  verificada sobre trayectoria política, académica y laboral.
+                </p>
+                <div className="grid md:grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-primary" />
+                    <span className="text-muted-foreground">
+                      Proyectos de ley presentados
+                    </span>
+                  </div>
+                  {/* <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                    <span className="text-muted-foreground">Asistencias y votaciones</span>
+                  </div> */}
+                  <div className="flex items-center gap-2">
+                    <UserX className="w-4 h-4 text-primary" />
+                    <span className="text-muted-foreground">
+                      Historial de transfuguismo
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-primary" />
+                    <span className="text-muted-foreground">
+                      Antecedentes verificados
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 pb-6 border-b border-border">
+              <Scale className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Partidos Políticos
+                </h3>
+                <p className="text-muted-foreground">
+                  Información sobre organizaciones políticas activas, su
+                  historia, composición y representación actual en el Congreso.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 pb-6 border-b border-border">
+              <TrendingUp className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Herramientas de Comparación
+                </h3>
+                <p className="text-muted-foreground">
+                  Comparador que permite analizar y contrastar métricas entre
+                  congresistas: productividad legislativa, asistencia, cambios
+                  de bancada y antecedentes.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <Database className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Candidatos{" "}
+                  <span className="text-sm text-muted-foreground font-normal">
+                    (próximamente)
+                  </span>
+                </h3>
+                <p className="text-muted-foreground">
+                  Información sobre candidatos a elecciones generales 2026.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Metodología */}
+      <section className="py-12 md:py-16">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <h2 className="text-3xl font-bold text-foreground mb-8">
+            Metodología
+          </h2>
+
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Database className="w-5 h-5 text-primary" />
+                Recopilación y Procesamiento de Datos
+              </h3>
+              <div className="pl-7 space-y-3 text-muted-foreground">
+                <p>
+                  Utilizamos un sistema semi-automatizado de investigación que
+                  combina herramientas de inteligencia artificial para búsqueda
+                  y análisis de fuentes, con verificación humana rigurosa.
+                </p>
+                <p>
+                  Los investigadores trabajan con plantillas estructuradas que
+                  garantizan consistencia en la recopilación de información.
+                  Cada dato debe incluir su fuente verificable antes de ser
+                  incorporado a la plataforma.
+                </p>
+                <p>
+                  Para proyectos de ley y métricas legislativas, implementamos
+                  procesos automatizados de extracción semanal desde fuentes
+                  oficiales del Congreso, con validación de calidad antes de
+                  publicación.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-primary" />
+                Verificación y Control de Calidad
+              </h3>
+              <div className="pl-7 space-y-3 text-muted-foreground">
+                <p>
+                  Cada pieza de información pasa por múltiples capas de
+                  verificación:
+                </p>
+                <ul className="space-y-2 list-none">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">•</span>
+                    <span>
+                      Validación automática de URLs de fuentes para garantizar
+                      accesibilidad
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">•</span>
+                    <span>
+                      Revisión de consistencia y formato en datos estructurados
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">•</span>
+                    <span>
+                      Priorización de fuentes primarias (documentos oficiales)
+                      sobre secundarias
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">•</span>
+                    <span>
+                      Contraste con múltiples fuentes cuando es posible
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary" />
+                Actualización Continua
+              </h3>
+              <div className="pl-7 space-y-3 text-muted-foreground">
+                <p>
+                  La plataforma se actualiza mediante pipelines automatizados
+                  que procesan nuevos datos semanalmente:
+                </p>
+                <ul className="space-y-2 list-none">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">•</span>
+                    <span>
+                      Proyectos de ley: extracción semanal de nuevas
+                      presentaciones y cambios de estado
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">•</span>
+                    <span>Métricas legislativas: actualización semanal</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-1">•</span>
+                    <span>
+                      Información biográfica: revisión continua con nuevos
+                      hallazgos verificados
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" />
+                Procesamiento de Información Legislativa
+              </h3>
+              <div className="pl-7 space-y-3 text-muted-foreground">
+                <p>
+                  Los proyectos de ley son procesados con tecnología de lenguaje
+                  natural para generar títulos comprensibles para el ciudadano
+                  común, facilitando el entendimiento de propuestas técnicas o
+                  complejas.
+                </p>
+                <p>
+                  Este procesamiento mantiene la fidelidad al contenido original
+                  mientras mejora la accesibilidad de la información.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Scale className="w-5 h-5 text-primary" />
+                Neutralidad Editorial
+              </h3>
+              <div className="pl-7 space-y-3 text-muted-foreground">
+                <p>
+                  Presentamos información sin interpretaciones políticas ni
+                  sesgos editoriales. Las métricas son objetivas y basadas en
+                  datos verificables. No realizamos valoraciones sobre el
+                  desempeño de legisladores más allá de las cifras documentadas.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Fuentes */}
+      <section className="py-12 md:py-16 border-y border-border bg-muted/20">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <h2 className="text-3xl font-bold text-foreground mb-6">
+            Fuentes de Información
+          </h2>
+
+          <p className="text-muted-foreground mb-8 text-lg">
+            Consultamos regularmente las siguientes fuentes oficiales y medios
+            periodísticos reconocidos:
+          </p>
+
+          <div className="flex flex-wrap gap-3">
+            {sources.map((source, idx) => (
               <div
                 key={idx}
-                className="group bg-card rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-border hover:border-primary"
+                className="text-sm text-muted-foreground py-2 px-3 bg-card border border-border rounded hover:border-primary/50 transition-colors"
               >
-                <div
-                  className={`w-14 h-14 ${feature.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
-                >
-                  <feature.icon className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
+                {source}
               </div>
             ))}
+          </div>
+
+          <div className="mt-8 p-4 bg-muted border border-border rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              <strong className="text-foreground">Nota:</strong> Todas las
+              referencias incluyen enlaces directos a la fuente original.
+              Priorizamos fuentes primarias sobre reportes secundarios.
+            </p>
           </div>
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-8 md:p-12 shadow-2xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-6">
-              Juntos Construimos una Democracia más Informada
-            </h2>
-            <p className="text-xl text-primary-foreground/90 mb-8">
-              VotaBienPerú es un proyecto ciudadano para ciudadanos. Empieza a
-              explorar quiénes nos representan.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-background text-foreground font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-              >
-                <Search className="w-5 h-5" />
-                Explorar Congresistas
-              </Link>
-              <Link
-                href="/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur text-primary-foreground font-bold rounded-lg border-2 border-white/30 hover:bg-white/20 transition-all duration-300"
-              >
-                Volver al inicio
-              </Link>
+      {/* Equipo */}
+      <section className="py-12 md:py-16">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <h2 className="text-3xl font-bold text-foreground mb-8">
+            Equipo y Desarrollo
+          </h2>
+
+          <div className="space-y-6 text-muted-foreground">
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-3">
+                Sobre el Proyecto
+              </h3>
+              <p className="mb-4">
+                VotaBienPerú es un proyecto ciudadano independiente impulsado
+                por ciudadanos comprometidos con la transparencia democrática en
+                el Perú.
+              </p>
+              <p>
+                El proyecto opera de manera independiente, sin afiliación
+                política ni financiamiento de partidos, gobiernos o grupos de
+                interés. Es un esfuerzo voluntario motivado por el objetivo de
+                facilitar el acceso ciudadano a información política
+                verificable.
+              </p>
             </div>
+
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-3">
+                Desarrollo Actual
+              </h3>
+              <p className="mb-4">
+                La plataforma está siendo desarrollada por un equipo reducido de
+                colaboradores voluntarios que dedican tiempo a la investigación,
+                verificación y actualización de datos.
+              </p>
+              <p>
+                El desarrollo técnico, diseño de la plataforma y coordinación
+                general son realizados actualmente por el fundador del proyecto,
+                con el apoyo de investigadores que colaboran en la recopilación
+                y verificación de información.
+              </p>
+            </div>
+
+            {/* <div>
+              <h3 className="text-xl font-semibold text-foreground mb-3">
+                Sostenibilidad
+              </h3>
+              <p>
+                Este es un proyecto sin fines de lucro. Los costos de operación
+                (hosting, herramientas) son actualmente cubiertos por los
+                colaboradores. No aceptamos publicidad ni patrocinios que puedan
+                comprometer la neutralidad e independencia del proyecto.
+              </p>
+            </div> */}
+
+            <div className="pt-6 border-t border-border">
+              <h3 className="text-xl font-semibold text-foreground mb-4">
+                Colaboración
+              </h3>
+              <p className="mb-4">
+                Estamos abiertos a colaboraciones con periodistas,
+                organizaciones de la sociedad civil y ciudadanos interesados en
+                contribuir a la transparencia democrática.
+              </p>
+              <p className="mb-6">
+                Si deseas colaborar, reportar información incorrecta o sugerir
+                mejoras, puedes contactarnos:
+              </p>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Mail className="w-5 h-5 text-primary" />
+                  <div>
+                    <span className="text-sm font-medium text-foreground block">
+                      Correo Electrónico
+                    </span>
+                    <Link
+                      href="mailto:avyllesca@gmail.com"
+                      className="text-primary hover:underline"
+                    >
+                      avyllesca@gmail.com
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Principios */}
+      <section className="py-12 md:py-16 border-t border-border bg-muted/20">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <h2 className="text-3xl font-bold text-foreground mb-8">
+            Principios
+          </h2>
+
+          <div className="space-y-6">
+            <div className="flex items-start gap-4">
+              <Scale className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Neutralidad Política
+                </h3>
+                <p className="text-muted-foreground">
+                  Sin sesgos políticos ni editorializaciones. Presentamos
+                  información verificable sin interpretaciones partidarias.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <Shield className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Transparencia Total
+                </h3>
+                <p className="text-muted-foreground">
+                  Todas las fuentes son verificables. Cada dato incluye la
+                  referencia específica a su origen.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Verificabilidad
+                </h3>
+                <p className="text-muted-foreground">
+                  Priorizamos fuentes primarias y oficiales. Contrastamos
+                  información cuando es posible.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <Users className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Independencia
+                </h3>
+                <p className="text-muted-foreground">
+                  Proyecto ciudadano sin afiliaciones políticas ni conflictos de
+                  interés económicos.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-12 md:py-16 border-t border-border">
+        <div className="container mx-auto px-4 max-w-3xl text-center">
+          <h2 className="text-3xl font-bold text-foreground mb-4">
+            Explora la Información
+          </h2>
+          <p className="text-lg text-muted-foreground mb-8">
+            Accede a datos verificables sobre congresistas, partidos políticos y
+            más.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity"
+            >
+              <Search className="w-5 h-5" />
+              Ver Congresistas
+            </Link>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-border text-foreground font-semibold rounded-lg hover:bg-muted transition-colors"
+            >
+              Volver al Inicio
+            </Link>
           </div>
         </div>
       </section>

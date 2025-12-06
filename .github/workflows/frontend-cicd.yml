@@ -148,9 +148,9 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ./
           scope: ${{ secrets.VERCEL_ORG_ID }}
-        env:
-          NEXT_PUBLIC_API_URL: https://api-staging.votabienperu.com
-          NEXT_PUBLIC_ENVIRONMENT: staging
+        # env:
+        #   NEXT_PUBLIC_API_URL: https://api-staging.votabienperu.com
+        #   NEXT_PUBLIC_ENVIRONMENT: staging
 
       - name: Comment PR with staging URL
         uses: actions/github-script@v7
@@ -200,12 +200,6 @@ jobs:
             NEXT_PUBLIC_ENVIRONMENT=production
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/votabien_frontend:latest
           cache-to: type=inline
-
-      - name: Deploy to Dokploy (Production)
-        run: |
-          echo "🚀 [SHIP] Deploying to PRODUCTION (minor change)..."
-          response=$(curl -s -X POST "${{ secrets.DOKPLOY_PRODUCTION_HOOK_FRONTEND }}")
-          echo "Response: $response"
 
       - name: Wait for deployment
         run: sleep 15
@@ -265,12 +259,6 @@ jobs:
             NEXT_PUBLIC_ENVIRONMENT=production
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/votabien_frontend:latest
           cache-to: type=inline
-
-      - name: Deploy to Dokploy (Production)
-        run: |
-          echo "🚀 [ASK] Deploying to PRODUCTION (after PR approval)..."
-          response=$(curl -s -X POST "${{ secrets.DOKPLOY_PRODUCTION_HOOK_FRONTEND }}")
-          echo "Response: $response"
 
       - name: Wait for deployment
         run: sleep 15
