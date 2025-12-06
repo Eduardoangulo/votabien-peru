@@ -201,11 +201,11 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/votabien_frontend:latest
           cache-to: type=inline
 
-      - name: Deploy to Dokploy (Production)
-        run: |
-          echo "🚀 [SHIP] Deploying to PRODUCTION (minor change)..."
-          response=$(curl -s -X POST "${{ secrets.DOKPLOY_PRODUCTION_HOOK_FRONTEND }}")
-          echo "Response: $response"
+      # - name: Deploy to Dokploy (Production)
+      #   run: |
+      #     echo "🚀 [SHIP] Deploying to PRODUCTION (minor change)..."
+      #     response=$(curl -s -X POST "${{ secrets.DOKPLOY_PRODUCTION_HOOK_FRONTEND }}")
+      #     echo "Response: $response"
 
       - name: Wait for deployment
         run: sleep 15
@@ -266,11 +266,11 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/votabien_frontend:latest
           cache-to: type=inline
 
-      - name: Deploy to Dokploy (Production)
-        run: |
-          echo "🚀 [ASK] Deploying to PRODUCTION (after PR approval)..."
-          response=$(curl -s -X POST "${{ secrets.DOKPLOY_PRODUCTION_HOOK_FRONTEND }}")
-          echo "Response: $response"
+      # - name: Deploy to Dokploy (Production)
+      #   run: |
+      #     echo "🚀 [ASK] Deploying to PRODUCTION (after PR approval)..."
+      #     response=$(curl -s -X POST "${{ secrets.DOKPLOY_PRODUCTION_HOOK_FRONTEND }}")
+      #     echo "Response: $response"
 
       - name: Wait for deployment
         run: sleep 15
