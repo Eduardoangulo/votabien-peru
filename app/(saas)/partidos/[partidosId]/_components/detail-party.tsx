@@ -144,14 +144,13 @@ export default function DetailParty({
               className="hover:text-foreground transition-colors flex items-center gap-1"
             >
               <Home className="w-4 h-4" />
-              Inicio
             </Link>
             <ChevronRight className="w-4 h-4" />
             <Link
               href="/partidos"
               className="hover:text-foreground transition-colors"
             >
-              Partidos Políticos
+              Partidos
             </Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-foreground font-medium truncate max-w-[200px] sm:max-w-none">
@@ -542,7 +541,9 @@ export default function DetailParty({
 }
 
 const TimelineComponent = ({ items }: { items: PartyHistory[] }) => {
-  const sortedItems = [...items].sort((a, b) => b.year - a.year);
+  const sortedItems = [...items].sort(
+    (a, b) => Number(b.date) - Number(a.date),
+  );
 
   return (
     <div className="relative space-y-6 sm:space-y-8">
@@ -550,7 +551,7 @@ const TimelineComponent = ({ items }: { items: PartyHistory[] }) => {
         <div key={idx} className="relative flex gap-4 sm:gap-6 group">
           <div className="flex-shrink-0 w-16 sm:w-20 text-right pt-1">
             <span className="text-lg sm:text-xl font-bold text-primary tabular-nums">
-              {item.year}
+              {item.date}
             </span>
           </div>
 

@@ -1,5 +1,4 @@
-import { BillBase } from "./bill";
-import { BillAuthorBasic } from "./bill-author";
+import { BillBase, BillBasic } from "./bill";
 import {
   ParliamentaryGroupBasic,
   ParliamentaryMembershipWithGroup,
@@ -36,7 +35,7 @@ export interface LegislatorBase {
 export interface LegislatorDetail extends LegislatorBase {
   elected_by_party: PoliticalPartyBase;
   electoral_district: ElectoralDistrictBase;
-  bill_authorships: BillAuthorBasic[];
+  bill_authorships: BillBasic[];
   attendances: Attendance[];
 }
 

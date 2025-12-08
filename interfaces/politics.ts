@@ -83,7 +83,7 @@ export interface WorkExperience {
 }
 
 export interface PartyHistory {
-  year: number;
+  date: string;
   event: string;
   source: string | null;
   source_type: string | null;

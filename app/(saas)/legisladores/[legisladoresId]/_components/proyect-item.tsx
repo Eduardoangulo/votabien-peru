@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { BillAuthorBasic } from "@/interfaces/bill-author";
+import { BillBasic } from "@/interfaces/bill";
 import { Calendar, ExternalLink } from "lucide-react";
 import { STATUS_LABELS } from "@/interfaces/enums";
 import { formatterDate, getStatusBadgeVariant } from "@/lib/utils/bill";
@@ -7,7 +7,7 @@ import Link from "next/link";
 import { FaFilePdf } from "react-icons/fa6";
 
 interface ProyectoItemProps {
-  proyecto: BillAuthorBasic;
+  proyecto: BillBasic;
   onClick?: () => void;
 }
 
@@ -40,21 +40,21 @@ export default function ProyectoItem({ proyecto, onClick }: ProyectoItemProps) {
             transition-colors
           "
               >
-                {proyecto.bill.number}
+                {proyecto.number}
               </h4>
 
               <Badge
-                variant={getStatusBadgeVariant(proyecto.bill.approval_status)}
+                variant={getStatusBadgeVariant(proyecto.approval_status)}
                 className="text-xs"
               >
-                {STATUS_LABELS[proyecto.bill.approval_status]}
+                {STATUS_LABELS[proyecto.approval_status]}
               </Badge>
             </div>
 
             {/* ✔️ Enlace del documento - Versión mejorada */}
-            {proyecto.bill.document_url && (
+            {proyecto.document_url && (
               <Link
-                href={proyecto.bill.document_url}
+                href={proyecto.document_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="
@@ -81,17 +81,17 @@ export default function ProyectoItem({ proyecto, onClick }: ProyectoItemProps) {
 
           {/* Título */}
           <p className="text-sm text-muted-foreground mb-2 text-justify">
-            {proyecto.bill.title_ai?.toUpperCase()}
+            {proyecto.title_ai?.toUpperCase()}
           </p>
 
           {/* Detalles inferiores */}
           <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
             <span className="flex items-center gap-1">
               <Calendar className="w-3 h-3" />
-              {formatterDate(proyecto.bill.submission_date)}
+              {formatterDate(proyecto.submission_date)}
             </span>
 
-            {proyecto.role && (
+            {/* {proyecto.role && (
               <span
                 className="
               px-2 py-0.5 
@@ -103,13 +103,13 @@ export default function ProyectoItem({ proyecto, onClick }: ProyectoItemProps) {
               >
                 {proyecto.role}
               </span>
-            )}
+            )} */}
 
             {/* ✔️ Fecha de aprobación */}
-            {proyecto.bill.approval_date && (
+            {proyecto.approval_date && (
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
-                Aprobado: {formatterDate(proyecto.bill.approval_date)}
+                Aprobado: {formatterDate(proyecto.approval_date)}
               </span>
             )}
           </div>

@@ -8,14 +8,14 @@ import {
 } from "@/components/ui/credenza";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BillAuthorBasic } from "@/interfaces/bill-author";
+import { BillBasic } from "@/interfaces/bill";
 import { FileText, Filter, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { BillStatusGroup, getStatusGroup } from "@/interfaces/enums";
 import ProyectoItem from "./proyect-item";
 
 interface BillsDialogProps {
-  proyectos: BillAuthorBasic[];
+  proyectos: BillBasic[];
   isOpen: boolean;
   onClose: () => void;
 }
@@ -34,7 +34,7 @@ export default function BillsDialog({
 
     Object.values(BillStatusGroup).forEach((group) => {
       counts[group] = proyectos.filter(
-        (p) => getStatusGroup(p.bill.approval_status) === group,
+        (p) => getStatusGroup(p.approval_status) === group,
       ).length;
     });
 
@@ -44,12 +44,12 @@ export default function BillsDialog({
   const proyectosFiltrados = useMemo(() => {
     return proyectos.filter((p) => {
       const matchSearch =
-        p.bill.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.bill.title.toLowerCase().includes(searchTerm.toLowerCase());
+        p.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.title.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchGroup =
         groupFilter === "todos" ||
-        getStatusGroup(p.bill.approval_status) === groupFilter;
+        getStatusGroup(p.approval_status) === groupFilter;
 
       return matchSearch && matchGroup;
     });
@@ -152,10 +152,7 @@ export default function BillsDialog({
           {proyectosFiltrados.length > 0 ? (
             <div className="space-y-2">
               {proyectosFiltrados.map((proyecto) => (
-                <ProyectoItem
-                  key={`${proyecto.legislator_id}-${proyecto.bill_id}`}
-                  proyecto={proyecto}
-                />
+                <ProyectoItem key={`${proyecto.id}`} proyecto={proyecto} />
               ))}
             </div>
           ) : (

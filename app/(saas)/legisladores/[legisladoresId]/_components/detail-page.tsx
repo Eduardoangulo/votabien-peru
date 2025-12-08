@@ -194,7 +194,7 @@ export default function DetailLegislador({
     };
 
     proyectos.forEach((p) => {
-      const group = getStatusGroup(p.bill.approval_status);
+      const group = getStatusGroup(p.approval_status);
       groupedStats[group]++;
     });
 
@@ -679,7 +679,7 @@ export default function DetailLegislador({
                   <div className="space-y-2">
                     {proyectos.slice(0, PREVIEW_LIMIT).map((proyecto) => (
                       <ProyectoItem
-                        key={`${proyecto.legislator_id}-${proyecto.bill_id}`}
+                        key={`${proyecto.id}`}
                         proyecto={proyecto}
                       />
                     ))}
