@@ -398,7 +398,7 @@ export default function AboutPage() {
               </p>
             </div>
 
-            <div>
+            {/* <div>
               <h3 className="text-xl font-semibold text-foreground mb-3">
                 Desarrollo Actual
               </h3>
@@ -413,7 +413,7 @@ export default function AboutPage() {
                 con el apoyo de investigadores que colaboran en la recopilación
                 y verificación de información.
               </p>
-            </div>
+            </div> */}
 
             {/* <div>
               <h3 className="text-xl font-semibold text-foreground mb-3">
@@ -441,7 +441,7 @@ export default function AboutPage() {
                 mejoras, puedes contactarnos:
               </p>
 
-              <div className="space-y-3">
+              {/* <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-primary" />
                   <div>
@@ -456,7 +456,7 @@ export default function AboutPage() {
                     </Link>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
