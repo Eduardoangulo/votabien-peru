@@ -1,11 +1,5 @@
-import { publicApi } from "@/lib/public-api";
 import ErrorLanding from "@/components/landing/error-landing";
-import {
-  ElectoralProcess,
-  ChamberType,
-  SeatParliamentary,
-  PoliticalPartyListPaginated,
-} from "@/interfaces/politics";
+import { ChamberType } from "@/interfaces/politics";
 import { Suspense } from "react";
 import HeroDualSplit from "@/components/landing/hero-dual-split";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,6 +7,9 @@ import ComparadorServer from "@/components/comparador/comparador-server";
 import HemiclicleLegislator from "@/components/landing/hemicicle";
 import Footer from "@/components/landing/footer";
 import PartidosListBasic from "@/components/landing/partidos-list-basic";
+import { getPartidosList } from "@/queries/public/parties";
+import { getElectoralProcess } from "@/queries/public/electoral-process";
+import { getSeatParliamentary } from "@/queries/public/seats";
 
 function ComparadorSkeleton() {
   return (
@@ -76,15 +73,12 @@ function ComparadorSkeleton() {
 export default async function VotaBienPage() {
   try {
     const [partidos, proceso_electoral, seats] = await Promise.all([
-      publicApi.getPartidos({
+      getPartidosList({
         active: true,
         limit: 8,
-      }) as Promise<PoliticalPartyListPaginated>,
-      // publicApi.getEjecutivos() as Promise<Executive[]>,
-      publicApi.getProcesosElectorales(true) as Promise<ElectoralProcess[]>,
-      publicApi.getSeatParliamentary(ChamberType.CONGRESO) as Promise<
-        SeatParliamentary[]
-      >,
+      }),
+      getElectoralProcess(true),
+      getSeatParliamentary(ChamberType.CONGRESO),
     ]);
 
     const seatsData = seats.sort((a, b) => {

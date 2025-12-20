@@ -58,7 +58,7 @@ export interface LegislatorCard {
   start_date: string;
   end_date: string;
   person: PersonBasicInfo;
-  elected_by_party: PoliticalPartyBase | null;
+  elected_by_party: PoliticalPartyBase;
   electoral_district: ElectoralDistrictBase;
   has_metrics: boolean;
 }

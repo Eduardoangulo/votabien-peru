@@ -4,13 +4,16 @@ import { ElectoralDistrictBase } from "@/interfaces/politics";
 import Link from "next/link";
 import { ParliamentaryGroupBasic } from "@/interfaces/parliamentary-membership";
 import { LegislatorCard } from "@/interfaces/legislator";
+import { getLegisladoresCards } from "@/queries/public/legislators";
+import getDistritos from "@/queries/public/electoral-districts";
+import { getParliamentaryGroups } from "@/queries/public/parliamentary-groups";
 
 interface PageProps {
   searchParams: {
     chamber?: string;
     search?: string;
-    groups?: string | string[];
-    districts?: string | string[];
+    groups?: string[];
+    districts?: string[];
   };
 }
 
@@ -25,9 +28,9 @@ export default async function LegisladoresPage({ searchParams }: PageProps) {
       params.chamber && params.chamber !== "all" ? params.chamber : undefined,
     search: params.search || undefined,
     groups:
-      params.groups && params.groups !== "all" ? params.groups : undefined,
+      params.groups && params.groups.length > 0 ? params.groups : undefined,
     districts:
-      params.districts && params.districts !== "all"
+      params.districts && params.districts.length > 0
         ? params.districts
         : undefined,
     skip: 0,
@@ -46,11 +49,9 @@ export default async function LegisladoresPage({ searchParams }: PageProps) {
   try {
     const [initialLegisladores, distritos, parliamentaryGroups] =
       await Promise.all([
-        publicApi.getLegisladoresCards(apiParams) as Promise<LegislatorCard[]>,
-        publicApi.getDistritos() as Promise<ElectoralDistrictBase[]>,
-        publicApi.getParliamentaryGroups(true) as Promise<
-          ParliamentaryGroupBasic[]
-        >,
+        getLegisladoresCards(apiParams),
+        getDistritos(),
+        getParliamentaryGroups(true),
       ]);
     return (
       <div className="container mx-auto p-4">
