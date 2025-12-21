@@ -44,7 +44,7 @@ export default function DetailParty({
     return new Intl.NumberFormat("es-PE").format(num);
   };
   const totalSeats = party.seats_by_district.reduce(
-    (acc, item) => acc + item.seats,
+    (acc, item) => acc + (item.seats || 0),
     0,
   );
   const añosFundacion = party.foundation_date

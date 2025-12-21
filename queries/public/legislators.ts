@@ -5,7 +5,8 @@ import { LegislatorVersusCard } from "@/interfaces/legislator-metrics";
 import { Database } from "@/interfaces/supabase";
 import { createClient } from "@/lib/supabase/server";
 
-type ChamberType = Database["public"]["Tables"]["legislator"]["Row"]["chamber"];
+export type ChamberType =
+  Database["public"]["Tables"]["legislator"]["Row"]["chamber"];
 
 interface GetLegislatorsParams {
   active_only?: boolean;
