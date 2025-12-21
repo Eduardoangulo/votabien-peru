@@ -126,7 +126,7 @@ export function getColumns({
           <div className="max-w-[200px] min-w-[200px]">
             <div
               className={`px-2 py-0.5 rounded-md text-xs whitespace-normal break-words ${textColor}`}
-              style={{ backgroundColor: party.color_hex }}
+              style={{ backgroundColor: party.color_hex ?? "#888888" }}
               title={party.name}
             >
               {party.name}

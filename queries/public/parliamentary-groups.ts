@@ -22,17 +22,14 @@ export async function getParliamentaryGroups(
     query = query.eq("active", true);
   }
 
-  // Ordenamos por nombre ascendente (igual que en Python)
   query = query.order("name", { ascending: true });
 
   const { data, error } = await query;
 
   if (error) {
     console.error("Error al obtener grupos parlamentarios:", error);
-    // Retornamos array vacío en caso de error para no romper la UI
     return [];
   }
 
-  // Casting seguro porque usamos alias para coincidir con la interfaz
   return data as unknown as ParliamentaryGroupBasic[];
 }

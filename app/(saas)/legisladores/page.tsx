@@ -1,10 +1,9 @@
-import { publicApi } from "@/lib/public-api";
 import LegisladoresList from "@/components/politics/legisladores-list";
-import { ElectoralDistrictBase } from "@/interfaces/politics";
 import Link from "next/link";
-import { ParliamentaryGroupBasic } from "@/interfaces/parliamentary-membership";
-import { LegislatorCard } from "@/interfaces/legislator";
-import { getLegisladoresCards } from "@/queries/public/legislators";
+import {
+  ChamberType,
+  getLegisladoresCards,
+} from "@/queries/public/legislators";
 import getDistritos from "@/queries/public/electoral-districts";
 import { getParliamentaryGroups } from "@/queries/public/parliamentary-groups";
 
@@ -24,8 +23,9 @@ export default async function LegisladoresPage({ searchParams }: PageProps) {
 
   const apiParams = {
     active_only: true,
-    chamber:
-      params.chamber && params.chamber !== "all" ? params.chamber : undefined,
+    chamber: (params.chamber && params.chamber !== "all"
+      ? params.chamber
+      : undefined) as ChamberType | undefined,
     search: params.search || undefined,
     groups:
       params.groups && params.groups.length > 0 ? params.groups : undefined,

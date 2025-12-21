@@ -587,18 +587,6 @@ export default function DetailLegislador({
                               ) : (
                                 <span>{antecedente.source}</span>
                               )}
-
-                              {antecedente.pdf_url && (
-                                <Link
-                                  href={antecedente.pdf_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 hover:underline text-primary transition-colors"
-                                >
-                                  Ver PDF
-                                  <FileText className="w-3 h-3" />
-                                </Link>
-                              )}
                             </div>
                           </div>
                         );

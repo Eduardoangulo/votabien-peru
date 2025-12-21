@@ -1,5 +1,3 @@
-import { publicApi } from "@/lib/public-api";
-import { PoliticalPartyListPaginated } from "@/interfaces/politics";
 import Link from "next/link";
 import PartidosListPaginated from "@/components/politics/partidos-list-paginated";
 import { getPartidosList } from "@/queries/public/parties";

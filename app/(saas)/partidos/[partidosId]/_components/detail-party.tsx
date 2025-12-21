@@ -35,7 +35,7 @@ export default function DetailParty({
 }: {
   party: PoliticalPartyDetail;
 }) {
-  const partidoColor = party.color_hex;
+  const partidoColor = party.color_hex ?? "#888888";
   const hasOverlay = needsOverlay(partidoColor);
   const textColor = getTextColor(partidoColor);
 
@@ -43,7 +43,10 @@ export default function DetailParty({
     if (!num) return "No disponible";
     return new Intl.NumberFormat("es-PE").format(num);
   };
-
+  const totalSeats = party.seats_by_district.reduce(
+    (acc, item) => acc + item.seats,
+    0,
+  );
   const añosFundacion = party.foundation_date
     ? new Date().getFullYear() - new Date(party.foundation_date).getFullYear()
     : null;
@@ -272,26 +275,27 @@ export default function DetailParty({
               </div>
             )}
 
-            {party.total_seats !== null && party.total_seats !== undefined && (
-              <div className="flex items-center gap-3">
-                <div
-                  className={cn(
-                    "w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0",
-                    textColor,
-                  )}
-                >
-                  <Building2 className="w-6 h-6" />
+            {party.seats_by_district !== null &&
+              party.seats_by_district !== undefined && (
+                <div className="flex items-center gap-3">
+                  <div
+                    className={cn(
+                      "w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0",
+                      textColor,
+                    )}
+                  >
+                    <Building2 className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <p className={cn("text-2xl font-bold", textColor)}>
+                      {totalSeats}
+                    </p>
+                    <p className={cn("text-xs opacity-80", textColor)}>
+                      escaños congresales
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className={cn("text-2xl font-bold", textColor)}>
-                    {party.total_seats}
-                  </p>
-                  <p className={cn("text-xs opacity-80", textColor)}>
-                    escaños congresales
-                  </p>
-                </div>
-              </div>
-            )}
+              )}
 
             {party.founder && (
               <div className="flex items-center gap-3">
@@ -323,7 +327,7 @@ export default function DetailParty({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-1 lg:order-1 flex flex-col space-y-8 order-1">
             <div className="lg:sticky lg:top-18 space-y-2">
-              {party.description && (
+              {/* {party.description && (
                 <Card className="order-1">
                   <CardHeader>
                     <CardTitle className="text-lg">Descripción</CardTitle>
@@ -334,7 +338,7 @@ export default function DetailParty({
                     </p>
                   </CardContent>
                 </Card>
-              )}
+              )} */}
 
               {hasSocialLinks && (
                 <>
@@ -452,9 +456,9 @@ export default function DetailParty({
                 <CardContent>
                   <PeruSeatsMapSimple
                     partyName={party.name}
-                    partyColor={party.color_hex}
+                    partyColor={party.color_hex ?? "#888888"}
                     seatsByDistrict={party.seats_by_district}
-                    totalSeats={party.total_seats}
+                    totalSeats={totalSeats}
                   />
                 </CardContent>
               </Card>

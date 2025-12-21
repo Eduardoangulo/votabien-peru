@@ -1,4 +1,4 @@
-import { BillBase, BillBasic } from "./bill";
+import { BillBasic } from "./bill";
 import {
   ParliamentaryGroupBasic,
   ParliamentaryMembershipWithGroup,

@@ -78,7 +78,7 @@ export default async function VotaBienPage() {
         limit: 8,
       }),
       getElectoralProcess(true),
-      getSeatParliamentary(ChamberType.CONGRESO),
+      getSeatParliamentary("CONGRESO"),
     ]);
 
     const seatsData = seats.sort((a, b) => {

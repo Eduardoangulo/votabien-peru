@@ -1,4 +1,3 @@
-import { publicApi } from "@/lib/public-api";
 import { notFound } from "next/navigation";
 import DetailLegislador from "./_components/detail-page";
 import { PersonDetail } from "@/interfaces/person";

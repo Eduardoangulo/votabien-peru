@@ -1,13 +1,11 @@
-import { publicApi } from "@/lib/public-api";
 import ComparadorSplit from "./comparador-split";
-import { LegislatorVersusCard } from "@/interfaces/legislator-metrics";
+import { getVersusLegislators } from "@/queries/public/legislators";
 
 export default async function ComparadorServer() {
-  const [legisladores] = await Promise.all([
-    publicApi.getVersusLegislators({
-      limit: 40,
-    }) as Promise<LegislatorVersusCard[]>,
-  ]);
+  const legisladores = await getVersusLegislators({
+    limit: 40,
+    activeOnly: true,
+  });
   const shuffled = [...legisladores].sort(() => Math.random() - 0.5);
   return <ComparadorSplit legisladores={shuffled} />;
 }

@@ -1,12 +1,15 @@
 "use server";
 
-import { ChamberType, SeatParliamentary } from "@/interfaces/politics";
+import { SeatParliamentary } from "@/interfaces/politics";
+import { Database } from "@/interfaces/supabase";
 import { createClient } from "@/lib/supabase/server";
+
+type ChamberType = Database["public"]["Tables"]["legislator"]["Row"]["chamber"];
 
 export async function getSeatParliamentary(
   chamber: ChamberType,
 ): Promise<SeatParliamentary[]> {
-  if (chamber !== ChamberType.CONGRESO) {
+  if (chamber !== "CONGRESO") {
     throw new Error("Solo se permite consultar escaños del congreso");
   }
 
@@ -37,7 +40,7 @@ export async function getSeatParliamentary(
       )
     `,
     )
-    .eq("chamber", chamber.toUpperCase())
+    .eq("chamber", chamber)
     .order("row", { ascending: true })
     .order("number_seat", { ascending: true });
 

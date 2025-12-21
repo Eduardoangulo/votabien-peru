@@ -1,17 +1,11 @@
 import { ComparisonDataStatus } from "./comparator";
-import {
-  ParliamentaryGroupBasic,
-  ParliamentaryMembershipWithGroup,
-} from "./parliamentary-membership";
-import { PersonBasicInfo, PersonWithActivePeriod } from "./person";
+import { PersonBasicInfo } from "./person";
 import {
   CandidacyStatus,
   CandidacyType,
-  ChamberType,
   ElectoralDistrictBase,
   ElectoralDistrictBasic,
   ElectoralProcess,
-  LegislatorCondition,
   PoliticalPartyBase,
 } from "./politics";
 

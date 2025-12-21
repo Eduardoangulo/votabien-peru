@@ -1,8 +1,8 @@
 // ============= ENUMS =============
 
-import { LegislatorDetail, LegislatorInSeat } from "./legislator";
-import { ParliamentaryGroupBasic } from "./parliamentary-membership";
-import { PersonBase, PersonBasicInfo } from "./person";
+import { LegislatorInSeat } from "./legislator";
+import { PartyFinancingBasic } from "./party-financing";
+import { PersonBasicInfo } from "./person";
 
 export enum ChamberType {
   CONGRESO = "Congreso",
@@ -50,16 +50,12 @@ export enum GroupChangeReason {
   OTRO = "otro",
 }
 
-export interface PreviousCase {
-  type: string;
-  title: string;
-  description: string;
-  status: string | null;
-  sanction: string | null;
+export interface PartyLegalCase {
+  case_type: string;
   date: string;
-  period: string | null;
-  source: string;
-  source_type: string;
+  description: string;
+  status: string;
+  source_name: string;
   source_url: string | null;
 }
 
@@ -93,9 +89,9 @@ export interface PartyHistory {
 export interface PoliticalPartyBase {
   id: string;
   name: string;
-  acronym: string;
+  acronym: string | null;
   logo_url: string | null;
-  color_hex: string;
+  color_hex: string | null;
   active: boolean;
   foundation_date: string | null;
 }
@@ -124,9 +120,10 @@ export interface ElectoralProcess {
 }
 // ============= PARTIDO ==========================
 export interface SeatsByDistrict {
-  district_name: string;
-  district_code: string;
-  seats: number;
+  district_code: string | null;
+  district_name: string | null;
+  elected_by_party_id: string | null;
+  seats: number | null;
 }
 export interface ElectedLegislatorBasic {
   id: string;
@@ -138,21 +135,23 @@ export interface ElectedLegislatorBasic {
 }
 export interface PoliticalPartyDetail extends PoliticalPartyBase {
   founder: string | null;
-  foundation_date: string | null;
-  description: string | null;
   ideology: string | null;
   main_office: string | null;
   phone: string | null;
   email: string | null;
   website: string | null;
-  party_timeline: PartyHistory[];
   facebook_url: string | null;
   twitter_url: string | null;
   youtube_url: string | null;
   tiktok_url: string | null;
   total_afiliates: number | null;
-  total_seats: number;
+  party_president: string | null;
+  purpose: string | null;
+  slogan: string | null;
+  party_timeline: PartyHistory[];
+  legal_cases: PartyLegalCase[];
   seats_by_district: SeatsByDistrict[];
+  financing_records: PartyFinancingBasic[];
   elected_legislators: ElectedLegislatorBasic[];
 }
 
@@ -162,9 +161,6 @@ export interface PoliticalPartyListPaginated {
   limit: number;
   offset: number;
 }
-// ============= PERSONA Y LEGISLADOR =============
-
-// ============= BANCADAS =============
 
 // ============= EJECUTIVOS =============
 

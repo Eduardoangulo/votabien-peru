@@ -3,13 +3,6 @@
 import { ElectoralProcess } from "@/interfaces/politics";
 import { createClient } from "@/lib/supabase/server";
 
-/**
- * Obtiene la lista de procesos electorales (ej: Elecciones 2026).
- * * @param active - (Opcional)
- * - true: Solo activos
- * - false: Solo inactivos
- * - undefined/null: Todos
- */
 export async function getElectoralProcess(
   active?: boolean | null,
 ): Promise<ElectoralProcess[]> {

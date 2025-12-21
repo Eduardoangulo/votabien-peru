@@ -301,7 +301,8 @@ const CandidatosList = ({
                   <Badge
                     className={`text-[10px] md:text-xs font-medium gap-1 border backdrop-blur-sm`}
                     style={{
-                      backgroundColor: candidato.political_party.color_hex,
+                      backgroundColor:
+                        candidato.political_party.color_hex ?? "#888888",
                     }}
                   >
                     <Building2 className="size-3 flex-shrink-0" />
