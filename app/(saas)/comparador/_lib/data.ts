@@ -17,6 +17,8 @@ import {
   LegislatorComparisonPayload,
   CandidateComparisonPayload,
 } from "@/interfaces/comparator";
+import { getLegisladoresCards } from "@/queries/public/legislators";
+import { getLegislatorsComparison } from "@/queries/public/compare";
 
 // ============================================
 // SERVER ACTIONS: Obtener entidades por IDs
@@ -33,8 +35,8 @@ export async function getEntitiesByIds(
   try {
     // CASO 1: LEGISLADORES
     if (mode === "legislator") {
-      const response = await publicApi.getLegisladoresCards({
-        ids: ids.join(","),
+      const response = await getLegisladoresCards({
+        ids: ids,
         limit: ids.length,
         // active_only: false,
       });
@@ -86,41 +88,34 @@ export async function getComparisonData(
     return null;
   }
 
-  const endpoint = isCandidateMode(params.mode)
-    ? "/api/v1/public/candidates/compare"
-    : "/api/v1/public/legislators/compare";
-
   try {
-    let payload: LegislatorComparisonPayload | CandidateComparisonPayload;
-
-    if (isCandidateMode(params.mode)) {
-      const candidatePayload: CandidateComparisonPayload = {
-        ids: params.ids,
-      };
-
-      const candidacyType = extractCandidacyType(params.mode);
-      if (candidacyType) {
-        candidatePayload.candidacy_type = candidacyType;
-      }
-      // if (params.process_id) {
-      //   candidatePayload.process_id = params.process_id;
-      // }
-
-      payload = candidatePayload;
-    } else {
-      payload = {
-        ids: params.ids,
-      };
+    // CASO 1: LEGISLADORES (Lógica Local Supabase)
+    if (!isCandidateMode(params.mode)) {
+      // Llamamos directamente a la función helper de base de datos
+      // Sin fetch, sin API Route intermedia
+      const result = await getLegislatorsComparison(params.ids);
+      return result;
     }
 
-    const result = await publicApi.post<ComparisonResponse>(endpoint, payload);
+    // CASO 2: CANDIDATOS (Lógica Legacy / API Externa)
+    // Si aún usas el backend para candidatos, mantenemos esto:
+    const endpoint = "/api/v1/public/candidates/compare";
+    const candidatePayload: CandidateComparisonPayload = { ids: params.ids };
 
-    // ✅ Normalizar respuesta vacía a null
+    const candidacyType = extractCandidacyType(params.mode);
+    if (candidacyType) {
+      candidatePayload.candidacy_type = candidacyType;
+    }
+
+    const result = await publicApi.post<ComparisonResponse>(
+      endpoint,
+      candidatePayload,
+    );
+
     if (
       !result ||
       (typeof result === "object" && Object.keys(result).length === 0)
     ) {
-      console.warn("⚠️ Empty comparison response");
       return null;
     }
 

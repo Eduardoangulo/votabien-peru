@@ -211,7 +211,7 @@ export default function DetailLegislador({
           {/* ===== HERO SECTION ===== */}
           <section className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
             <div className="bg-gradient-to-r from-primary to-primary/90 p-6 text-primary-foreground relative">
-              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5"></div>
+              <div className="absolute inset-0 opacity-5"></div>
 
               <div className="relative flex flex-col md:flex-row items-center gap-8">
                 <div className="relative w-40 h-40 flex-shrink-0 rounded-full overflow-hidden border-4 border-primary-foreground/20 shadow-xl">

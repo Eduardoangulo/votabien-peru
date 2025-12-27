@@ -1,10 +1,8 @@
 "use server";
 
-import { SeatParliamentary } from "@/interfaces/politics";
+import { ChamberType, SeatParliamentary } from "@/interfaces/politics";
 import { Database } from "@/interfaces/supabase";
 import { createClient } from "@/lib/supabase/server";
-
-type ChamberType = Database["public"]["Tables"]["legislator"]["Row"]["chamber"];
 
 export async function getSeatParliamentary(
   chamber: ChamberType,

@@ -10,13 +10,10 @@ import { searchEntities } from "./_lib/actions";
 import { ComparatorProvider } from "@/components/context/comparator";
 import ComparatorLayout from "./_components/comparator-layout";
 import { SearchableEntity } from "@/interfaces/ui-types";
-import {
-  ChamberType,
-  ElectoralDistrictBase,
-  PoliticalPartyBase,
-} from "@/interfaces/politics";
 import { ComparisonResponse } from "@/interfaces/comparator";
-import { publicApi } from "@/lib/public-api";
+import getDistritos from "@/queries/public/electoral-districts";
+import { getPartidosListSimple } from "@/queries/public/parties";
+import { ChamberType } from "@/interfaces/politics";
 
 interface PageProps {
   searchParams: Promise<SearchParams>;
@@ -166,12 +163,10 @@ export default async function ComparatorPage(props: PageProps) {
     }
   }
   const [districts, parties] = await Promise.all([
-    publicApi.getDistritos() as Promise<ElectoralDistrictBase[]>,
-    publicApi.getPartidosList(true) as Promise<PoliticalPartyBase[]>,
+    getDistritos(),
+    getPartidosListSimple({ active: true }),
   ]);
-  // ============================================
-  // RENDER
-  // ============================================
+
   return (
     <ComparatorProvider
       initialEntities={initialEntities}

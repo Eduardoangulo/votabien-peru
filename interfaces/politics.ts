@@ -5,49 +5,49 @@ import { PartyFinancingBasic } from "./party-financing";
 import { PersonBasicInfo } from "./person";
 
 export enum ChamberType {
-  CONGRESO = "Congreso",
-  SENADO = "Senado",
-  DIPUTADOS = "Diputados",
+  CONGRESO = "CONGRESO",
+  SENADO = "SENADO",
+  DIPUTADOS = "DIPUTADOS",
 }
 
 export enum CandidacyType {
-  PRESIDENTE = "Presidente",
-  VICEPRESIDENTE = "Vicepresidente",
-  SENADOR = "Senador",
-  DIPUTADO = "Diputado",
-  CONGRESISTA = "Congresista",
+  PRESIDENTE = "PRESIDENTE",
+  VICEPRESIDENTE = "VICEPRESIDENTE",
+  SENADOR = "SENADOR",
+  DIPUTADO = "DIPUTADO",
+  CONGRESISTA = "CONGRESISTA",
 }
 
 export enum CandidacyStatus {
-  INSCRITO = "Inscrito",
-  HABIL = "Hábil",
-  INHABILITADO = "Inhabilitado",
-  TACADO = "Tacado",
+  INSCRITO = "INSCRITO",
+  HABILITADO = "HABILITADO",
+  INHABILITADO = "INHABILITADO",
+  TACADO = "TACADO",
 }
 export enum LegislatorCondition {
-  EN_EJERCICIO = "En_ejercicio",
-  FALLECIDO = "Fallecido",
-  SUSPENDIDO = "Suspendido",
-  LICENCIA = "Licencia",
-  DESTITUIDO = "Destituido",
+  EN_EJERCICIO = "EN_EJERCICIO",
+  FALLECIDO = "FALLECIDO",
+  SUSPENDIDO = "SUSPENDIDO",
+  LICENCIA = "LICENCIA",
+  DESTITUIDO = "DESTITUIDO",
 }
 
 export enum ExecutiveRole {
-  PRESIDENTE = "Presidente",
-  VICEPRESIDENTE = "Vicepresidente",
-  PRIMER_MINISTRO = "Primer_ministro",
-  MINISTRO = "Ministro",
+  PRESIDENTE = "PRESIDENTE",
+  VICEPRESIDENTE = "VICEPRESIDENTE",
+  PRIMER_MINISTRO = "PRIMER_MINISTRO",
+  MINISTRO = "MINISTRO",
 }
 
 export enum GroupChangeReason {
-  INICIAL = "inicial",
-  CAMBIO_VOLUNTARIO = "cambio_voluntario",
-  EXPULSION = "expulsion",
-  RENUNCIA = "renuncia",
-  DISOLUCION_BANCADA = "disolucion_bancada",
-  CAMBIO_ESTRATEGICO = "cambio_estrategico",
-  SANCION_DISCIPLINARIA = "sancion_disciplinaria",
-  OTRO = "otro",
+  INICIAL = "INICIAL",
+  CAMBIO_VOLUNTARIO = "CAMBIO_VOLUNTARIO",
+  EXPULSION = "EXPULSION",
+  RENUNCIA = "RENUNCIA",
+  DISOLUCION_BANCADA = "DISOLUCION_BANCADA",
+  CAMBIO_ESTRATEGICO = "CAMBIO_ESTRATEGICO",
+  SANCION_DISCIPLINARIA = "SANCION_DISCIPLINARIA",
+  OTRO = "OTRO",
 }
 
 export interface PartyLegalCase {
@@ -78,11 +78,19 @@ export interface WorkExperience {
   source_url: string | null;
 }
 
+export interface GovernmentPlanSummary {
+  title: string;
+  summary: string;
+  tags: string[];
+  proposals: string[];
+  goals: { indicator: string }[];
+}
+
 export interface PartyHistory {
   date: string;
   event: string;
   source: string | null;
-  source_type: string | null;
+  source_url: string | null;
 }
 // ============= INTERFACES BASE =============
 
@@ -148,6 +156,9 @@ export interface PoliticalPartyDetail extends PoliticalPartyBase {
   party_president: string | null;
   purpose: string | null;
   slogan: string | null;
+  government_plan_url: string | null;
+  government_audio_url: string | null;
+  government_plan_summary: GovernmentPlanSummary[];
   party_timeline: PartyHistory[];
   legal_cases: PartyLegalCase[];
   seats_by_district: SeatsByDistrict[];

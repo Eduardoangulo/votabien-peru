@@ -9,10 +9,10 @@ import {
   getAuthorizedNavGroups,
   adminNavGroups,
 } from "./navbar-config";
-import { AuthUser } from "@/interfaces/auth";
+import { User } from "@supabase/supabase-js";
 
 interface NavbarDesktopProps {
-  user?: AuthUser | null;
+  user?: User | null;
 }
 
 export const NavbarDesktop = ({ user }: NavbarDesktopProps) => {
@@ -24,8 +24,11 @@ export const NavbarDesktop = ({ user }: NavbarDesktopProps) => {
   };
 
   const publicLinks = publicNavGroups[0].links;
+
+  const customRole = user?.user_metadata?.role || "user";
+
   const authorizedAdminGroups = user
-    ? getAuthorizedNavGroups(adminNavGroups, user.role)
+    ? getAuthorizedNavGroups(adminNavGroups, customRole)
     : [];
 
   return (

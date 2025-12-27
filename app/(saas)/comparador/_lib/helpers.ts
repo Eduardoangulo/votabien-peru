@@ -28,7 +28,7 @@ export function adaptLegislatorFromSearch(
     type: "legislator",
     has_metrics: leg.has_metrics ?? false, // 🔥 Viene directo del endpoint
     metadata: {
-      chamber: leg.chamber as ChamberType,
+      chamber: leg.chamber,
       district: leg.electoral_district?.name,
       is_active: leg.active,
     },

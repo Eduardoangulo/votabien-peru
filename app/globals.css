@@ -509,3 +509,17 @@ body {
     border-color: hsl(var(--info) / 0.35) !important;
   }
 }
+
+/* ========================================
+   SCROLLING
+   ======================================== */
+
+/* Ocultar barra de scroll pero permitir funcionalidad */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE y Edge */
+  scrollbar-width: none; /* Firefox */
+}

@@ -44,3 +44,5 @@ export async function getPersonaById(
 
   return data as unknown as PersonDetail;
 }
+// CORREGIR, CREO QUE LA CONSULTA DEBERIA DE SER A LEGISLATOR NO A PERSON DIRECTAMENTE
+// Y OBTENER LA INFO DE DICHO LEGISLATOR

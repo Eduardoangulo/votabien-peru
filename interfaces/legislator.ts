@@ -20,7 +20,7 @@ export interface LegislatorBasicInfo {
   active: boolean;
   person: PersonBasicInfo;
   electoral_district: ElectoralDistrictBasic;
-  current_parliamentary_group: ParliamentaryGroupBasic;
+  current_parliamentary_group: ParliamentaryGroupBasic | null;
 }
 export interface LegislatorBase {
   id: string;

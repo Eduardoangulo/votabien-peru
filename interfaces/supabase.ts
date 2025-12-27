@@ -78,6 +78,7 @@ export type Database = {
           source_url: string | null;
           status: Database["public"]["Enums"]["backgroundstatus"];
           summary: string | null;
+          title: string;
           type: Database["public"]["Enums"]["backgroundtype"];
           updated_at: string;
         };
@@ -91,6 +92,7 @@ export type Database = {
           source_url?: string | null;
           status: Database["public"]["Enums"]["backgroundstatus"];
           summary?: string | null;
+          title: string;
           type: Database["public"]["Enums"]["backgroundtype"];
           updated_at: string;
         };
@@ -104,6 +106,7 @@ export type Database = {
           source_url?: string | null;
           status?: Database["public"]["Enums"]["backgroundstatus"];
           summary?: string | null;
+          title?: string;
           type?: Database["public"]["Enums"]["backgroundtype"];
           updated_at?: string;
         };
@@ -705,12 +708,12 @@ export type Database = {
           category: Database["public"]["Enums"]["financingcategory"] | null;
           created_at: string;
           currency: string | null;
-          date: string;
+          date: string | null;
           flow_type: Database["public"]["Enums"]["flowtype"] | null;
           id: string;
           notes: string | null;
           party_id: string;
-          period: string;
+          period: string | null;
           source_name: string | null;
           source_url: string | null;
           status: Database["public"]["Enums"]["financingstatus"];
@@ -721,12 +724,12 @@ export type Database = {
           category?: Database["public"]["Enums"]["financingcategory"] | null;
           created_at: string;
           currency?: string | null;
-          date: string;
+          date?: string | null;
           flow_type?: Database["public"]["Enums"]["flowtype"] | null;
           id: string;
           notes?: string | null;
           party_id: string;
-          period: string;
+          period?: string | null;
           source_name?: string | null;
           source_url?: string | null;
           status: Database["public"]["Enums"]["financingstatus"];
@@ -737,12 +740,12 @@ export type Database = {
           category?: Database["public"]["Enums"]["financingcategory"] | null;
           created_at?: string;
           currency?: string | null;
-          date?: string;
+          date?: string | null;
           flow_type?: Database["public"]["Enums"]["flowtype"] | null;
           id?: string;
           notes?: string | null;
           party_id?: string;
-          period?: string;
+          period?: string | null;
           source_name?: string | null;
           source_url?: string | null;
           status?: Database["public"]["Enums"]["financingstatus"];
@@ -841,6 +844,9 @@ export type Database = {
           facebook_url: string | null;
           foundation_date: string | null;
           founder: string | null;
+          government_audio_url: string | null;
+          government_plan_summary: Json | null;
+          government_plan_url: string | null;
           id: string;
           ideology: string | null;
           legal_cases: Json | null;
@@ -869,6 +875,9 @@ export type Database = {
           facebook_url?: string | null;
           foundation_date?: string | null;
           founder?: string | null;
+          government_audio_url?: string | null;
+          government_plan_summary?: Json | null;
+          government_plan_url?: string | null;
           id: string;
           ideology?: string | null;
           legal_cases?: Json | null;
@@ -897,6 +906,9 @@ export type Database = {
           facebook_url?: string | null;
           foundation_date?: string | null;
           founder?: string | null;
+          government_audio_url?: string | null;
+          government_plan_summary?: Json | null;
+          government_plan_url?: string | null;
           id?: string;
           ideology?: string | null;
           legal_cases?: Json | null;

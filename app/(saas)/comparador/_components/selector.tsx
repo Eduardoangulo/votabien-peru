@@ -67,21 +67,21 @@ const LEGISLATOR_CONFIG: Record<
     placeholder: string;
   }
 > = {
-  Congreso: {
+  CONGRESO: {
     title: "Congresistas",
     subtitle: "Analiza productividad, asistencia e integridad.",
     icon: Users,
     emptyStateText: "Agregar Congresista",
     placeholder: "Ej. Susel Paredes, Keiko Fujimori...",
   },
-  Senado: {
+  SENADO: {
     title: "Senadores",
     subtitle: "Analiza productividad, asistencia e integridad.",
     icon: Building2,
     emptyStateText: "Agregar Senador",
     placeholder: "Ej. Juan Pérez, María González...",
   },
-  Diputados: {
+  DIPUTADOS: {
     title: "Diputados",
     subtitle: "Analiza productividad, asistencia e integridad.",
     icon: Scale,
@@ -100,28 +100,28 @@ const CANDIDATE_CONFIG: Record<
     placeholder: string;
   }
 > = {
-  Senador: {
+  SENADOR: {
     title: "Candidatos a Senador 2026",
     subtitle: "Evalúa propuestas, trayectoria y antecedentes.",
     icon: Users,
     emptyStateText: "Agregar Candidato",
     placeholder: "Ej. Antauro Humala, Rafael López Aliaga...",
   },
-  Diputado: {
+  DIPUTADO: {
     title: "Candidatos a Diputado 2026",
     subtitle: "Compara hojas de vida y planes de trabajo.",
     icon: Users,
     emptyStateText: "Agregar Candidato",
     placeholder: "Buscar por nombre, partido o distrito...",
   },
-  Presidente: {
+  PRESIDENTE: {
     title: "Candidatos Presidenciales 2026",
     subtitle: "Analiza planes de gobierno y trayectoria.",
     icon: Trophy,
     emptyStateText: "Agregar Candidato",
     placeholder: "Ej. Julio Guzmán, Verónika Mendoza...",
   },
-  Vicepresidente: {
+  VICEPRESIDENTE: {
     title: "Candidatos Vicepresidenciales 2026",
     subtitle: "Revisa perfiles y experiencia política.",
     icon: Users,
@@ -144,7 +144,7 @@ const getEntityConfig = (
   }
 
   // Fallback por defecto
-  return LEGISLATOR_CONFIG.Congreso;
+  return LEGISLATOR_CONFIG.CONGRESO;
 };
 // ============================================
 // PROPS DEL COMPONENTE

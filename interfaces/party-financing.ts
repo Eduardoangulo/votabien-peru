@@ -5,9 +5,9 @@ export enum FinancingStatus {
 }
 
 export enum FinancingCategory {
-  INGRESO = "INGRESO",
-  GASTO = "GASTO",
-  DEUDA = "DEUDA",
+  INGRESO = "ingreso",
+  GASTO = "gasto",
+  DEUDA = "deuda",
 }
 
 export enum FlowType {
@@ -22,8 +22,8 @@ export enum FlowType {
 
 export interface PartyFinancingBasic {
   id: string;
-  date: string;
-  period: string;
+  date: string | null;
+  period: string | null;
   status: FinancingStatus;
   category: FinancingCategory | null;
   flow_type: FlowType | null;

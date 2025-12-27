@@ -88,6 +88,17 @@ export const MobileThemeToggle = ({
   theme,
   setTheme,
 }: MobileThemeToggleProps) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isActive = (btnTheme: string) => {
+    if (!mounted) return false;
+    return theme === btnTheme;
+  };
+
   return (
     <div className="pt-4 border-t border-border">
       <p className="px-3 text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">
@@ -95,7 +106,8 @@ export const MobileThemeToggle = ({
       </p>
       <div className="grid grid-cols-3 gap-2">
         <Button
-          variant={theme === "light" ? "default" : "outline"}
+          // Usamos la función segura isActive
+          variant={isActive("light") ? "default" : "outline"}
           size="sm"
           onClick={() => setTheme("light")}
           className="flex-col h-auto py-4 gap-2 transition-all hover:scale-105"
@@ -103,8 +115,9 @@ export const MobileThemeToggle = ({
           <Sun className="w-5 h-5" />
           <span className="text-xs font-medium">Claro</span>
         </Button>
+
         <Button
-          variant={theme === "dark" ? "default" : "outline"}
+          variant={isActive("dark") ? "default" : "outline"}
           size="sm"
           onClick={() => setTheme("dark")}
           className="flex-col h-auto py-4 gap-2 transition-all hover:scale-105"
@@ -112,8 +125,9 @@ export const MobileThemeToggle = ({
           <Moon className="w-5 h-5" />
           <span className="text-xs font-medium">Oscuro</span>
         </Button>
+
         <Button
-          variant={theme === "system" ? "default" : "outline"}
+          variant={isActive("system") ? "default" : "outline"}
           size="sm"
           onClick={() => setTheme("system")}
           className="flex-col h-auto py-4 gap-2 transition-all hover:scale-105"

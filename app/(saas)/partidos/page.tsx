@@ -60,7 +60,7 @@ export default async function PartidosPage({ searchParams }: PageProps) {
             No se pudieron cargar los partidos. Por favor, intenta nuevamente.
           </p>
           <Link
-            href="/partidos"
+            href="/partidos?active=true"
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-block"
           >
             Reintentar

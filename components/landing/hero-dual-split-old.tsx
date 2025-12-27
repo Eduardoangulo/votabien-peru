@@ -88,10 +88,10 @@ export default function HeroDualSplit({
   const carouselRef = useRef<HTMLDivElement>(null);
 
   // Filtrar datos del ejecutivo
-  const presidente = ejecutivos.find((m) => m.role === "Presidente");
+  const presidente = ejecutivos.find((m) => m.role === "PRESIDENTE");
   // const vicepresidente = ejecutivos.find((m) => m.role === "Vicepresidente");
-  const primerMinistro = ejecutivos.find((m) => m.role === "Primer_ministro");
-  const ministros = ejecutivos.filter((m) => m.role === "Ministro");
+  const primerMinistro = ejecutivos.find((m) => m.role === "PRIMER_MINISTRO");
+  const ministros = ejecutivos.filter((m) => m.role === "MINISTRO");
 
   // Funciones de navegación del carousel
   const scrollCarousel = (direction: "left" | "right") => {

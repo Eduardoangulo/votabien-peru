@@ -1,6 +1,6 @@
 // interfaces/ui-types.ts
 
-import { CandidacyType } from "./politics";
+import { CandidacyType, ChamberType } from "./politics";
 
 /** Tipos permitidos para cualquier entidad buscable o comparable */
 export type EntityType = "legislator" | "candidate";
@@ -11,7 +11,7 @@ export type CandidateConfigKeys = Exclude<
 >;
 /** Información contextual opcional */
 export interface EntityMetadata {
-  chamber?: "Congreso" | "Senado" | "Diputados";
+  chamber?: ChamberType;
   district?: string;
   process_id?: string;
   candidacy_type?: CandidacyType;

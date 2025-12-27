@@ -13,7 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ROLE_LABELS } from "@/interfaces/navbar";
-import { AuthUser } from "@/interfaces/auth";
+import { User } from "@supabase/supabase-js";
 import { LogoutButton } from "@/components/auth/logout-button";
 import {
   Tooltip,
@@ -24,11 +24,19 @@ import {
 import { useState } from "react";
 
 interface NavbarUserMenuProps {
-  user: AuthUser;
+  user: User;
 }
 
 export const NavbarUserMenu = ({ user }: NavbarUserMenuProps) => {
+  const name =
+    user.user_metadata?.full_name || user.user_metadata?.name || "Usuario";
+  const email = user.email || "";
+  const role = user.user_metadata?.role || "user";
+  const image =
+    user.user_metadata?.avatar_url || user.user_metadata?.picture || "";
+
   const getInitials = (name: string) => {
+    if (!name) return "U";
     return name
       .split(" ")
       .map((n) => n[0])
@@ -49,7 +57,9 @@ export const NavbarUserMenu = ({ user }: NavbarUserMenuProps) => {
         return "bg-gray-500/15 text-gray-600 dark:text-gray-400 border-gray-500/30";
     }
   };
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   return (
     <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
       <TooltipProvider disableHoverableContent>
@@ -62,11 +72,11 @@ export const NavbarUserMenu = ({ user }: NavbarUserMenuProps) => {
               >
                 <Avatar className="h-8 w-8">
                   <AvatarImage
-                    src="/images/avatar.png?height=128&width=128"
-                    alt={user.name}
+                    src={image || "/images/avatar.png?height=128&width=128"}
+                    alt={name}
                     className="dark:invert"
                   />
-                  <AvatarFallback>{`${user.name?.charAt(0)}`}</AvatarFallback>
+                  <AvatarFallback>{name.charAt(0)}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -78,28 +88,29 @@ export const NavbarUserMenu = ({ user }: NavbarUserMenuProps) => {
         <DropdownMenuLabel>
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={user.image} alt={user.name} />
+              <AvatarImage src={image} alt={name} />
               <AvatarFallback className="bg-gradient-to-br from-[var(--brand)] to-[var(--brand)]/80 text-white font-semibold">
-                {getInitials(user.name)}
+                {getInitials(name)}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col space-y-1.5 flex-1 min-w-0">
               <p className="text-sm font-semibold leading-none truncate">
-                {user.name}
+                {name}
               </p>
               <p className="text-xs text-muted-foreground leading-none truncate">
-                {user.email}
+                {email}
               </p>
               <span
-                className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-md w-fit border ${getRoleBadgeColor(user.role)}`}
+                className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-md w-fit border ${getRoleBadgeColor(role)}`}
               >
                 <Settings className="w-3 h-3" />
-                {ROLE_LABELS[user.role]}
+                {ROLE_LABELS[role as keyof typeof ROLE_LABELS] || "Usuario"}
               </span>
             </div>
           </div>
         </DropdownMenuLabel>
-        {user.role === "super_admin" && (
+
+        {role === "super_admin" && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
@@ -111,6 +122,7 @@ export const NavbarUserMenu = ({ user }: NavbarUserMenuProps) => {
           </>
         )}
         <DropdownMenuSeparator />
+
         <LogoutButton>
           <DropdownMenuItem className="hover:cursor-pointer">
             <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />

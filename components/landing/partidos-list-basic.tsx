@@ -149,7 +149,7 @@ const PartidosListBasic = ({ partidos }: PartidosListProps) => {
       {/* CTA para ver todos los partidos */}
       <div className="flex justify-center mt-8 md:mt-12">
         <Link
-          href="/partidos"
+          href="/partidos?active=true"
           className="group inline-flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 bg-primary text-primary-foreground rounded-full font-semibold text-sm md:text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
         >
           Ver todos los partidos

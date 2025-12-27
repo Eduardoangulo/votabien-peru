@@ -1,11 +1,9 @@
 import LegisladoresList from "@/components/politics/legisladores-list";
 import Link from "next/link";
-import {
-  ChamberType,
-  getLegisladoresCards,
-} from "@/queries/public/legislators";
+import { getLegisladoresCards } from "@/queries/public/legislators";
 import getDistritos from "@/queries/public/electoral-districts";
 import { getParliamentaryGroups } from "@/queries/public/parliamentary-groups";
+import { ChamberType } from "@/interfaces/politics";
 
 interface PageProps {
   searchParams: {

@@ -2,11 +2,9 @@
 
 import { LegislatorCard } from "@/interfaces/legislator";
 import { LegislatorVersusCard } from "@/interfaces/legislator-metrics";
+import { ChamberType } from "@/interfaces/politics";
 import { Database } from "@/interfaces/supabase";
 import { createClient } from "@/lib/supabase/server";
-
-export type ChamberType =
-  Database["public"]["Tables"]["legislator"]["Row"]["chamber"];
 
 interface GetLegislatorsParams {
   active_only?: boolean;
@@ -17,6 +15,7 @@ interface GetLegislatorsParams {
   ids?: string[];
   page?: number;
   pageSize?: number;
+  limit?: number;
 }
 
 export async function getLegisladoresCards({

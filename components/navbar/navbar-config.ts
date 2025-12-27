@@ -1,8 +1,8 @@
 import {
   Home,
-  Users,
+  // Users,
   Flag,
-  UserCheck,
+  // UserCheck,
   GitCompare,
   Info,
   // LayoutDashboard,
@@ -17,10 +17,10 @@ export const publicNavGroups: NavGroup[] = [
   {
     links: [
       { href: "/", label: "Inicio", icon: Home },
-      { href: "/aprende", label: "Aprende", icon: Users },
+      // { href: "/aprende", label: "Aprende", icon: Users },
       { href: "/legisladores", label: "Congresistas", icon: BookHeadphones },
-      { href: "/partidos", label: "Partidos", icon: Flag },
-      { href: "/candidatos", label: "Candidatos 2026", icon: UserCheck },
+      { href: "/partidos?active=true", label: "Partidos", icon: Flag },
+      // { href: "/candidatos", label: "Candidatos 2026", icon: UserCheck },
       {
         href: "/comparador?mode=legislator&chamber=Congreso",
         label: "Comparador",

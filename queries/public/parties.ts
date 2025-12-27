@@ -7,6 +7,8 @@ import {
   ElectedLegislatorBasic,
   PartyHistory,
   PartyLegalCase,
+  PoliticalPartyBase,
+  GovernmentPlanSummary,
 } from "@/interfaces/politics";
 import {
   FinancingCategory,
@@ -15,6 +17,36 @@ import {
   PartyFinancingBasic,
 } from "@/interfaces/party-financing";
 import { Database } from "@/interfaces/supabase";
+
+export async function getPartidosListSimple({
+  active,
+}: {
+  active: boolean;
+}): Promise<PoliticalPartyBase[]> {
+  const supabase = await createClient();
+  const TABLE_NAME = "politicalparty";
+  try {
+    const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .select(
+        `
+        id, name, acronym, logo_url, color_hex, active, foundation_date
+        `,
+      )
+      .eq("active", active)
+      .order("name", { ascending: true });
+
+    if (error) {
+      console.error("Error al obtener partidos:", error);
+      throw new Error(`Error al obtener partidos: ${error.message}`);
+    }
+
+    return data as unknown as PoliticalPartyBase[];
+  } catch (error) {
+    console.error("Error en getPartidosListSimple:", error);
+    throw error;
+  }
+}
 
 interface GetPartidosParams {
   active?: boolean;
@@ -137,7 +169,9 @@ export async function getPartidoById(
     // Casteos
     party_timeline: (partido.party_timeline as unknown as PartyHistory[]) || [],
     legal_cases: (partido.legal_cases as unknown as PartyLegalCase[]) || [],
-
+    government_plan_summary:
+      (partido.government_plan_summary as unknown as GovernmentPlanSummary[]) ||
+      [],
     // Mapeo directo
     seats_by_district: seatsRes.data || [],
 
@@ -145,10 +179,6 @@ export async function getPartidoById(
     financing_records: financingRes.data?.map(mapFinancingRecord) || [],
   };
 }
-
-// ---------------------------------------------------------
-// MAPPERS TIPADOS (Adiós 'any')
-// ---------------------------------------------------------
 
 const mapFinancingRecord = (f: FinancingRow): PartyFinancingBasic => ({
   id: f.id,

@@ -275,11 +275,11 @@ const CandidatosList = ({
                     <Badge
                       className={cn(
                         "text-[10px] md:text-xs font-semibold uppercase border shadow-md backdrop-blur-sm",
-                        candidato.type === "Presidente" &&
+                        candidato.type === "PRESIDENTE" &&
                           "bg-primary text-primary-foreground",
-                        candidato.type === "Senador" &&
+                        candidato.type === "SENADOR" &&
                           "bg-info text-info-foreground",
-                        candidato.type === "Diputado" &&
+                        candidato.type === "DIPUTADO" &&
                           "bg-success text-success-foreground",
                       )}
                     >

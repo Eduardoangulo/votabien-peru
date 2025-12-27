@@ -1,87 +1,67 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { serverGetUser } from "@/lib/auth-actions";
-import { AuthUser } from "@/interfaces/auth";
+import { createContext, useContext, useEffect, useState } from "react";
+import { User } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
-  user: AuthUser | null;
+  user: User | null;
   loading: boolean;
-  status: "authenticated" | "unauthenticated" | "loading";
-  update: () => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
   children: React.ReactNode;
-  initialUser?: AuthUser | null;
+  initialUser: User | null;
 }
 
 export function AuthProvider({ children, initialUser }: AuthProviderProps) {
-  const [user, setUser] = useState<AuthUser | null>(initialUser || null);
+  const [user, setUser] = useState<User | null>(initialUser);
+
   const [loading, setLoading] = useState(!initialUser);
 
-  const loadUser = async () => {
-    try {
-      setLoading(true);
-      const result = await serverGetUser();
-
-      if (result.error || !result.user) {
-        setUser(null);
-      } else {
-        setUser(result.user);
-      }
-    } catch (error) {
-      console.error("Error loading user:", error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
-    if (!initialUser) {
-      loadUser();
-    }
-  }, [initialUser]);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+      } else {
+        setUser(null);
+      }
 
-  const status = loading
-    ? "loading"
-    : user
-      ? "authenticated"
-      : "unauthenticated";
+      setLoading(false);
+      router.refresh();
+    });
 
-  const value: AuthContextType = {
-    user,
-    loading,
-    status,
-    update: loadUser,
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router, supabase]);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    router.refresh();
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, loading, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-}
-
-/**
- * Hook para proteger componentes cliente
- * Redirige automáticamente a login si no está autenticado
- */
-export function useRequireAuth() {
-  const { user, loading, status } = useAuth();
-
-  useEffect(() => {
-    if (!loading && status === "unauthenticated") {
-      window.location.href = "/auth/login";
-    }
-  }, [loading, status]);
-
-  return { user, loading };
-}
+};

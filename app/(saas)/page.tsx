@@ -1,15 +1,16 @@
 import ErrorLanding from "@/components/landing/error-landing";
-import { ChamberType } from "@/interfaces/politics";
-import { Suspense } from "react";
+// import { ChamberType } from "@/interfaces/politics";
+// import { Suspense } from "react";
 import HeroDualSplit from "@/components/landing/hero-dual-split";
 import { Skeleton } from "@/components/ui/skeleton";
-import ComparadorServer from "@/components/comparador/comparador-server";
-import HemiclicleLegislator from "@/components/landing/hemicicle";
+// import ComparadorServer from "@/components/comparador/comparador-server";
+// import HemiclicleLegislator from "@/components/landing/hemicicle";
 import Footer from "@/components/landing/footer";
 import PartidosListBasic from "@/components/landing/partidos-list-basic";
 import { getPartidosList } from "@/queries/public/parties";
 import { getElectoralProcess } from "@/queries/public/electoral-process";
 import { getSeatParliamentary } from "@/queries/public/seats";
+import { ChamberType } from "@/interfaces/politics";
 
 function ComparadorSkeleton() {
   return (
@@ -78,7 +79,7 @@ export default async function VotaBienPage() {
         limit: 8,
       }),
       getElectoralProcess(true),
-      getSeatParliamentary("CONGRESO"),
+      getSeatParliamentary(ChamberType.CONGRESO),
     ]);
 
     const seatsData = seats.sort((a, b) => {
@@ -93,12 +94,12 @@ export default async function VotaBienPage() {
           ejecutivos={ejecutivos}
         /> */}
         <HeroDualSplit proceso_electoral={proceso_electoral[0]} />
-        <Suspense fallback={<ComparadorSkeleton />}>
+        {/* <Suspense fallback={<ComparadorSkeleton />}>
           <ComparadorServer />
-        </Suspense>
+        </Suspense> */}
 
-        <HemiclicleLegislator seatsData={seatsData} />
-        {/* Partidos Políticos */}
+        {/* <HemiclicleLegislator seatsData={seatsData} /> */}
+
         <PartidosListBasic partidos={partidos.items} />
         <Footer />
       </div>
