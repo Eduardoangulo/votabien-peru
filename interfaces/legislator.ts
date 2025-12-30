@@ -1,9 +1,9 @@
-import { BillBase, BillBasic } from "./bill";
+import { BillBasic } from "./bill";
 import {
   ParliamentaryGroupBasic,
   ParliamentaryMembershipWithGroup,
 } from "./parliamentary-membership";
-import { PersonBasicInfo, PersonWithActivePeriod } from "./person";
+import { PersonBasicInfo } from "./person";
 import {
   Attendance,
   ChamberType,
@@ -20,7 +20,7 @@ export interface LegislatorBasicInfo {
   active: boolean;
   person: PersonBasicInfo;
   electoral_district: ElectoralDistrictBasic;
-  current_parliamentary_group: ParliamentaryGroupBasic;
+  current_parliamentary_group: ParliamentaryGroupBasic | null;
 }
 export interface LegislatorBase {
   id: string;
@@ -58,7 +58,7 @@ export interface LegislatorCard {
   start_date: string;
   end_date: string;
   person: PersonBasicInfo;
-  elected_by_party: PoliticalPartyBase | null;
+  elected_by_party: PoliticalPartyBase;
   electoral_district: ElectoralDistrictBase;
   has_metrics: boolean;
 }
@@ -74,14 +74,14 @@ export interface AdminLegislator {
   start_date: string;
   end_date: string | null;
   active: boolean;
-  institutional_email?: string;
+  institutional_email?: string | null;
   current_parliamentary_group: ParliamentaryGroupBasic | null;
-  parliamentary_memberships: ParliamentaryMembershipWithGroup[];
+  parliamentary_memberships: ParliamentaryMembershipWithGroup[] | undefined;
   created_at: string;
   // Relaciones populadas
-  person: PersonWithActivePeriod;
-  elected_by_party: PoliticalPartyBase;
-  electoral_district: ElectoralDistrictBase;
+  person: PersonBasicInfo | null;
+  elected_by_party: PoliticalPartyBase | null;
+  electoral_district: ElectoralDistrictBase | null;
 }
 
 export interface CreateLegislatorPeriodRequest {

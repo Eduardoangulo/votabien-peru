@@ -13,12 +13,9 @@ import {
 } from "./_lib/data";
 import { CreateLegislator } from "./_components/buttons";
 import { AdminLegislatorProvider } from "@/components/context/admin-legislator";
-import { publicApi } from "@/lib/public-api";
-import {
-  ElectoralDistrictBase,
-  PoliticalPartyListPaginated,
-} from "@/interfaces/politics";
-import { ParliamentaryGroupBasic } from "@/interfaces/parliamentary-membership";
+import getDistritos from "@/queries/public/electoral-districts";
+import { getPartidosList } from "@/queries/public/parties";
+import { getParliamentaryGroups } from "@/queries/public/parliamentary-groups";
 
 interface IndexPageProps {
   searchParams: Promise<SearchParams>;
@@ -33,14 +30,12 @@ export default async function ClearancePage(props: IndexPageProps) {
     getDistrictsCounts(),
   ]);
   const [districts, parties, parliamentaryGroups] = await Promise.all([
-    publicApi.getDistritos() as Promise<ElectoralDistrictBase[]>,
-    publicApi.getPartidos({
+    getDistritos(),
+    getPartidosList({
       active: true,
       limit: 100,
-    }) as Promise<PoliticalPartyListPaginated>,
-    publicApi.getParliamentaryGroups(true) as Promise<
-      ParliamentaryGroupBasic[]
-    >,
+    }),
+    getParliamentaryGroups(true),
   ]);
   return (
     <Shell className="gap-2 mx-auto">

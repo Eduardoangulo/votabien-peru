@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Users, Columns } from "lucide-react";
-import { PiYoutubeLogoFill } from "react-icons/pi";
+// import { PiYoutubeLogoFill } from "react-icons/pi";
 
 // ============= INTERFACES =============
 
@@ -231,7 +231,7 @@ export default function HeroDualSplit({
                     SISTEMA BICAMERAL
                   </span>
 
-                  <div className="w-full max-w-sm space-y-1.5 mb-4">
+                  <div className="w-full max-w-sm space-y-1.5 mb-16">
                     <div className="flex items-center justify-between p-2 rounded-lg bg-white/10 border border-white/20 backdrop-blur-sm">
                       <span className="text-xs md:text-sm text-white/90">
                         👤 Presidente
@@ -265,15 +265,14 @@ export default function HeroDualSplit({
                       </span>
                     </div>
                   </div>
-
-                  <Link
+                  {/* <Link
                     href="/aprende"
                     className="relative inline-flex items-center justify-center gap-2 w-full px-4 md:px-5 py-2.5 md:py-3 rounded-xl bg-gradient-to-r from-warning to-warning/90 text-black text-sm md:text-base font-semibold hover:shadow-xl transition-all shadow-lg"
                   >
                     <PiYoutubeLogoFill className="w-4 h-4 md:w-5 md:h-5" />
                     Entiende el Cambio
                     <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                  </Link>
+                  </Link> */}
                 </div>
               </div>
             </div>

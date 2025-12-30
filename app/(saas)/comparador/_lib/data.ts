@@ -1,4 +1,3 @@
-// comparador/_lib/data.ts
 "use server";
 
 import { publicApi } from "@/lib/public-api";
@@ -8,19 +7,13 @@ import {
   isCandidateMode,
   extractCandidacyType,
 } from "./validation";
-import {
-  adaptLegislatorFromSearch, // 🔥 Para búsqueda/IDs individuales
-  adaptCandidateFromSearch, // 🔥 Para búsqueda/IDs individuales
-} from "./helpers";
+import { adaptLegislatorFromSearch, adaptCandidateFromSearch } from "./helpers";
 import {
   ComparisonResponse,
-  LegislatorComparisonPayload,
   CandidateComparisonPayload,
 } from "@/interfaces/comparator";
-
-// ============================================
-// SERVER ACTIONS: Obtener entidades por IDs
-// ============================================
+import { getLegisladoresCards } from "@/queries/public/legislators";
+import { getLegislatorsComparison } from "@/queries/public/compare";
 
 export async function getEntitiesByIds(
   ids: string[],
@@ -33,18 +26,17 @@ export async function getEntitiesByIds(
   try {
     // CASO 1: LEGISLADORES
     if (mode === "legislator") {
-      const response = await publicApi.getLegisladoresCards({
-        ids: ids.join(","),
+      const response = await getLegisladoresCards({
+        ids: ids,
         limit: ids.length,
         // active_only: false,
       });
 
       if (!Array.isArray(response)) {
-        console.error("❌ Invalid legislator response");
+        console.error("Invalid legislator response");
         return [];
       }
 
-      // 🔥 Usar adapter de búsqueda (estructura simple)
       return response.map(adaptLegislatorFromSearch);
     }
 
@@ -59,25 +51,20 @@ export async function getEntitiesByIds(
       });
 
       if (!Array.isArray(response)) {
-        console.error("❌ Invalid candidate response");
+        console.error("Invalid candidate response");
         return [];
       }
 
-      // 🔥 Usar adapter de búsqueda (estructura simple)
       return response.map((cand) => adaptCandidateFromSearch(cand, mode));
     }
 
-    console.warn(`⚠️ Unsupported mode: ${mode}`);
+    console.warn(`Unsupported mode: ${mode}`);
     return [];
   } catch (error) {
-    console.error(`💥 Error in getEntitiesByIds (${mode}):`, error);
+    console.error(`Error in getEntitiesByIds (${mode}):`, error);
     return [];
   }
 }
-
-// ============================================
-// SERVER ACTION: Comparación
-// ============================================
 
 export async function getComparisonData(
   params: ComparatorParamsSchema,
@@ -86,47 +73,38 @@ export async function getComparisonData(
     return null;
   }
 
-  const endpoint = isCandidateMode(params.mode)
-    ? "/api/v1/public/candidates/compare"
-    : "/api/v1/public/legislators/compare";
-
   try {
-    let payload: LegislatorComparisonPayload | CandidateComparisonPayload;
-
-    if (isCandidateMode(params.mode)) {
-      const candidatePayload: CandidateComparisonPayload = {
-        ids: params.ids,
-      };
-
-      const candidacyType = extractCandidacyType(params.mode);
-      if (candidacyType) {
-        candidatePayload.candidacy_type = candidacyType;
-      }
-      // if (params.process_id) {
-      //   candidatePayload.process_id = params.process_id;
-      // }
-
-      payload = candidatePayload;
-    } else {
-      payload = {
-        ids: params.ids,
-      };
+    // CASO 1: LEGISLADORES
+    if (!isCandidateMode(params.mode)) {
+      // Llamamos directamente a la función helper de base de datos
+      const result = await getLegislatorsComparison(params.ids);
+      return result;
     }
 
-    const result = await publicApi.post<ComparisonResponse>(endpoint, payload);
+    // CASO 2: CANDIDATOS (Lógica Legacy / API Externa)
+    const endpoint = "/api/v1/public/candidates/compare";
+    const candidatePayload: CandidateComparisonPayload = { ids: params.ids };
 
-    // ✅ Normalizar respuesta vacía a null
+    const candidacyType = extractCandidacyType(params.mode);
+    if (candidacyType) {
+      candidatePayload.candidacy_type = candidacyType;
+    }
+
+    const result = await publicApi.post<ComparisonResponse>(
+      endpoint,
+      candidatePayload,
+    );
+
     if (
       !result ||
       (typeof result === "object" && Object.keys(result).length === 0)
     ) {
-      console.warn("⚠️ Empty comparison response");
       return null;
     }
 
     return result;
   } catch (error) {
-    console.error(`💥 Error fetching comparison:`, error);
+    console.error(`Error fetching comparison:`, error);
     return null;
   }
 }

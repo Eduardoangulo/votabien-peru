@@ -1,6 +1,5 @@
-import { LegislatorBasicInfo } from "./legislator";
 import { ParliamentaryGroupBasic } from "./parliamentary-membership";
-import { ElectoralDistrictBase, PoliticalPartyBase } from "./politics";
+import { ElectoralDistrictBasic, PoliticalPartyBase } from "./politics";
 
 export interface LegislatorVersusCard {
   id: string;
@@ -21,7 +20,7 @@ export interface LegislatorVersusCard {
 
   // Relaciones
   current_parliamentary_group: ParliamentaryGroupBasic | null;
-  electoral_district: ElectoralDistrictBase | null;
+  electoral_district: ElectoralDistrictBasic | null;
   elected_by_party: PoliticalPartyBase | null;
 
   // Stats

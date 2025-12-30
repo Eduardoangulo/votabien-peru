@@ -275,11 +275,11 @@ const CandidatosList = ({
                     <Badge
                       className={cn(
                         "text-[10px] md:text-xs font-semibold uppercase border shadow-md backdrop-blur-sm",
-                        candidato.type === "Presidente" &&
+                        candidato.type === "PRESIDENTE" &&
                           "bg-primary text-primary-foreground",
-                        candidato.type === "Senador" &&
+                        candidato.type === "SENADOR" &&
                           "bg-info text-info-foreground",
-                        candidato.type === "Diputado" &&
+                        candidato.type === "DIPUTADO" &&
                           "bg-success text-success-foreground",
                       )}
                     >
@@ -301,7 +301,8 @@ const CandidatosList = ({
                   <Badge
                     className={`text-[10px] md:text-xs font-medium gap-1 border backdrop-blur-sm`}
                     style={{
-                      backgroundColor: candidato.political_party.color_hex,
+                      backgroundColor:
+                        candidato.political_party.color_hex ?? "#888888",
                     }}
                   >
                     <Building2 className="size-3 flex-shrink-0" />

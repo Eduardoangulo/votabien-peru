@@ -43,7 +43,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/partidos"
+                  href="/partidos?active=true"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-2 group"
                 >
                   <Building2 className="w-4 h-4 text-primary" />

@@ -28,12 +28,14 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { FilterField, FilterPanel } from "@/components/ui/filter-panel";
 import {
+  ChamberType,
   ElectoralDistrictBase,
   FiltersPerson,
   LegislatorCondition,
 } from "@/interfaces/politics";
 import { ParliamentaryGroupBasic } from "@/interfaces/parliamentary-membership";
 import { LegislatorCard } from "@/interfaces/legislator";
+import { getLegisladoresCards } from "@/queries/public/legislators";
 
 interface LegisladoresListProps {
   legisladores: LegislatorCard[];
@@ -102,6 +104,8 @@ const getConditionConfig = (condition: LegislatorCondition) => {
   return configs[condition] || configs[LegislatorCondition.EN_EJERCICIO];
 };
 
+const PAGE_SIZE = 30;
+
 const LegisladoresList = ({
   legisladores: initialLegisladores,
   bancadas,
@@ -113,47 +117,7 @@ const LegisladoresList = ({
     useState<LegislatorCard[]>(initialLegisladores);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialLegisladores.length >= 10);
-  const [currentSkip, setCurrentSkip] = useState(initialLegisladores.length);
   const observerTarget = useRef<HTMLDivElement>(null);
-
-  const buildQueryString = useCallback(() => {
-    const params = new URLSearchParams();
-
-    if (currentFilters.chamber && currentFilters.chamber !== "all") {
-      params.append("chamber", currentFilters.chamber);
-    }
-
-    if (currentFilters.search) {
-      params.append("search", currentFilters.search);
-    }
-
-    if (currentFilters.groups && currentFilters.groups !== "all") {
-      const partidosArray =
-        typeof currentFilters.groups === "string"
-          ? currentFilters.groups.split(",")
-          : currentFilters.groups;
-
-      partidosArray.forEach((p) => {
-        if (p && p !== "all") params.append("groups", p.trim());
-      });
-    }
-
-    if (currentFilters.districts && currentFilters.districts !== "all") {
-      const distritosArray =
-        typeof currentFilters.districts === "string"
-          ? currentFilters.districts.split(",")
-          : currentFilters.districts;
-
-      distritosArray.forEach((d) => {
-        if (d && d !== "all") params.append("districts", d.trim());
-      });
-    }
-
-    params.append("skip", String(currentSkip));
-    params.append("limit", "30");
-
-    return params.toString();
-  }, [currentFilters, currentSkip]);
 
   const loadMore = useCallback(async () => {
     if (!infiniteScroll || loading || !hasMore) return;
@@ -161,31 +125,67 @@ const LegisladoresList = ({
     setLoading(true);
 
     try {
-      const queryString = buildQueryString();
-      const response = await fetch(`/api/legisladores?${queryString}`);
-      if (!response.ok) {
-        throw new Error("Error al cargar legisladores");
-      }
+      // Calculamos la siguiente página basada en cuantos items ya tenemos
+      const currentPage = Math.ceil(legisladores.length / PAGE_SIZE);
+      const nextPage = currentPage + 1;
 
-      const newLegisladores: LegislatorCard[] = await response.json();
+      const groupsFilter =
+        currentFilters.groups && currentFilters.groups !== "all"
+          ? typeof currentFilters.groups === "string"
+            ? currentFilters.groups.split(",")
+            : currentFilters.groups
+          : undefined;
 
-      if (newLegisladores.length === 0) {
+      const districtsFilter =
+        currentFilters.districts && currentFilters.districts !== "all"
+          ? typeof currentFilters.districts === "string"
+            ? currentFilters.districts.split(",")
+            : currentFilters.districts
+          : undefined;
+
+      const chamberFilter =
+        currentFilters.chamber && currentFilters.chamber !== "all"
+          ? (currentFilters.chamber as ChamberType)
+          : undefined;
+
+      const newLegisladores = await getLegisladoresCards({
+        active_only: true,
+        chamber: chamberFilter,
+        search: currentFilters.search,
+        groups: groupsFilter,
+        districts: districtsFilter,
+        page: nextPage,
+        pageSize: PAGE_SIZE,
+      });
+
+      if (!newLegisladores || newLegisladores.length === 0) {
         setHasMore(false);
       } else {
-        setLegisladores((prev) => [...prev, ...newLegisladores]);
-        setCurrentSkip((prev) => prev + newLegisladores.length);
+        setLegisladores((prev) => {
+          // Creamos un Set con los IDs existentes para filtrar duplicados
+          const existingIds = new Set(prev.map((l) => l.id));
+          const uniqueNewLegislators = newLegisladores.filter(
+            (l) => !existingIds.has(l.id),
+          );
 
-        if (newLegisladores.length < 10) {
+          // Si después de filtrar no queda nada nuevo
+          if (uniqueNewLegislators.length === 0) {
+            setHasMore(false);
+          }
+
+          return [...prev, ...uniqueNewLegislators];
+        });
+
+        if (newLegisladores.length < PAGE_SIZE) {
           setHasMore(false);
         }
       }
     } catch (error) {
       console.error("Error cargando más legisladores:", error);
-      setHasMore(false);
     } finally {
       setLoading(false);
     }
-  }, [infiniteScroll, loading, hasMore, buildQueryString]);
+  }, [infiniteScroll, loading, hasMore, legisladores.length, currentFilters]); // Dependencias actualizadas
 
   useEffect(() => {
     if (!infiniteScroll) return;
@@ -213,15 +213,8 @@ const LegisladoresList = ({
 
   useEffect(() => {
     setLegisladores(initialLegisladores);
-    setCurrentSkip(initialLegisladores.length);
-    setHasMore(initialLegisladores.length >= 10);
-  }, [
-    initialLegisladores,
-    currentFilters.chamber,
-    currentFilters.search,
-    currentFilters.groups,
-    currentFilters.districts,
-  ]);
+    setHasMore(initialLegisladores.length >= PAGE_SIZE);
+  }, [initialLegisladores]);
 
   const filterFields: FilterField[] = [
     {

@@ -10,13 +10,13 @@ import {
   Trash2,
   X,
   ArrowRight,
+  ArrowLeft, // Agregamos ArrowLeft para navegar atrás
   Loader2,
 } from "lucide-react";
 import {
   Credenza,
   CredenzaBody,
   CredenzaContent,
-  CredenzaFooter,
   CredenzaHeader,
   CredenzaTitle,
 } from "@/components/ui/credenza";
@@ -41,7 +41,6 @@ import { CalendarDatePicker } from "@/components/date-picker";
 import { toast } from "sonner";
 import { AdminLegislatorContext } from "@/components/context/admin-legislator";
 import { GroupChangeReason } from "@/interfaces/politics";
-import Link from "next/link";
 import Image from "next/image";
 import {
   createParliamentaryMembership,
@@ -52,15 +51,23 @@ import {
   CreateParliamentaryMembershipResult,
   ParliamentaryMembershipWithGroup,
 } from "@/interfaces/parliamentary-membership";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
+// ... (Mantenemos REASON_CONFIG y membershipSchema igual que antes)
 const REASON_CONFIG = {
   [GroupChangeReason.INICIAL]: {
     label: "Inicial",
     color: "bg-info/10 text-info border-info/20",
   },
   [GroupChangeReason.CAMBIO_VOLUNTARIO]: {
-    label: "Cambio Voluntario",
-    color: "bg-primary/10 text-primary border-primary/20",
+    label: "Voluntario",
+    color: "bg-success/10 text-success border-success/20",
   },
   [GroupChangeReason.EXPULSION]: {
     label: "Expulsión",
@@ -68,24 +75,23 @@ const REASON_CONFIG = {
   },
   [GroupChangeReason.RENUNCIA]: {
     label: "Renuncia",
-    color: "bg-warning/10 text-warning border-warning/20",
+    color: "bg-warning/15 text-warning border-warning/20",
   },
   [GroupChangeReason.DISOLUCION_BANCADA]: {
-    label: "Disolución de Bancada",
-    color:
-      "bg-muted-foreground/10 text-muted-foreground border-muted-foreground/20",
+    label: "Disolución",
+    color: "bg-muted text-muted-foreground border-border",
   },
   [GroupChangeReason.CAMBIO_ESTRATEGICO]: {
-    label: "Cambio Estratégico",
+    label: "Estratégico",
     color: "bg-chart-5/10 text-chart-5 border-chart-5/20",
   },
   [GroupChangeReason.SANCION_DISCIPLINARIA]: {
-    label: "Sanción Disciplinaria",
-    color: "bg-destructive/15 text-destructive border-destructive/25",
+    label: "Sanción",
+    color: "bg-chart-4/10 text-chart-4 border-chart-4/20",
   },
   [GroupChangeReason.OTRO]: {
     label: "Otro",
-    color: "bg-muted text-muted-foreground border-border",
+    color: "bg-secondary text-secondary-foreground border-secondary",
   },
 };
 
@@ -110,8 +116,7 @@ const membershipSchema = z
       return true;
     },
     {
-      message:
-        "La fecha de fin debe ser posterior o igual a la fecha de inicio",
+      message: "La fecha de fin debe ser posterior a la fecha de inicio",
       path: ["end_date"],
     },
   );
@@ -141,6 +146,7 @@ export function ParliamentaryMembershipDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { parliamentaryGroups } = useContext(AdminLegislatorContext);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+
   const form = useForm<MembershipFormValues>({
     resolver: zodResolver(membershipSchema),
     defaultValues: {
@@ -159,11 +165,9 @@ export function ParliamentaryMembershipDialog({
 
   useEffect(() => {
     if (!open) {
-      form.reset();
-      setEditingMembership(null);
-      setShowForm(false);
+      handleCancel(); // Reset completo al cerrar el dialog principal
     }
-  }, [open, form]);
+  }, [open]);
 
   const handleEdit = useCallback(
     (membership: ParliamentaryMembershipWithGroup) => {
@@ -186,65 +190,47 @@ export function ParliamentaryMembershipDialog({
     setEditingMembership(null);
     setShowForm(false);
   }, [form]);
+
+  // ... (Mantenemos handleDelete y onSubmit igual, funcionan bien)
   const handleDelete = async (membershipId: string) => {
-    // Confirmación antes de eliminar
     if (
       !confirm("¿Estás seguro de que deseas eliminar este cambio de bancada?")
     ) {
       return;
     }
-
     setIsDeleting(membershipId);
-
     try {
       const result = await deleteParliamentaryMembership(
         legislator_id,
         membershipId,
       );
-
       if (!result.success) {
-        toast.error(result.error || "Error al eliminar el cambio de bancada");
+        toast.error(result.error || "Error al eliminar");
         return;
       }
-
-      // Eliminar de la lista local
       setMemberships((prev) => prev.filter((m) => m.id !== membershipId));
-
-      toast.success("Cambio de bancada eliminado exitosamente");
+      toast.success("Eliminado exitosamente");
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Error al eliminar el cambio de bancada",
-      );
+      toast.error("Error al eliminar");
     } finally {
       setIsDeleting(null);
     }
   };
+
   const onSubmit = async (values: MembershipFormValues) => {
     const isEditing = !!editingMembership;
-    const actionLabel = isEditing ? "actualizado" : "creado";
-
     setIsSubmitting(true);
-
     try {
       let result;
-
       if (isEditing) {
-        // Solo devuelve la membresía actualizada
         result = await updateParliamentaryMembership(legislator_id, values);
-
         if (!result.success) {
-          toast.error(
-            result.error || `Error al ${actionLabel} el cambio de bancada`,
-          );
+          toast.error(result.error || `Error al actualizar`);
           return;
         }
-
         if (result.data) {
           const updatedMembership =
             result.data as ParliamentaryMembershipWithGroup;
-
           setMemberships((prev) =>
             prev.map((m) =>
               m.id === updatedMembership.id ? updatedMembership : m,
@@ -254,38 +240,27 @@ export function ParliamentaryMembershipDialog({
       } else {
         const { id, ...createData } = values;
         result = await createParliamentaryMembership(legislator_id, createData);
-
         if (!result.success) {
-          toast.error(
-            result.error || `Error al ${actionLabel} el cambio de bancada`,
-          );
+          toast.error(result.error || `Error al crear`);
           return;
         }
-
         if (result.data) {
           const { created, updated } =
             result.data as CreateParliamentaryMembershipResult;
-
           setMemberships((prev) => {
-            // 1. Si existe updated, actualizar la membresía anterior
             const updatedList = updated
               ? prev.map((m) => (m.id === updated.id ? updated : m))
               : prev;
-
-            // 2. Agregar la nueva membresía al inicio
             return [created, ...updatedList];
           });
         }
       }
-
-      toast.success(`Cambio de bancada ${actionLabel} exitosamente`);
+      toast.success(
+        isEditing ? "Actualizado exitosamente" : "Creado exitosamente",
+      );
       handleCancel();
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : `Error al ${actionLabel} el cambio de bancada`,
-      );
+      toast.error("Ocurrió un error inesperado");
     } finally {
       setIsSubmitting(false);
     }
@@ -307,322 +282,258 @@ export function ParliamentaryMembershipDialog({
 
   return (
     <Credenza open={open} onOpenChange={onOpenChange}>
-      <CredenzaContent className="sm:max-w-3xl md:max-h-[95vh]">
-        <CredenzaHeader>
-          <CredenzaTitle>Historial de Bancadas</CredenzaTitle>
+      <CredenzaContent className="p-4 sm:max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
+        {/* CABECERA DINÁMICA: Cambia según si estamos en modo lista o formulario */}
+        <CredenzaHeader className="text-left">
+          <div className="flex items-center gap-2">
+            {showForm && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="-ml-2 h-8 w-8 rounded-full"
+                onClick={handleCancel}
+                disabled={isSubmitting}
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            )}
+            <div>
+              <CredenzaTitle>
+                {showForm
+                  ? editingMembership
+                    ? "Editar Afiliación"
+                    : "Nueva Afiliación"
+                  : "Historial de Bancadas"}
+              </CredenzaTitle>
+              {!showForm && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {legislatorName}
+                </p>
+              )}
+            </div>
+          </div>
         </CredenzaHeader>
 
-        <CredenzaBody className="space-y-4 md:max-h-[70vh] md:overflow-y-auto">
-          {/* Lista de membresías existentes */}
-          {!showForm && (
-            <div className="space-y-3 sm:space-y-4">
-              {/* Header mejorado */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 pb-3 border-b">
-                <div>
-                  <h3 className="font-semibold text-sm sm:text-lg">
-                    {legislatorName}
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {memberships.length}{" "}
-                    {memberships.length === 1
-                      ? "cambio registrado"
-                      : "cambios registrados"}
-                  </p>
-                </div>
+        {/* CUERPO: Scrollable */}
+        <CredenzaBody className="sm:p-4 overflow-y-auto min-h-[300px]">
+          {!showForm ? (
+            // VISTA LISTA
+            <div className="space-y-4">
+              <div className="flex justify-end">
                 <Button
                   size="sm"
                   onClick={() => setShowForm(true)}
-                  className="gap-2 shadow-sm hover:shadow-md transition-shadow w-full sm:w-auto"
+                  className="gap-2"
                 >
                   <Plus className="h-4 w-4" />
-                  Nuevo Cambio
+                  Registrar Cambio
                 </Button>
               </div>
 
               {memberships.length === 0 ? (
-                <div className="text-center py-12 sm:py-16">
-                  <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-muted to-muted/50 mb-3">
-                    <AlertCircle className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
+                <div className="text-center py-12 border-2 border-dashed rounded-xl bg-muted/20">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-3">
+                    <AlertCircle className="h-6 w-6 text-muted-foreground" />
                   </div>
-                  <h4 className="font-medium text-sm sm:text-base mb-1">
-                    Sin cambios registrados
-                  </h4>
-                  <p className="text-xs sm:text-sm text-muted-foreground mb-3">
-                    Comienza agregando el primer cambio de bancada
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Sin historial registrado
                   </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowForm(true)}
-                    className="gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Agregar Primer Cambio
-                  </Button>
                 </div>
               ) : (
-                <div className="space-y-2.5 sm:space-y-3">
-                  {sortedMemberships.map((membership) => {
-                    const isBeingDeleted = isDeleting === membership.id;
-                    const isCurrentMembership = !membership.end_date;
+                <div className="space-y-3">
+                  <TooltipProvider>
+                    {sortedMemberships.map((membership) => {
+                      const isBeingDeleted = isDeleting === membership.id;
+                      const isCurrentMembership = !membership.end_date;
+                      const reasonConfig =
+                        REASON_CONFIG[membership.change_reason] ||
+                        REASON_CONFIG[GroupChangeReason.OTRO];
 
-                    return (
-                      <div
-                        key={membership.id}
-                        className={`
-                        relative rounded-lg sm:rounded-xl border-2 bg-card overflow-hidden
-                        transition-all duration-300
-                        ${
-                          isBeingDeleted
-                            ? "opacity-40 scale-[0.98] border-destructive/30 bg-destructive/5"
-                            : isCurrentMembership
-                              ? "border-primary/30 bg-primary/5 shadow-md shadow-primary/5"
-                              : "border-border hover:border-primary/20 hover:shadow-sm"
-                        }
-                      `}
-                      >
-                        {/* Accent bar */}
+                      return (
                         <div
-                          className="absolute left-0 top-0 bottom-0 w-1 transition-all duration-300"
-                          style={{
-                            backgroundColor: isCurrentMembership
-                              ? "hsl(var(--primary))"
-                              : membership.parliamentary_group?.color_hex ||
-                                "transparent",
-                          }}
-                        />
+                          key={membership.id}
+                          className={`
+                              group relative flex items-center gap-4 p-4 rounded-xl border bg-card transition-all duration-200
+                              ${
+                                isBeingDeleted
+                                  ? "opacity-50 pointer-events-none"
+                                  : "hover:border-primary/40 hover:shadow-sm"
+                              }
+                              ${isCurrentMembership ? "border-primary/30 bg-primary/5" : "border-border/60"}
+                            `}
+                        >
+                          {isCurrentMembership && (
+                            <div className="absolute left-0 top-3 bottom-3 w-1 rounded-r-full bg-primary" />
+                          )}
 
-                        <div className="p-2.5 sm:p-4 pl-3.5 sm:pl-5">
-                          <div className="flex gap-2.5 sm:gap-3">
-                            {/* Logo con badge */}
-                            <div className="relative flex-shrink-0">
+                          <div className="relative flex-shrink-0 ml-1">
+                            <div className="w-12 h-12 rounded-lg border bg-white p-1 flex items-center justify-center overflow-hidden">
                               {membership.parliamentary_group?.logo_url ? (
-                                <div
-                                  className={`
-                                  relative w-14 h-14 sm:w-16 sm:h-16 p-1.5 rounded-xl 
-                                  bg-gradient-to-br from-background to-muted/30
-                                  border-2 shadow-sm
-                                  transition-all duration-300
-                                  sm:group-hover:shadow-lg sm:group-hover:scale-105
-                                `}
-                                  style={{
-                                    borderColor:
-                                      membership.parliamentary_group
-                                        ?.color_hex || "hsl(var(--border))",
-                                  }}
-                                >
-                                  <Image
-                                    src={
-                                      membership.parliamentary_group.logo_url
-                                    }
-                                    alt={`Logo ${membership.parliamentary_group.name}`}
-                                    className="w-full h-full object-contain"
-                                    width={64}
-                                    height={64}
-                                  />
-                                </div>
+                                <Image
+                                  src={membership.parliamentary_group.logo_url}
+                                  alt={membership.parliamentary_group.name}
+                                  width={48}
+                                  height={48}
+                                  className="object-contain w-full h-full"
+                                />
                               ) : (
-                                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br from-muted to-muted/50 border-2 flex items-center justify-center">
-                                  <span className="text-2xl text-muted-foreground/50">
-                                    ?
-                                  </span>
-                                </div>
+                                <span className="text-xs font-bold text-muted-foreground">
+                                  S/L
+                                </span>
                               )}
                             </div>
+                          </div>
 
-                            {/* Contenido principal */}
-                            <div className="flex-1 min-w-0">
-                              {/* Nombre del grupo */}
-                              <div className="mb-1.5 sm:mb-2">
-                                <h4 className="font-bold text-sm sm:text-base leading-tight mb-0.5 sm:mb-1">
-                                  {membership.parliamentary_group?.name ||
-                                    "Grupo no encontrado"}
-                                </h4>
-                                {membership.parliamentary_group?.acronym && (
-                                  <span className="inline-flex items-center text-xs sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-muted/80 text-muted-foreground font-semibold">
-                                    {membership.parliamentary_group.acronym}
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Fechas compactas */}
-                              <div className="flex items-center gap-1.5 mb-2 text-xs sm:text-sm">
-                                <div className="flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-muted/50">
-                                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-green-500" />
-                                  <span className="font-medium text-xs sm:text-xs">
-                                    {formatDate(membership.start_date)}
-                                  </span>
-                                </div>
-
-                                <ArrowRight className="h-3 w-3 text-muted-foreground shrink-0" />
-
-                                <div
-                                  className={`
-                                  flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md
-                                  ${
+                          <div className="flex-1 min-w-0 pr-16">
+                            <div className="flex flex-wrap items-baseline gap-2 mb-1.5">
+                              <h4 className="font-semibold text-sm text-foreground leading-none">
+                                {membership.parliamentary_group?.name}
+                              </h4>
+                              {membership.parliamentary_group?.acronym && (
+                                <span className="text-xs font-medium text-muted-foreground">
+                                  ({membership.parliamentary_group.acronym})
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center flex-wrap gap-3 text-xs">
+                              <Badge
+                                variant="secondary"
+                                className={`px-1.5 py-0 rounded text-[10px] font-medium uppercase border-0 ${reasonConfig.color}`}
+                              >
+                                {reasonConfig.label}
+                              </Badge>
+                              <div className="flex items-center gap-1.5 text-muted-foreground">
+                                <span>{formatDate(membership.start_date)}</span>
+                                <ArrowRight className="h-3 w-3 opacity-50" />
+                                <span
+                                  className={
                                     isCurrentMembership
-                                      ? "bg-primary/10 ring-1 ring-primary/30"
-                                      : "bg-muted/50"
+                                      ? "font-medium text-primary"
+                                      : ""
                                   }
-                                `}
                                 >
-                                  <div
-                                    className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full ${
-                                      isCurrentMembership
-                                        ? "bg-primary"
-                                        : "bg-red-500"
-                                    }`}
-                                  />
-                                  <span
-                                    className={`font-medium text-xs sm:text-xs ${
-                                      isCurrentMembership ? "text-primary" : ""
-                                    }`}
-                                  >
-                                    {membership.end_date
-                                      ? formatDate(membership.end_date)
-                                      : "Actualidad"}
-                                  </span>
-                                </div>
-                              </div>
-
-                              {/* Tags */}
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <div
-                                  className={`
-                                  inline-flex items-center gap-1 text-xs sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md border font-semibold
-                                  ${REASON_CONFIG[membership.change_reason]?.color || REASON_CONFIG[GroupChangeReason.OTRO].color}
-                                `}
-                                >
-                                  {/* <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-current" /> */}
-                                  <span>
-                                    {REASON_CONFIG[membership.change_reason]
-                                      ?.label || membership.change_reason}
-                                  </span>
-                                </div>
-
-                                {membership.source_url && (
-                                  <Link
-                                    href={membership.source_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 text-xs sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md border border-primary/20 text-primary hover:bg-primary/10 transition-colors"
-                                  >
-                                    <ExternalLink className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                                    <span className="hidden sm:inline">
-                                      Ver fuente
-                                    </span>
-                                    <span className="sm:hidden">Fuente</span>
-                                  </Link>
-                                )}
-                              </div>
-
-                              {/* Botones de acción */}
-                              <div className="flex gap-1.5 mt-2 sm:mt-2.5">
-                                <Button
-                                  size="sm"
-                                  type="button"
-                                  variant="outline"
-                                  onClick={() => handleEdit(membership)}
-                                  disabled={isBeingDeleted}
-                                  className="flex-1 h-7 sm:h-8 px-2 sm:px-3 gap-1 sm:text-xs hover:bg-primary/10 hover:text-primary hover:border-primary disabled:opacity-30 transition-all"
-                                >
-                                  <SquarePen className="h-3 w-3" />
-                                  <span className="font-medium">Editar</span>
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  type="button"
-                                  variant="outline"
-                                  onClick={() => handleDelete(membership.id)}
-                                  disabled={isBeingDeleted}
-                                  className="flex-1 h-7 sm:h-8 px-2 sm:px-3 gap-1 sm:text-xs hover:bg-destructive/10 hover:text-destructive hover:border-destructive disabled:opacity-70 transition-all"
-                                >
-                                  {isBeingDeleted ? (
-                                    <>
-                                      <Loader2 className="h-3 w-3 animate-spin" />
-                                      <span className="font-medium">
-                                        Eliminando...
-                                      </span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Trash2 className="h-3 w-3" />
-                                      <span className="font-medium">
-                                        Eliminar
-                                      </span>
-                                    </>
-                                  )}
-                                </Button>
+                                  {membership.end_date
+                                    ? formatDate(membership.end_date)
+                                    : "Actualidad"}
+                                </span>
                               </div>
                             </div>
                           </div>
+
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => handleEdit(membership)}
+                                  className="h-8 w-8 text-muted-foreground hover:text-primary"
+                                >
+                                  <SquarePen className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Editar</TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => handleDelete(membership.id)}
+                                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                >
+                                  {isDeleting === membership.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Eliminar</TooltipContent>
+                            </Tooltip>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </TooltipProvider>
                 </div>
               )}
             </div>
-          )}
-
-          {/* Formulario de creación/edición */}
-          {showForm && (
+          ) : (
+            // VISTA FORMULARIO (Integrada, sin bordes extra)
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-3 sm:space-y-4"
+                className="space-y-6"
               >
-                <div className="bg-muted/30 border rounded-lg p-3 sm:p-4 space-y-3 sm:space-y-4">
-                  <h3 className="text-sm sm:text-base font-semibold">
-                    {editingMembership
-                      ? "Editar Cambio de Bancada"
-                      : "Nuevo Cambio de Bancada"}
-                  </h3>
+                <FormField
+                  control={form.control}
+                  name="parliamentary_group_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Grupo Parlamentario</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={isSubmitting}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="h-10">
+                            <SelectValue placeholder="Seleccionar bancada..." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="max-h-[300px]">
+                          {parliamentaryGroups.map((group) => (
+                            <SelectItem key={group.id} value={group.id}>
+                              {group.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  {/* Grupo Parlamentario */}
+                <div className="grid grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
-                    name="parliamentary_group_id"
+                    name="start_date"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs sm:text-sm">
-                          Grupo Parlamentario *
-                        </FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          disabled={isSubmitting}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="h-9 sm:h-10">
-                              <SelectValue placeholder="Seleccionar grupo parlamentario" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="max-h-[250px] sm:max-h-[400px]">
-                            {parliamentaryGroups.map((group) => (
-                              <SelectItem key={group.id} value={group.id}>
-                                {group.name}{" "}
-                                {group.acronym && `(${group.acronym})`}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Fecha Inicio</FormLabel>
+                        <CalendarDatePicker
+                          date={{
+                            from: field.value
+                              ? new Date(field.value)
+                              : undefined,
+                            to: field.value ? new Date(field.value) : undefined,
+                          }}
+                          onDateSelect={({ from }) => {
+                            if (from)
+                              form.setValue("start_date", from.toISOString());
+                          }}
+                          variant="outline"
+                          numberOfMonths={1}
+                          withoutdropdown
+                          closeOnSelect
+                          yearsRange={10}
+                          className="w-full"
+                        />
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
-                  {/* Fechas */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    <FormField
-                      control={form.control}
-                      name="start_date"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-xs sm:text-sm">
-                            Fecha de Inicio *
-                          </FormLabel>
-                          <FormControl>
+                  <FormField
+                    control={form.control}
+                    name="end_date"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Fecha Fin</FormLabel>
+                        <div className="flex gap-2">
+                          <div className="flex-1">
                             <CalendarDatePicker
                               date={{
                                 from: field.value
@@ -633,112 +544,59 @@ export function ParliamentaryMembershipDialog({
                                   : undefined,
                               }}
                               onDateSelect={({ from }) => {
-                                if (from) {
-                                  form.setValue(
-                                    "start_date",
-                                    from.toISOString(),
-                                  );
-                                }
+                                field.onChange(
+                                  from ? from.toISOString() : null,
+                                );
                               }}
                               variant="outline"
                               numberOfMonths={1}
                               withoutdropdown
                               closeOnSelect
-                              yearsRange={13}
-                              centerCurrentYear
+                              yearsRange={10}
                               className="w-full"
                             />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                          </div>
+                          {field.value && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => field.onChange(null)}
+                              className="shrink-0 text-muted-foreground hover:text-foreground"
+                              title="Limpiar fecha"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-                    <FormField
-                      control={form.control}
-                      name="end_date"
-                      render={({ field }) => {
-                        const currentDate = field.value
-                          ? new Date(field.value)
-                          : null;
-
-                        return (
-                          <FormItem>
-                            <FormLabel className="text-xs sm:text-sm">
-                              Fecha de Fin
-                            </FormLabel>
-                            <div className="flex gap-1.5 items-start">
-                              <FormControl className="flex-1">
-                                <CalendarDatePicker
-                                  date={{
-                                    from: currentDate || undefined,
-                                    to: currentDate || undefined,
-                                  }}
-                                  onDateSelect={({ from }) => {
-                                    if (from) {
-                                      field.onChange(from.toISOString());
-                                    } else {
-                                      field.onChange(null);
-                                    }
-                                  }}
-                                  variant="outline"
-                                  numberOfMonths={1}
-                                  withoutdropdown
-                                  yearsRange={13}
-                                  centerCurrentYear
-                                  className="w-full"
-                                />
-                              </FormControl>
-                              {field.value && (
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => field.onChange(null)}
-                                  className="shrink-0 h-9 w-9"
-                                >
-                                  <X className="h-3.5 w-3.5" />
-                                </Button>
-                              )}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  </div>
-
-                  {/* Motivo del Cambio */}
+                <div className="grid grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
                     name="change_reason"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs sm:text-sm">
-                          Motivo del Cambio *
-                        </FormLabel>
+                        <FormLabel>Motivo del cambio</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                           disabled={isSubmitting}
                         >
                           <FormControl>
-                            <SelectTrigger className="h-9 sm:h-10">
-                              <SelectValue placeholder="Seleccionar motivo" />
+                            <SelectTrigger className="h-10">
+                              <SelectValue />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             {Object.entries(REASON_CONFIG).map(
                               ([key, config]) => (
                                 <SelectItem key={key} value={key}>
-                                  <div className="flex items-center gap-2">
-                                    <span
-                                      className={`inline-block w-2 h-2 rounded-full ${config.color
-                                        .split(" ")[0]
-                                        .replace("/10", "")}`}
-                                    />
-                                    {config.label}
-                                  </div>
+                                  {config.label}
                                 </SelectItem>
                               ),
                             )}
@@ -748,70 +606,55 @@ export function ParliamentaryMembershipDialog({
                       </FormItem>
                     )}
                   />
-
-                  {/* URL de Fuente */}
                   <FormField
                     control={form.control}
                     name="source_url"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs sm:text-sm">
-                          URL de Fuente
-                        </FormLabel>
+                        <FormLabel>Fuente (Opcional)</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="https://ejemplo.com/noticia"
-                            {...field}
-                            value={field.value || ""}
-                            disabled={isSubmitting}
-                            className="h-9 sm:h-10"
-                          />
+                          <div className="relative">
+                            <ExternalLink className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              className="pl-9 h-10"
+                              placeholder="https://..."
+                              {...field}
+                              value={field.value || ""}
+                            />
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                </div>
 
-                  {/* Botones de acción */}
-                  <div className="flex flex-col-reverse sm:flex-row gap-2 justify-end pt-1">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleCancel}
-                      disabled={isSubmitting}
-                      className="w-full sm:w-auto h-9"
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full sm:w-auto h-9"
-                    >
-                      {isSubmitting
-                        ? "Guardando..."
-                        : editingMembership
-                          ? "Actualizar"
-                          : "Crear"}
-                    </Button>
-                  </div>
+                <div className="flex items-center justify-end gap-3 pt-4 border-t mt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleCancel}
+                    disabled={isSubmitting}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Guardando...
+                      </>
+                    ) : editingMembership ? (
+                      "Actualizar Cambio"
+                    ) : (
+                      "Registrar Cambio"
+                    )}
+                  </Button>
                 </div>
               </form>
             </Form>
           )}
         </CredenzaBody>
-
-        {!showForm && (
-          <CredenzaFooter>
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="w-full sm:w-auto h-9"
-            >
-              Cerrar
-            </Button>
-          </CredenzaFooter>
-        )}
       </CredenzaContent>
     </Credenza>
   );

@@ -13,7 +13,7 @@ export interface ParliamentaryMembershipBase {
   start_date: string;
   end_date: string | null;
   change_reason: GroupChangeReason;
-  source_url?: string;
+  source_url: string | null;
 }
 
 export interface ParliamentaryMembershipBasic

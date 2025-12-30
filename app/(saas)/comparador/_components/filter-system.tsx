@@ -6,8 +6,8 @@ import { ChevronDown, LucideIcon } from "lucide-react";
 import {
   Users,
   Trophy,
-  Building2,
-  Scale,
+  // Building2,
+  // Scale,
   Filter,
   X,
   ChevronRight,
@@ -34,10 +34,6 @@ import { Popover, PopoverContent } from "@/components/ui/popover";
 import { PopoverTrigger } from "@radix-ui/react-popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ComparatorContext } from "@/components/context/comparator";
-
-// ============================================
-// TIPOS
-// ============================================
 
 type CategoryId = "legislator" | "candidate";
 
@@ -80,13 +76,13 @@ const ENTITY_CATEGORIES: EntityCategory[] = [
     icon: Users,
     color: "bg-blue-500",
   },
-  {
-    id: "candidate",
-    label: "Candidatos",
-    description: "Elecciones 2026",
-    icon: Trophy,
-    color: "bg-purple-500",
-  },
+  // {
+  //   id: "candidate",
+  //   label: "Candidatos",
+  //   description: "Elecciones 2026",
+  //   icon: Trophy,
+  //   color: "bg-purple-500",
+  // },
 ];
 
 const LEGISLATOR_SUBTYPES: Subtype[] = [
@@ -94,23 +90,23 @@ const LEGISLATOR_SUBTYPES: Subtype[] = [
     mode: "legislator",
     label: "Congreso",
     icon: Users,
-    chamber: "Congreso",
+    chamber: "CONGRESO",
     needsRefinement: false,
   },
-  {
-    mode: "legislator",
-    label: "Senado",
-    icon: Building2,
-    chamber: "Senado",
-    needsRefinement: false,
-  },
-  {
-    mode: "legislator",
-    label: "Diputados",
-    icon: Scale,
-    chamber: "Diputados",
-    needsRefinement: false,
-  },
+  // {
+  //   mode: "legislator",
+  //   label: "Senado",
+  //   icon: Building2,
+  //   chamber: "Senado",
+  //   needsRefinement: false,
+  // },
+  // {
+  //   mode: "legislator",
+  //   label: "Diputados",
+  //   icon: Scale,
+  //   chamber: "Diputados",
+  //   needsRefinement: false,
+  // },
 ];
 
 const CANDIDATE_SUBTYPES: Subtype[] = [
@@ -118,28 +114,28 @@ const CANDIDATE_SUBTYPES: Subtype[] = [
     mode: "candidate",
     label: "Senador",
     icon: Users,
-    type: "Senador",
+    type: "SENADOR",
     needsRefinement: false,
   },
   {
     mode: "candidate",
     label: "Diputado",
     icon: Users,
-    type: "Diputado",
+    type: "DIPUTADO",
     needsRefinement: false,
   },
   {
     mode: "candidate",
     label: "Presidente",
     icon: Trophy,
-    type: "Presidente",
+    type: "PRESIDENTE",
     needsRefinement: false,
   },
   {
     mode: "candidate",
     label: "Vicepresidente",
     icon: Users,
-    type: "Vicepresidente",
+    type: "VICEPRESIDENTE",
     needsRefinement: false,
   },
 ];

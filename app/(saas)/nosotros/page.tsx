@@ -10,7 +10,6 @@ import {
   TrendingUp,
   UserX,
   AlertTriangle,
-  Mail,
 } from "lucide-react";
 
 export default function AboutPage() {

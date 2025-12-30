@@ -1,7 +1,6 @@
-import { publicApi } from "@/lib/public-api";
-import { PoliticalPartyListPaginated } from "@/interfaces/politics";
 import Link from "next/link";
 import PartidosListPaginated from "@/components/politics/partidos-list-paginated";
+import { getPartidosList } from "@/queries/public/parties";
 
 interface PageProps {
   searchParams: {
@@ -18,7 +17,7 @@ export default async function PartidosPage({ searchParams }: PageProps) {
   const limit = parseInt(params.limit || "30");
   const offset = parseInt(params.offset || "0");
 
-  const apiParams = {
+  const queryParams = {
     active:
       params.active === "false"
         ? false
@@ -38,9 +37,7 @@ export default async function PartidosPage({ searchParams }: PageProps) {
   };
 
   try {
-    const partidos = (await publicApi.getPartidos(
-      apiParams,
-    )) as PoliticalPartyListPaginated;
+    const partidos = await getPartidosList(queryParams);
 
     return (
       <div className="min-h-screen bg-background">
@@ -63,7 +60,7 @@ export default async function PartidosPage({ searchParams }: PageProps) {
             No se pudieron cargar los partidos. Por favor, intenta nuevamente.
           </p>
           <Link
-            href="/partidos"
+            href="/partidos?active=true"
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-block"
           >
             Reintentar

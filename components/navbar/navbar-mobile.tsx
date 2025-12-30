@@ -19,19 +19,29 @@ import {
   adminNavGroups,
   getAuthorizedNavGroups,
 } from "./navbar-config";
-import { AuthUser } from "@/interfaces/auth";
+import { User } from "@supabase/supabase-js";
+import { UserProfile } from "@/lib/auth-actions"; // Importar tipo
 import { LogoutButton } from "@/components/auth/logout-button";
+import Link from "next/link";
 
 interface NavbarMobileProps {
-  user?: AuthUser | null;
+  user?: User | null;
+  profile?: UserProfile | null;
 }
 
-export const NavbarMobile = ({ user }: NavbarMobileProps) => {
+export const NavbarMobile = ({ user, profile }: NavbarMobileProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, setTheme } = useTheme();
 
-  const getInitials = (name: string) => {
-    return name
+  // DATOS REALES DEL PERFIL
+  const name = profile?.full_name || user?.email?.split("@")[0] || "Usuario";
+  const email = user?.email || "";
+  const role = profile?.role || "user";
+  const image = profile?.avatar_url || "";
+
+  const getInitials = (nameStr: string) => {
+    if (!nameStr) return "U";
+    return nameStr
       .split(" ")
       .map((n) => n[0])
       .join("")
@@ -39,8 +49,8 @@ export const NavbarMobile = ({ user }: NavbarMobileProps) => {
       .slice(0, 2);
   };
 
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
+  const getRoleBadgeColor = (roleStr: string) => {
+    switch (roleStr) {
       case "super_admin":
         return "bg-purple-500/15 text-purple-600 border-purple-500/30";
       case "admin":
@@ -52,9 +62,12 @@ export const NavbarMobile = ({ user }: NavbarMobileProps) => {
     }
   };
 
-  const authorizedAdminGroups = user
-    ? getAuthorizedNavGroups(adminNavGroups, user.role)
-    : [];
+  // FILTRADO DE RUTAS SEGÚN EL ROL DE LA BD
+  const authorizedAdminGroups =
+    user && profile
+      ? getAuthorizedNavGroups(adminNavGroups, role) // Usamos el role del profile
+      : [];
+
   const allGroups = [...publicNavGroups, ...authorizedAdminGroups];
 
   return (
@@ -77,21 +90,26 @@ export const NavbarMobile = ({ user }: NavbarMobileProps) => {
               {user ? (
                 <div className="flex items-center space-x-4">
                   <Avatar className="w-14 h-14 ring-4 ring-[var(--brand)]/10">
-                    <AvatarImage src={user.image} alt={user.name} />
+                    <AvatarImage
+                      src={image}
+                      alt={name}
+                      className="object-cover"
+                    />
                     <AvatarFallback className="bg-gradient-to-br from-[var(--brand)] to-[var(--brand)]/80 text-white text-lg font-bold">
-                      {getInitials(user.name)}
+                      {getInitials(name)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-lg truncate">{user.name}</p>
+                    <p className="font-bold text-lg truncate">{name}</p>
                     <p className="text-sm text-muted-foreground truncate">
-                      {user.email}
+                      {email}
                     </p>
                     <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 mt-2 text-xs font-semibold rounded-full border ${getRoleBadgeColor(user.role)}`}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 mt-2 text-xs font-semibold rounded-full border ${getRoleBadgeColor(role)}`}
                     >
                       <Settings className="w-3 h-3" />
-                      {ROLE_LABELS[user.role]}
+                      {ROLE_LABELS[role as keyof typeof ROLE_LABELS] ||
+                        "Usuario"}
                     </span>
                   </div>
                 </div>
@@ -118,10 +136,10 @@ export const NavbarMobile = ({ user }: NavbarMobileProps) => {
             </div>
 
             <div className="px-4 py-4 border-t border-border bg-card/50 backdrop-blur-sm">
-              {user && (
+              {user ? (
                 <LogoutButton>
                   <Button
-                    className=" w-full shadow-lg"
+                    className="w-full shadow-lg"
                     variant="outline"
                     size="lg"
                   >
@@ -129,20 +147,14 @@ export const NavbarMobile = ({ user }: NavbarMobileProps) => {
                     Cerrar Sesión
                   </Button>
                 </LogoutButton>
-              )}
-              {/* : (
-                <Button
-                  onClick={() => setIsOpen(false)}
-                  className="w-full shadow-lg"
-                  size="lg"
-                  asChild
-                >
-                  <Link href="/auth/login">
-                    <User className="w-4 h-4 mr-2" />
+              ) : (
+                // Botón para login en móvil si no está logueado
+                <Button asChild className="w-full" size="lg">
+                  <Link href="/auth/login" onClick={() => setIsOpen(false)}>
                     Iniciar Sesión
                   </Link>
                 </Button>
-              ) */}
+              )}
             </div>
           </div>
         </SheetContent>

@@ -27,8 +27,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const result = await serverGetUser();
-  const initialUser = result.user || null;
+  const { user, profile } = await serverGetUser();
+
   return (
     <html lang="es" suppressHydrationWarning>
       <body
@@ -41,7 +41,7 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider initialUser={initialUser}>
+          <AuthProvider initialUser={user} initialProfile={profile}>
             <TooltipProvider>
               <NuqsAdapter>{children}</NuqsAdapter>
             </TooltipProvider>

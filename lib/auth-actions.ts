@@ -1,221 +1,268 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
+import { LoginSchema, RegisterSchema } from "@/schemas/auth";
 import { redirect } from "next/navigation";
-import { API_BASE_URL } from "./config";
-import {
-  AuthTokens,
-  LoginCredentials,
-  RegisterData,
-  AuthUser,
-} from "@/interfaces/auth";
+import { z } from "zod";
+import { User } from "@supabase/supabase-js";
 
-const getCookieOptions = (maxAge: number) => ({
-  httpOnly: true,
-  secure: process.env.NEXT_PUBLIC_ENVIRONMENT === "production",
-  sameSite: "lax" as const,
-  maxAge,
-  path: "/",
-});
+// ============================================
+// TIPOS
+// ============================================
+export type UserRole = "user" | "editor" | "admin";
 
-function decodeJwtPayload(token: string) {
-  const parts = token.split(".");
-  if (parts.length !== 3) {
-    throw new Error("Token inválido (no es un JWT)");
-  }
+export type UserProfile = {
+  id: string;
+  full_name: string | null;
+  role: UserRole;
+  avatar_url: string | null;
+  bio: string | null;
+  created_at: string;
+  updated_at: string;
+};
 
-  let base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+type GetUserResponse = {
+  user: User | null;
+  profile: UserProfile | null;
+  error?: string | null;
+};
 
-  // padding
-  while (base64.length % 4) {
-    base64 += "=";
-  }
+type AuthActionResponse = {
+  error?: string;
+  success?: boolean;
+};
 
-  const decoded = Buffer.from(base64, "base64").toString("utf-8");
-  return JSON.parse(decoded);
-}
+// ============================================
+// OBTENER USUARIO CON PERFIL
+// ============================================
 
-export async function serverLogin(credentials: LoginCredentials) {
+export async function serverGetUser(): Promise<GetUserResponse> {
   try {
-    const formData = new FormData();
-    formData.append("username", credentials.email);
-    formData.append("password", credentials.password);
+    const supabase = await createClient();
 
-    const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-      method: "POST",
-      body: formData,
-    });
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return { error: data.detail || "Login failed" };
+    if (error || !user) {
+      return {
+        user: null,
+        profile: null,
+        error: error?.message || "No session",
+      };
     }
 
-    const tokens: AuthTokens = data;
-    const cookieStore = await cookies();
+    // Obtener el perfil con el rol
+    const { data: rawProfile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
 
-    cookieStore.set(
-      "access_token",
-      tokens.access_token,
-      getCookieOptions(tokens.expires_in || 1800),
-    );
-
-    if (tokens.refresh_token) {
-      cookieStore.set(
-        "refresh_token",
-        tokens.refresh_token,
-        getCookieOptions(30 * 24 * 60 * 60),
-      );
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+      // Si no existe el perfil, podrías crearlo aquí o manejarlo
+      return { user, profile: null, error: profileError.message };
     }
 
-    return { success: true, tokens };
-  } catch (error) {
-    console.error("Network error login", error);
-    return {
-      error: error instanceof Error ? error.message : "Network error occurred",
+    const profile: UserProfile = {
+      ...rawProfile,
+      role: (rawProfile.role as UserRole) || "user", // Fallback seguro a "user"
+      // Aseguramos que los campos requeridos no sean null (aunque la BD lo evite)
+      created_at: rawProfile.created_at || new Date().toISOString(),
+      updated_at: rawProfile.updated_at || new Date().toISOString(),
     };
+    return { user, profile, error: null };
+  } catch (error) {
+    console.error("Unexpected error in serverGetUser:", error);
+    return { user: null, profile: null, error: "Internal Error" };
   }
 }
 
-export async function serverRegister(data: RegisterData) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+// ============================================
+// LOGIN
+// ============================================
+export async function serverLogin(
+  values: z.infer<typeof LoginSchema>,
+): Promise<AuthActionResponse> {
+  const supabase = await createClient();
+  const { email, password } = values;
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  // ANTES: redirect("/");  <-- ESTO CAUSABA EL ERROR
+
+  // AHORA: Retornamos éxito para que el cliente redirija
+  return { success: true };
+}
+
+// ============================================
+// REGISTRO
+// ============================================
+export async function serverRegister(
+  values: z.infer<typeof RegisterSchema>,
+): Promise<AuthActionResponse> {
+  const supabase = await createClient();
+
+  const { email, password, name } = values;
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: name,
       },
-      body: JSON.stringify(data),
-    });
+    },
+  });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      console.error("Error en registro:", error);
-      return { error: error.detail || "Registration failed" };
-    }
-
-    const user: AuthUser = await response.json();
-    return { success: true, user };
-  } catch (error) {
-    console.error("Network error en registro:", error);
-    return {
-      error: error instanceof Error ? error.message : "Network error occurred",
-    };
+  if (error) {
+    return { error: error.message };
   }
+
+  // El trigger debería crear el perfil automáticamente
+  // pero puedes verificar si se creó correctamente
+  if (data.user) {
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("id", data.user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Profile was not created:", profileError);
+      // Opcional: podrías crear el perfil manualmente aquí como fallback
+    }
+  }
+
+  return { success: true };
 }
 
-export async function serverGetUser() {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("access_token")?.value;
-
-    if (!token) {
-      return { error: "No token found" };
-    }
-
-    const response = await fetch(`${API_BASE_URL}/api/v1/users/me`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      cache: "no-store", // ✅ Importante: no cachear datos del usuario
-    });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        return { error: "Unauthorized" };
-      }
-      const error = await response.json().catch(() => ({}));
-      return { error: error.detail || "Failed to get user" };
-    }
-
-    const user: AuthUser = await response.json();
-    return { success: true, user };
-  } catch (error) {
-    console.error("Error obteniendo usuario:", error);
-    return {
-      error: error instanceof Error ? error.message : "Failed to get user",
-    };
-  }
-}
-
+// ============================================
+// LOGOUT
+// ============================================
 export async function serverLogout() {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("access_token")?.value;
-
-    if (token) {
-      try {
-        await fetch(`${API_BASE_URL}/api/v1/users/logout`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      } catch (error) {
-        console.error("Backend logout failed:", error);
-      }
-    }
-
-    cookieStore.delete("access_token");
-    cookieStore.delete("refresh_token");
-  } catch (error) {
-    console.error("Logout error:", error);
-  }
-
+  const supabase = await createClient();
+  await supabase.auth.signOut();
   redirect("/auth/login");
 }
 
-export async function serverVerifyAccount(email: string, token: string) {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/api/v1/auth/new-verification`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, token }),
-      },
-    );
+// ============================================
+// VERIFICAR ROL (Utility)
+// ============================================
+export async function serverCheckRole(allowedRoles: UserRole[]) {
+  const { user, profile } = await serverGetUser();
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      return { error: error.detail || "Account verification failed" };
-    }
-
-    return { success: true };
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : "Network error occurred",
-    };
+  if (!user || !profile) {
+    redirect("/auth/login");
   }
+
+  if (!allowedRoles.includes(profile.role)) {
+    redirect("/unauthorized");
+  }
+
+  return { user, profile };
 }
 
-// ✅ NUEVA: Action para obtener info del token (exp, iat)
-export async function serverGetTokenInfo() {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("access_token")?.value;
+// ============================================
+// VERIFICAR SI ES ADMIN (Utility)
+// ============================================
+export async function serverRequireAdmin() {
+  return serverCheckRole(["admin"]);
+}
 
-    if (!token) {
-      return { error: "No token found" };
-    }
+// ============================================
+// VERIFICAR SI ES EDITOR O ADMIN (Utility)
+// ============================================
+export async function serverRequireEditor() {
+  return serverCheckRole(["editor", "admin"]);
+}
 
-    const payload = decodeJwtPayload(token);
-    const now = Math.floor(Date.now() / 1000);
+// ============================================
+// ACTUALIZAR ROL (Solo para admins)
+// ============================================
+export async function serverUpdateUserRole(
+  userId: string,
+  newRole: UserRole,
+): Promise<AuthActionResponse> {
+  const supabase = await createClient();
 
-    return {
-      exp: payload.exp,
-      iat: payload.iat,
-      timeUntilExpiry: payload.exp - now,
-      isExpired: now >= payload.exp,
-    };
-  } catch (error) {
-    console.error("Error obteniendo token:", error);
-    return {
-      error: error instanceof Error ? error.message : "Invalid token ",
-    };
+  // Verificar que quien ejecuta sea admin
+  const { profile: currentUserProfile } = await serverGetUser();
+
+  if (!currentUserProfile || currentUserProfile.role !== "admin") {
+    return { error: "No tienes permisos para realizar esta acción" };
   }
+
+  // No permitir que el admin se quite su propio rol
+  if (userId === currentUserProfile.id && newRole !== "admin") {
+    return { error: "No puedes cambiar tu propio rol de administrador" };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ role: newRole })
+    .eq("id", userId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true };
+}
+
+// ============================================
+// ACTUALIZAR PERFIL (Datos propios)
+// ============================================
+export async function serverUpdateProfile(
+  updates: Partial<Pick<UserProfile, "full_name" | "bio" | "avatar_url">>,
+): Promise<AuthActionResponse> {
+  const supabase = await createClient();
+
+  const { user } = await serverGetUser();
+
+  if (!user) {
+    return { error: "No autenticado" };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update(updates)
+    .eq("id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true };
+}
+
+// ============================================
+// OBTENER TODOS LOS USUARIOS (Solo para admins)
+// ============================================
+export async function serverGetAllUsers() {
+  const supabase = await createClient();
+
+  // Verificar que sea admin
+  await serverRequireAdmin();
+
+  const { data: profiles, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching users:", error);
+    return { profiles: [], error: error.message };
+  }
+
+  return { profiles, error: null };
 }

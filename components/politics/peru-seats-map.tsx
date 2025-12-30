@@ -68,32 +68,36 @@ export default function PeruSeatsMapSimple({
       .replace(/[\u0300-\u036f]/g, "")
       .trim();
 
+  const normalizeSafe = (value: string | null | undefined) =>
+    normalize(value ?? "");
+
   const getDistrictData = (
     districtName: string,
   ): SeatsByDistrict | undefined => {
-    const normalizedName = normalize(districtName);
+    const normalizedName = normalizeSafe(districtName);
 
     if (normalizedName === "lima") {
       const limaMetro = seatsByDistrict.find(
-        (d) => normalize(d.district_name) === "lima metropolitana",
-      );
-      const limaProv = seatsByDistrict.find(
-        (d) => normalize(d.district_name) === "lima provincias",
+        (d) => normalizeSafe(d.district_name) === "lima metropolitana",
       );
 
-      // Combinar los datos de ambas
+      const limaProv = seatsByDistrict.find(
+        (d) => normalizeSafe(d.district_name) === "lima provincias",
+      );
+
       if (limaMetro || limaProv) {
         return {
           district_code:
-            limaMetro?.district_code || limaProv?.district_code || "",
+            limaMetro?.district_code ?? limaProv?.district_code ?? "",
           district_name: "Lima",
-          seats: (limaMetro?.seats || 0) + (limaProv?.seats || 0),
+          seats: (limaMetro?.seats ?? 0) + (limaProv?.seats ?? 0),
+          elected_by_party_id: limaMetro?.elected_by_party_id ?? "",
         };
       }
     }
 
     return seatsByDistrict.find(
-      (d) => normalize(d.district_name) === normalizedName,
+      (d) => normalizeSafe(d.district_name) === normalizedName,
     );
   };
 
@@ -102,19 +106,21 @@ export default function PeruSeatsMapSimple({
     if (!data || data.seats === 0) return "#E5E7EB";
 
     // Calcular el máximo considerando Lima completa
-    const allSeats = seatsByDistrict.map((d) => d.seats);
+    const allSeats = seatsByDistrict.map((d) => d.seats ?? 0);
     const limaMetro = seatsByDistrict.find(
-      (d) => normalize(d.district_name) === "lima metropolitana",
+      (d) =>
+        d.district_name && normalize(d.district_name) === "lima metropolitana",
     );
     const limaProv = seatsByDistrict.find(
-      (d) => normalize(d.district_name) === "lima provincias",
+      (d) =>
+        d.district_name && normalize(d.district_name) === "lima provincias",
     );
     if (limaMetro && limaProv) {
-      allSeats.push(limaMetro.seats + limaProv.seats);
+      allSeats.push((limaMetro?.seats ?? 0) + (limaProv?.seats ?? 0));
     }
 
     const maxSeats = Math.max(...allSeats);
-    const intensity = data.seats / maxSeats;
+    const intensity = (data.seats ?? 0) / maxSeats;
 
     const hex = partyColor.replace("#", "");
     const r = parseInt(hex.substr(0, 2), 16);
@@ -248,7 +254,9 @@ export default function PeruSeatsMapSimple({
       : null;
   };
 
-  const districtsWithSeats = seatsByDistrict.filter((d) => d.seats > 0).length;
+  const districtsWithSeats = seatsByDistrict.filter(
+    (d) => (d.seats ?? 0) > 0,
+  ).length;
   const hoveredData = hoveredDistrict ? getDistrictData(hoveredDistrict) : null;
 
   if (loading) {

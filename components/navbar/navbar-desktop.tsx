@@ -9,13 +9,15 @@ import {
   getAuthorizedNavGroups,
   adminNavGroups,
 } from "./navbar-config";
-import { AuthUser } from "@/interfaces/auth";
+import { User } from "@supabase/supabase-js";
+import { UserProfile } from "@/lib/auth-actions"; // Importar tipo
 
 interface NavbarDesktopProps {
-  user?: AuthUser | null;
+  user?: User | null;
+  profile?: UserProfile | null; // <--- 1. Recibir Profile
 }
 
-export const NavbarDesktop = ({ user }: NavbarDesktopProps) => {
+export const NavbarDesktop = ({ user, profile }: NavbarDesktopProps) => {
   const pathname = usePathname();
 
   const isActiveLink = (href: string) => {
@@ -24,8 +26,13 @@ export const NavbarDesktop = ({ user }: NavbarDesktopProps) => {
   };
 
   const publicLinks = publicNavGroups[0].links;
+
+  // <--- 2. USAR EL ROL DE LA BD (PROFILE), NO METADATA
+  const role = profile?.role || "user";
+
+  // Debug: Esto te confirmará en la consola del navegador qué rol está llegando
   const authorizedAdminGroups = user
-    ? getAuthorizedNavGroups(adminNavGroups, user.role)
+    ? getAuthorizedNavGroups(adminNavGroups, role)
     : [];
 
   return (

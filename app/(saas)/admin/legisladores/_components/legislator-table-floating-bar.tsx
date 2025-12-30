@@ -94,21 +94,23 @@ export function LegislatorsTableFloatingBar({
                   setAction("update-active");
 
                   startTransition(async () => {
-                    const { data, error } = await bulkUpdateLegislators({
+                    const result = await bulkUpdateLegislators({
                       ids: rows.map((row) => row.original.id),
                       active: value === "true", // Convierte string a boolean
                     });
 
-                    if (error) {
-                      toast.error(error);
+                    if (result.error) {
+                      toast.error(result.error);
                       return;
                     }
 
-                    const status =
-                      value === "true" ? "activado(s)" : "desactivado(s)";
-                    toast.success(
-                      `${data?.count} legislador(es) ${status} correctamente`,
-                    );
+                    if ("data" in result && result.data) {
+                      const status =
+                        value === "true" ? "activado(s)" : "desactivado(s)";
+                      toast.success(
+                        `${result.data.count} legislador(es) ${status} correctamente`,
+                      );
+                    }
 
                     table.toggleAllRowsSelected(false);
                   });

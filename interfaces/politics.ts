@@ -1,65 +1,61 @@
 // ============= ENUMS =============
 
-import { LegislatorDetail, LegislatorInSeat } from "./legislator";
-import { ParliamentaryGroupBasic } from "./parliamentary-membership";
-import { PersonBase, PersonBasicInfo } from "./person";
+import { LegislatorInSeat } from "./legislator";
+import { FinancingReport } from "./party-financing";
+import { PersonBasicInfo } from "./person";
 
 export enum ChamberType {
-  CONGRESO = "Congreso",
-  SENADO = "Senado",
-  DIPUTADOS = "Diputados",
+  CONGRESO = "CONGRESO",
+  SENADO = "SENADO",
+  DIPUTADOS = "DIPUTADOS",
 }
 
 export enum CandidacyType {
-  PRESIDENTE = "Presidente",
-  VICEPRESIDENTE = "Vicepresidente",
-  SENADOR = "Senador",
-  DIPUTADO = "Diputado",
-  CONGRESISTA = "Congresista",
+  PRESIDENTE = "PRESIDENTE",
+  VICEPRESIDENTE = "VICEPRESIDENTE",
+  SENADOR = "SENADOR",
+  DIPUTADO = "DIPUTADO",
+  CONGRESISTA = "CONGRESISTA",
 }
 
 export enum CandidacyStatus {
-  INSCRITO = "Inscrito",
-  HABIL = "Hábil",
-  INHABILITADO = "Inhabilitado",
-  TACADO = "Tacado",
+  INSCRITO = "INSCRITO",
+  HABILITADO = "HABILITADO",
+  INHABILITADO = "INHABILITADO",
+  TACADO = "TACADO",
 }
 export enum LegislatorCondition {
-  EN_EJERCICIO = "En_ejercicio",
-  FALLECIDO = "Fallecido",
-  SUSPENDIDO = "Suspendido",
-  LICENCIA = "Licencia",
-  DESTITUIDO = "Destituido",
+  EN_EJERCICIO = "EN_EJERCICIO",
+  FALLECIDO = "FALLECIDO",
+  SUSPENDIDO = "SUSPENDIDO",
+  LICENCIA = "LICENCIA",
+  DESTITUIDO = "DESTITUIDO",
 }
 
 export enum ExecutiveRole {
-  PRESIDENTE = "Presidente",
-  VICEPRESIDENTE = "Vicepresidente",
-  PRIMER_MINISTRO = "Primer_ministro",
-  MINISTRO = "Ministro",
+  PRESIDENTE = "PRESIDENTE",
+  VICEPRESIDENTE = "VICEPRESIDENTE",
+  PRIMER_MINISTRO = "PRIMER_MINISTRO",
+  MINISTRO = "MINISTRO",
 }
 
 export enum GroupChangeReason {
-  INICIAL = "inicial",
-  CAMBIO_VOLUNTARIO = "cambio_voluntario",
-  EXPULSION = "expulsion",
-  RENUNCIA = "renuncia",
-  DISOLUCION_BANCADA = "disolucion_bancada",
-  CAMBIO_ESTRATEGICO = "cambio_estrategico",
-  SANCION_DISCIPLINARIA = "sancion_disciplinaria",
-  OTRO = "otro",
+  INICIAL = "INICIAL",
+  CAMBIO_VOLUNTARIO = "CAMBIO_VOLUNTARIO",
+  EXPULSION = "EXPULSION",
+  RENUNCIA = "RENUNCIA",
+  DISOLUCION_BANCADA = "DISOLUCION_BANCADA",
+  CAMBIO_ESTRATEGICO = "CAMBIO_ESTRATEGICO",
+  SANCION_DISCIPLINARIA = "SANCION_DISCIPLINARIA",
+  OTRO = "OTRO",
 }
 
-export interface PreviousCase {
-  type: string;
-  title: string;
-  description: string;
-  status: string | null;
-  sanction: string | null;
+export interface PartyLegalCase {
+  case_type: string;
   date: string;
-  period: string | null;
-  source: string;
-  source_type: string;
+  description: string;
+  status: string;
+  source_name: string;
   source_url: string | null;
 }
 
@@ -82,20 +78,28 @@ export interface WorkExperience {
   source_url: string | null;
 }
 
+export interface GovernmentPlanSummary {
+  title: string;
+  summary: string;
+  tags: string[];
+  proposals: string[];
+  goals: { indicator: string }[];
+}
+
 export interface PartyHistory {
   date: string;
   event: string;
   source: string | null;
-  source_type: string | null;
+  source_url: string | null;
 }
 // ============= INTERFACES BASE =============
 
 export interface PoliticalPartyBase {
   id: string;
   name: string;
-  acronym: string;
+  acronym: string | null;
   logo_url: string | null;
-  color_hex: string;
+  color_hex: string | null;
   active: boolean;
   foundation_date: string | null;
 }
@@ -124,9 +128,10 @@ export interface ElectoralProcess {
 }
 // ============= PARTIDO ==========================
 export interface SeatsByDistrict {
-  district_name: string;
-  district_code: string;
-  seats: number;
+  district_code: string | null;
+  district_name: string | null;
+  elected_by_party_id: string | null;
+  seats: number | null;
 }
 export interface ElectedLegislatorBasic {
   id: string;
@@ -138,21 +143,26 @@ export interface ElectedLegislatorBasic {
 }
 export interface PoliticalPartyDetail extends PoliticalPartyBase {
   founder: string | null;
-  foundation_date: string | null;
-  description: string | null;
   ideology: string | null;
   main_office: string | null;
   phone: string | null;
   email: string | null;
   website: string | null;
-  party_timeline: PartyHistory[];
   facebook_url: string | null;
   twitter_url: string | null;
   youtube_url: string | null;
   tiktok_url: string | null;
   total_afiliates: number | null;
-  total_seats: number;
+  party_president: string | null;
+  purpose: string | null;
+  slogan: string | null;
+  government_plan_url: string | null;
+  government_audio_url: string | null;
+  government_plan_summary: GovernmentPlanSummary[];
+  party_timeline: PartyHistory[];
+  legal_cases: PartyLegalCase[];
   seats_by_district: SeatsByDistrict[];
+  financing_reports: FinancingReport[];
   elected_legislators: ElectedLegislatorBasic[];
 }
 
@@ -162,9 +172,6 @@ export interface PoliticalPartyListPaginated {
   limit: number;
   offset: number;
 }
-// ============= PERSONA Y LEGISLADOR =============
-
-// ============= BANCADAS =============
 
 // ============= EJECUTIVOS =============
 

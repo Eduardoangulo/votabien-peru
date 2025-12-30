@@ -25,5 +25,4 @@ export interface BackgroundBase {
   sanction: string | null;
   source: string | null;
   source_url: string | null;
-  pdf_url: string | null;
 }
