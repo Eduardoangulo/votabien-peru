@@ -198,8 +198,6 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=https://api.votabienperu.com
             NEXT_PUBLIC_ENVIRONMENT=production
-            NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/votabien_frontend:latest
           cache-to: type=inline
 
@@ -265,8 +263,6 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=https://api.votabienperu.com
             NEXT_PUBLIC_ENVIRONMENT=production
-            NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/votabien_frontend:latest
           cache-to: type=inline
 
@@ -276,23 +272,23 @@ jobs:
       #     response=$(curl -s -X POST "${{ secrets.DOKPLOY_PRODUCTION_HOOK_FRONTEND }}")
       #     echo "Response: $response"
 
-      - name: Wait for deployment
-        run: sleep 15
+      # - name: Wait for deployment
+      #   run: sleep 15
 
-      - name: Health check
-        run: |
-          echo "🏥 Checking production health..."
-          response=$(curl -s -f -o /dev/null -w "%{http_code}" https://votabienperu.com)
-          if [ "$response" != "200" ]; then
-            echo "❌ Health check failed! Status: $response"
-            exit 1
-          fi
-          echo "✅ Production is healthy! Status: $response"
+      # - name: Health check
+      #   run: |
+      #     echo "🏥 Checking production health..."
+      #     response=$(curl -s -f -o /dev/null -w "%{http_code}" https://votabienperu.com)
+      #     if [ "$response" != "200" ]; then
+      #       echo "❌ Health check failed! Status: $response"
+      #       exit 1
+      #     fi
+      #     echo "✅ Production is healthy! Status: $response"
 
-      - name: Notify success
-        if: success()
-        run: |
-          echo "🎉 [ASK] Production deployed successfully!"
-          echo "🌐 URL: https://votabienperu.com"
-          echo "🐳 Image: votabien_frontend:v${{ github.run_number }}"
-          echo "📝 Deployed after PR approval"
+      # - name: Notify success
+      #   if: success()
+      #   run: |
+      #     echo "🎉 [ASK] Production deployed successfully!"
+      #     echo "🌐 URL: https://votabienperu.com"
+      #     echo "🐳 Image: votabien_frontend:v${{ github.run_number }}"
+      #     echo "📝 Deployed after PR approval"
