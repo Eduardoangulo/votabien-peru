@@ -20,7 +20,6 @@ export function PersonSelector({
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<PersonBasicInfo[]>([]);
   const [searching, setSearching] = useState(false);
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const handleSearch = async () => {
     if (!searchTerm.trim()) return;
@@ -40,13 +39,6 @@ export function PersonSelector({
     } finally {
       setSearching(false);
     }
-  };
-
-  const handlePersonCreated = (person: PersonBasicInfo) => {
-    onSelect(person);
-    setShowCreateDialog(false);
-    setSearchResults([]);
-    setSearchTerm("");
   };
 
   const handleSelectPerson = (person: PersonBasicInfo) => {
@@ -111,16 +103,6 @@ export function PersonSelector({
                 className="flex-1 sm:flex-none h-9 sm:h-10 text-sm"
               >
                 Buscar
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowCreateDialog(true)}
-                className="flex-1 sm:flex-none h-9 sm:h-10 px-3 sm:px-4"
-              >
-                <Plus className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Nueva Persona</span>
-                <span className="sm:hidden">Nueva</span>
               </Button>
             </div>
           </div>

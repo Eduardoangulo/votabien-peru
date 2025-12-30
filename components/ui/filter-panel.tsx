@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useMemo, useRef, KeyboardEvent } from "react";
+import { useState, useMemo, useRef, KeyboardEvent, useCallback } from "react";
 import { X, Search, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,26 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+
+export function useDebouncedCallback<Args extends unknown[]>(
+  func: (...args: Args) => void,
+  wait: number,
+) {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  return useCallback(
+    (...args: Args) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        func(...args);
+      }, wait);
+    },
+    [func, wait],
+  );
+}
 
 export interface FilterOption {
   value: string;
@@ -60,22 +80,14 @@ export function FilterPanel<T extends Record<string, unknown>>({
   const [searchTerms, setSearchTerms] = useState<Record<string, string>>({});
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSearchKeyDown = (
-    key: keyof T,
-    event: KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      const value = (event.target as HTMLInputElement).value;
-      const newFilters = { ...filters, [key]: value };
-      setFilters(newFilters);
-      applyFiltersToUrl(newFilters);
-    }
-  };
+  const debouncedUrlUpdate = useDebouncedCallback((newFilters: T) => {
+    applyFiltersToUrl(newFilters);
+  }, 500);
 
   const handleSearchChange = (key: keyof T, value: string) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
+    debouncedUrlUpdate(newFilters);
   };
 
   const handleFilterChange = (key: keyof T, value: string) => {
@@ -251,7 +263,6 @@ export function FilterPanel<T extends Record<string, unknown>>({
               }
               value={String(filters[fieldKey] || "")}
               onChange={(e) => handleSearchChange(fieldKey, e.target.value)}
-              onKeyDown={(e) => handleSearchKeyDown(fieldKey, e)}
               className="pl-9 bg-background"
             />
             {filters[fieldKey] && (
