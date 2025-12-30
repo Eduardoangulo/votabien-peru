@@ -450,6 +450,56 @@ export type Database = {
           },
         ];
       };
+      financingreports: {
+        Row: {
+          created_at: string | null;
+          filing_status: Database["public"]["Enums"]["financingstatus"];
+          id: string;
+          party_id: string;
+          period_end: string;
+          period_start: string;
+          report_date: string;
+          report_name: string;
+          source_name: string;
+          source_url: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          created_at?: string | null;
+          filing_status: Database["public"]["Enums"]["financingstatus"];
+          id: string;
+          party_id: string;
+          period_end: string;
+          period_start: string;
+          report_date: string;
+          report_name: string;
+          source_name: string;
+          source_url?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          created_at?: string | null;
+          filing_status?: Database["public"]["Enums"]["financingstatus"];
+          id?: string;
+          party_id?: string;
+          period_end?: string;
+          period_start?: string;
+          report_date?: string;
+          report_name?: string;
+          source_name?: string;
+          source_url?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "financingreports_party_id_fkey";
+            columns: ["party_id"];
+            isOneToOne: false;
+            referencedRelation: "politicalparty";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       legislator: {
         Row: {
           active: boolean;
@@ -665,7 +715,7 @@ export type Database = {
         };
         Insert: {
           change_reason: Database["public"]["Enums"]["groupchangereason"];
-          created_at: string;
+          created_at?: string;
           end_date?: string | null;
           id: string;
           legislator_id: string;
@@ -704,59 +754,44 @@ export type Database = {
       };
       partyfinancing: {
         Row: {
-          amount: number | null;
-          category: Database["public"]["Enums"]["financingcategory"] | null;
-          created_at: string;
+          amount: number;
+          category: Database["public"]["Enums"]["financingcategory"];
+          created_at: string | null;
           currency: string | null;
-          date: string | null;
-          flow_type: Database["public"]["Enums"]["flowtype"] | null;
+          financing_report_id: string;
+          flow_type: Database["public"]["Enums"]["flowtype"];
           id: string;
           notes: string | null;
-          party_id: string;
-          period: string | null;
-          source_name: string | null;
-          source_url: string | null;
-          status: Database["public"]["Enums"]["financingstatus"];
-          updated_at: string;
+          updated_at: string | null;
         };
         Insert: {
-          amount?: number | null;
-          category?: Database["public"]["Enums"]["financingcategory"] | null;
-          created_at: string;
+          amount: number;
+          category: Database["public"]["Enums"]["financingcategory"];
+          created_at?: string | null;
           currency?: string | null;
-          date?: string | null;
-          flow_type?: Database["public"]["Enums"]["flowtype"] | null;
+          financing_report_id: string;
+          flow_type: Database["public"]["Enums"]["flowtype"];
           id: string;
           notes?: string | null;
-          party_id: string;
-          period?: string | null;
-          source_name?: string | null;
-          source_url?: string | null;
-          status: Database["public"]["Enums"]["financingstatus"];
-          updated_at: string;
+          updated_at?: string | null;
         };
         Update: {
-          amount?: number | null;
-          category?: Database["public"]["Enums"]["financingcategory"] | null;
-          created_at?: string;
+          amount?: number;
+          category?: Database["public"]["Enums"]["financingcategory"];
+          created_at?: string | null;
           currency?: string | null;
-          date?: string | null;
-          flow_type?: Database["public"]["Enums"]["flowtype"] | null;
+          financing_report_id?: string;
+          flow_type?: Database["public"]["Enums"]["flowtype"];
           id?: string;
           notes?: string | null;
-          party_id?: string;
-          period?: string | null;
-          source_name?: string | null;
-          source_url?: string | null;
-          status?: Database["public"]["Enums"]["financingstatus"];
-          updated_at?: string;
+          updated_at?: string | null;
         };
         Relationships: [
           {
-            foreignKeyName: "partyfinancing_party_id_fkey";
-            columns: ["party_id"];
+            foreignKeyName: "partyfinancing_financing_report_id_fkey";
+            columns: ["financing_report_id"];
             isOneToOne: false;
-            referencedRelation: "politicalparty";
+            referencedRelation: "financingreports";
             referencedColumns: ["id"];
           },
         ];
@@ -926,6 +961,51 @@ export type Database = {
           updated_at?: string;
           website?: string | null;
           youtube_url?: string | null;
+        };
+        Relationships: [];
+      };
+      profiles: {
+        Row: {
+          avatar_url: string | null;
+          bio: string | null;
+          company: string | null;
+          created_at: string | null;
+          full_name: string | null;
+          id: string;
+          is_active: boolean | null;
+          last_sign_in_at: string | null;
+          phone: string | null;
+          role: string | null;
+          updated_at: string | null;
+          website: string | null;
+        };
+        Insert: {
+          avatar_url?: string | null;
+          bio?: string | null;
+          company?: string | null;
+          created_at?: string | null;
+          full_name?: string | null;
+          id: string;
+          is_active?: boolean | null;
+          last_sign_in_at?: string | null;
+          phone?: string | null;
+          role?: string | null;
+          updated_at?: string | null;
+          website?: string | null;
+        };
+        Update: {
+          avatar_url?: string | null;
+          bio?: string | null;
+          company?: string | null;
+          created_at?: string | null;
+          full_name?: string | null;
+          id?: string;
+          is_active?: boolean | null;
+          last_sign_in_at?: string | null;
+          phone?: string | null;
+          role?: string | null;
+          updated_at?: string | null;
+          website?: string | null;
         };
         Relationships: [];
       };
@@ -1099,6 +1179,13 @@ export type Database = {
         Returns: Json;
       };
       get_partido_detail: { Args: { p_partido_id: string }; Returns: Json };
+      is_admin: { Args: never; Returns: boolean };
+      legislator_fullname: {
+        Args: {
+          legislator_row: Database["public"]["Tables"]["legislator"]["Row"];
+        };
+        Returns: string;
+      };
     };
     Enums: {
       attendancestatus:

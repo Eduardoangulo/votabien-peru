@@ -1,6 +1,6 @@
 "use server";
 
-import { PersonDetail } from "@/interfaces/person";
+import { PersonDetail, PersonWithActivePeriod } from "@/interfaces/person";
 import { createClient } from "@/lib/supabase/server";
 
 export async function getPersonaById(
@@ -44,5 +44,39 @@ export async function getPersonaById(
 
   return data as unknown as PersonDetail;
 }
-// CORREGIR, CREO QUE LA CONSULTA DEBERIA DE SER A LEGISLATOR NO A PERSON DIRECTAMENTE
-// Y OBTENER LA INFO DE DICHO LEGISLATOR
+
+interface GetPersonasParams {
+  search: string;
+  limit?: number;
+  skip?: number;
+}
+
+export async function getPersonas({
+  search,
+  limit = 10,
+  skip = 0,
+}: GetPersonasParams): Promise<PersonWithActivePeriod[]> {
+  const supabase = await createClient();
+
+  // Limpiamos la búsqueda para evitar espacios vacíos
+  const searchTerm = search.trim();
+
+  if (!searchTerm) return [];
+
+  const { data, error } = await supabase
+    .from("person")
+    .select("*")
+    .ilike("fullname", `%${searchTerm}%`)
+    .order("fullname", { ascending: true })
+    .range(skip, skip + limit - 1);
+
+  if (error) {
+    console.error("Error searching personas:", error);
+    return [];
+  }
+
+  // Retornamos los datos.
+  // Nota: Hacemos el cast porque PersonWithActivePeriod suele tener campos extras
+  // que aquí no estamos calculando, pero para el "Selector" la info básica basta.
+  return (data || []) as unknown as PersonWithActivePeriod[];
+}

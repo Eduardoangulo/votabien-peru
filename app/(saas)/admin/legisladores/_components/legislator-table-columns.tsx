@@ -71,7 +71,7 @@ export function getColumns({
         return (
           <div className="flex space-x-2">
             <span className="min-w-[20rem] max-w-[31.25rem] break-words font-medium whitespace-normal">
-              {row.original.person.fullname}
+              {row.original.person?.fullname}
             </span>
           </div>
         );
@@ -86,7 +86,7 @@ export function getColumns({
         return (
           <div className="flex space-x-2">
             <Badge variant="outline">
-              {row.original.electoral_district.name}
+              {row.original.electoral_district?.name}
             </Badge>
           </div>
         );
@@ -120,16 +120,16 @@ export function getColumns({
       cell: ({ row }) => {
         const party = row.original.elected_by_party;
         const textColor =
-          party.color_hex === "#ffffff" ? "text-black" : "text-white";
+          party?.color_hex === "#ffffff" ? "text-black" : "text-white";
 
         return (
           <div className="max-w-[200px] min-w-[200px]">
             <div
               className={`px-2 py-0.5 rounded-md text-xs whitespace-normal break-words ${textColor}`}
-              style={{ backgroundColor: party.color_hex ?? "#888888" }}
-              title={party.name}
+              style={{ backgroundColor: party?.color_hex ?? "#888888" }}
+              title={party?.name}
             >
-              {party.name}
+              {party?.name}
             </div>
           </div>
         );

@@ -6,8 +6,8 @@ import { ChevronDown, LucideIcon } from "lucide-react";
 import {
   Users,
   Trophy,
-  Building2,
-  Scale,
+  // Building2,
+  // Scale,
   Filter,
   X,
   ChevronRight,
@@ -34,10 +34,6 @@ import { Popover, PopoverContent } from "@/components/ui/popover";
 import { PopoverTrigger } from "@radix-ui/react-popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ComparatorContext } from "@/components/context/comparator";
-
-// ============================================
-// TIPOS
-// ============================================
 
 type CategoryId = "legislator" | "candidate";
 

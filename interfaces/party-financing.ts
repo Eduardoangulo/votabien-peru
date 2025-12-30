@@ -22,14 +22,22 @@ export enum FlowType {
 
 export interface PartyFinancingBasic {
   id: string;
-  date: string | null;
-  period: string | null;
-  status: FinancingStatus;
   category: FinancingCategory | null;
   flow_type: FlowType | null;
   amount: number | null;
   currency: string | null;
-  source_name: string | null;
-  source_url: string | null;
   notes: string | null;
+}
+
+export interface FinancingReport {
+  id: string;
+  // party_id: string;
+  report_name: string; // "IFA 2024"
+  filing_status: FinancingStatus;
+  source_name: string;
+  source_url: string | null;
+  report_date: string;
+  period_start: string;
+  period_end: string;
+  transactions: PartyFinancingBasic[];
 }

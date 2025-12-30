@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { LogOut, Settings } from "lucide-react";
 import {
@@ -14,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ROLE_LABELS } from "@/interfaces/navbar";
 import { User } from "@supabase/supabase-js";
+import { UserProfile } from "@/lib/auth-actions"; // Asegúrate de importar esto
 import { LogoutButton } from "@/components/auth/logout-button";
 import {
   Tooltip,
@@ -21,23 +23,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useState } from "react";
 
 interface NavbarUserMenuProps {
   user: User;
+  profile: UserProfile | null;
 }
 
-export const NavbarUserMenu = ({ user }: NavbarUserMenuProps) => {
-  const name =
-    user.user_metadata?.full_name || user.user_metadata?.name || "Usuario";
+export const NavbarUserMenu = ({ user, profile }: NavbarUserMenuProps) => {
+  // LÓGICA DE DATOS: Prioridad al perfil de base de datos
+  const name = profile?.full_name || user.email?.split("@")[0] || "Usuario";
   const email = user.email || "";
-  const role = user.user_metadata?.role || "user";
-  const image =
-    user.user_metadata?.avatar_url || user.user_metadata?.picture || "";
+  const role = profile?.role || "user";
+  const image = profile?.avatar_url || ""; // Avatar de BD, o vacío
 
-  const getInitials = (name: string) => {
-    if (!name) return "U";
-    return name
+  const getInitials = (nameStr: string) => {
+    if (!nameStr) return "U";
+    return nameStr
       .split(" ")
       .map((n) => n[0])
       .join("")
@@ -45,8 +46,8 @@ export const NavbarUserMenu = ({ user }: NavbarUserMenuProps) => {
       .slice(0, 2);
   };
 
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
+  const getRoleBadgeColor = (roleStr: string) => {
+    switch (roleStr) {
       case "super_admin":
         return "bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30";
       case "admin":
@@ -72,11 +73,11 @@ export const NavbarUserMenu = ({ user }: NavbarUserMenuProps) => {
               >
                 <Avatar className="h-8 w-8">
                   <AvatarImage
-                    src={image || "/images/avatar.png?height=128&width=128"}
+                    src={image} // Ya no ponemos fallback de imagen rota, dejamos que AvatarFallback actúe
                     alt={name}
-                    className="dark:invert"
+                    className="object-cover"
                   />
-                  <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{getInitials(name)}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -88,7 +89,7 @@ export const NavbarUserMenu = ({ user }: NavbarUserMenuProps) => {
         <DropdownMenuLabel>
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={image} alt={name} />
+              <AvatarImage src={image} alt={name} className="object-cover" />
               <AvatarFallback className="bg-gradient-to-br from-[var(--brand)] to-[var(--brand)]/80 text-white font-semibold">
                 {getInitials(name)}
               </AvatarFallback>
@@ -110,13 +111,14 @@ export const NavbarUserMenu = ({ user }: NavbarUserMenuProps) => {
           </div>
         </DropdownMenuLabel>
 
-        {role === "super_admin" && (
+        {/* Solo mostramos config si es super_admin (o admin, según prefieras) */}
+        {role === "admin" && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/admin/settings" className="cursor-pointer">
+              <Link href="/admin/dashboard" className="cursor-pointer">
                 <Settings className="w-4 h-4 mr-2" />
-                Configuración
+                Administración
               </Link>
             </DropdownMenuItem>
           </>
@@ -124,8 +126,8 @@ export const NavbarUserMenu = ({ user }: NavbarUserMenuProps) => {
         <DropdownMenuSeparator />
 
         <LogoutButton>
-          <DropdownMenuItem className="hover:cursor-pointer">
-            <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
+          <DropdownMenuItem className="hover:cursor-pointer text-red-600 focus:text-red-600">
+            <LogOut className="w-4 h-4 mr-3" />
             Cerrar Sesión
           </DropdownMenuItem>
         </LogoutButton>

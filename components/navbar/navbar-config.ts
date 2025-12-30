@@ -35,7 +35,7 @@ export const adminNavGroups: NavGroup[] = [
   {
     label: "Gestión de Contenido",
     requiresAuth: true,
-    requiresRole: ["super_admin", "admin", "editor"],
+    requiresRole: ["admin", "editor"],
     links: [
       { href: "/admin/legisladores", label: "Legisladores", icon: FileEdit },
       { href: "/admin/partidos", label: "Partidos", icon: FileEdit },

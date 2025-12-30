@@ -45,7 +45,7 @@ import {
 } from "@/components/ui/credenza";
 import { CalendarDatePicker } from "@/components/date-picker";
 import { AdminLegislator } from "@/interfaces/legislator";
-import { PersonWithActivePeriod } from "@/interfaces/person";
+import { PersonBasicInfo } from "@/interfaces/person";
 
 const legislatorPeriodSchema = z
   .object({
@@ -98,8 +98,9 @@ export function LegislatorFormDialog({
   initialData,
 }: LegislatorFormDialogProps) {
   const { districts, parties } = useContext(AdminLegislatorContext);
-  const [selectedPerson, setSelectedPerson] =
-    useState<PersonWithActivePeriod | null>(null);
+  const [selectedPerson, setSelectedPerson] = useState<PersonBasicInfo | null>(
+    null,
+  );
   const router = useRouter();
   const form = useForm<z.output<typeof legislatorPeriodSchema>>({
     resolver: zodResolver(legislatorPeriodSchema),
@@ -123,12 +124,15 @@ export function LegislatorFormDialog({
       form.reset({
         ...form.getValues(),
         ...initialData,
+        institutional_email: initialData.institutional_email ?? "",
+        end_date: initialData.end_date ?? "",
+        start_date: initialData.start_date ?? "",
       });
       setSelectedPerson(initialData.person ?? null);
     }
   }, [initialData, form]);
 
-  const handlePersonSelect = (person: PersonWithActivePeriod | null) => {
+  const handlePersonSelect = (person: PersonBasicInfo | null) => {
     setSelectedPerson(person);
     if (person) {
       form.setValue("person_id", person.id);

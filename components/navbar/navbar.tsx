@@ -1,13 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
-import { NavbarDesktop } from "./navbar-desktop";
+import { NavbarDesktop } from "./navbar-desktop"; // Asumo que este también podría necesitar profile
 import { NavbarMobile } from "./navbar-mobile";
 import { serverGetUser } from "@/lib/auth-actions";
 import { NavbarUserMenu } from "./navbar-user-menu";
 import { NavbarThemeToggle } from "./navbar-theme-toggle";
 
 export default async function Navbar() {
-  const { user } = await serverGetUser();
+  // 1. Extraemos user Y profile
+  const { user, profile } = await serverGetUser();
 
   return (
     <header className="sticky top-0 z-20 w-full bg-background/95 shadow backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:shadow-secondary">
@@ -28,20 +29,21 @@ export default async function Navbar() {
             </div>
           </Link>
 
-          <NavbarDesktop user={user} />
+          {/* Pasamos profile si NavbarDesktop lo necesita para filtrar menú */}
+          <NavbarDesktop user={user} profile={profile} />
 
           <div className="hidden lg:flex items-center">
             <NavbarThemeToggle />
-            {user && <NavbarUserMenu user={user} />}
 
-            {/* : (
-              <Button size="sm" asChild>
-                <Link href="/auth/login">Iniciar Sesión</Link>
-              </Button>
-            ) */}
+            {/* Validamos que exista user antes de mostrar el menú */}
+            {user ? (
+              <NavbarUserMenu user={user} profile={profile} />
+            ) : // Opcional: Botón de login si quieres mostrarlo
+            null}
           </div>
 
-          <NavbarMobile user={user} />
+          {/* Pasamos ambos datos al móvil */}
+          <NavbarMobile user={user} profile={profile} />
         </div>
       </div>
     </header>

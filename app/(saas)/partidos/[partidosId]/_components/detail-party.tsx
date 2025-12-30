@@ -585,7 +585,7 @@ export default function DetailParty({
               </Card>
             )}
             {/* 2. FINANCIAMIENTO */}
-            {party.financing_records && party.financing_records.length > 0 && (
+            {party.financing_reports && party.financing_reports.length > 0 && (
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-xl">
@@ -597,11 +597,22 @@ export default function DetailParty({
                   </p>
                 </CardHeader>
                 <CardContent>
-                  {(() => {
-                    const mainRecord = party.financing_records[0];
-                    const periodLabel = mainRecord.period || "2024";
-                    const rawStatus = mainRecord.status?.toLowerCase() || "";
+                  {party.financing_reports.map((report) => {
+                    // Calcular totales por categoría
+                    const ingresos = report.transactions
+                      .filter((t) => t.category === "ingreso")
+                      .reduce((acc, t) => acc + (t.amount || 0), 0);
 
+                    const gastos = report.transactions
+                      .filter((t) => t.category === "gasto")
+                      .reduce((acc, t) => acc + (t.amount || 0), 0);
+
+                    const deudas = report.transactions
+                      .filter((t) => t.category === "deuda")
+                      .reduce((acc, t) => acc + (t.amount || 0), 0);
+
+                    // Configuración del badge según filing_status
+                    const rawStatus = report.filing_status.toLowerCase();
                     let statusConfig = {
                       label: "Presentado",
                       className:
@@ -617,24 +628,30 @@ export default function DetailParty({
                         icon: <AlertCircle className="w-3 h-3 mr-1" />,
                       };
                     } else if (
-                      rawStatus.includes("no_presentaron") ||
-                      rawStatus.includes("omiso")
+                      rawStatus.includes("no_presentado") ||
+                      rawStatus.includes("pendiente")
                     ) {
                       statusConfig = {
-                        label: "No Presentó",
+                        label: "No Presentado",
                         className:
                           "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800",
                         icon: <AlertCircle className="w-3 h-3 mr-1" />,
                       };
                     }
 
+                    // Formatear periodo
+                    const periodLabel = `${new Date(report.period_start).toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" })} - ${new Date(report.period_end).toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" })}`;
+
                     return (
-                      <div className="border border-border rounded-xl overflow-hidden">
+                      <div
+                        key={report.id}
+                        className="border border-border rounded-xl overflow-hidden mb-4 last:mb-0"
+                      >
+                        {/* Header del Reporte */}
                         <div className="bg-muted/40 p-4 border-b border-border flex flex-col w-full">
-                          {/* Fila Superior: Título y Badge */}
                           <div className="flex flex-row justify-between items-start w-full gap-2">
                             <h3 className="font-bold text-foreground text-lg leading-tight">
-                              IFA 2024
+                              {report.report_name}
                             </h3>
                             <Badge
                               variant="outline"
@@ -648,58 +665,50 @@ export default function DetailParty({
                             </Badge>
                           </div>
 
-                          {/* Subtítulo agregado (Texto Muted) */}
                           <p className="text-sm text-muted-foreground font-medium mt-0.5">
-                            Informe Financiero Anual
+                            {report.source_name}
                           </p>
 
-                          {/* Periodo */}
                           <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1.5">
                             <Calendar className="w-3 h-3" />
                             <span>Periodo: {periodLabel}</span>
                           </div>
                         </div>
 
-                        {/* Resumen de Totales (Dashboard pequeño) */}
-                        <div className="grid grid-cols-2 divide-x divide-border border-b border-border bg-card">
+                        {/* Dashboard de Totales */}
+                        <div className="grid grid-cols-3 divide-x divide-border border-b border-border bg-card">
                           <div className="p-4 text-center sm:text-left">
                             <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider flex items-center justify-center sm:justify-start gap-1">
-                              <ArrowUpCircle className="w-3 h-3 text-emerald-600" />{" "}
+                              <ArrowUpCircle className="w-3 h-3 text-emerald-600" />
                               Ingresos
                             </span>
                             <p className="text-xl sm:text-2xl font-bold text-emerald-700 mt-1">
-                              {formatCurrency(
-                                party.financing_records
-                                  .filter((f) => f.category === "ingreso")
-                                  .reduce(
-                                    (acc, curr) => acc + (curr.amount || 0),
-                                    0,
-                                  ),
-                              )}
+                              {formatCurrency(ingresos)}
                             </p>
                           </div>
                           <div className="p-4 text-center sm:text-left">
                             <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider flex items-center justify-center sm:justify-start gap-1">
-                              <ArrowDownCircle className="w-3 h-3 text-rose-600" />{" "}
+                              <ArrowDownCircle className="w-3 h-3 text-rose-600" />
                               Gastos
                             </span>
                             <p className="text-xl sm:text-2xl font-bold text-rose-700 mt-1">
-                              {formatCurrency(
-                                party.financing_records
-                                  .filter((f) => f.category === "gasto")
-                                  .reduce(
-                                    (acc, curr) => acc + (curr.amount || 0),
-                                    0,
-                                  ),
-                              )}
+                              {formatCurrency(gastos)}
+                            </p>
+                          </div>
+                          <div className="p-4 text-center sm:text-left">
+                            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider flex items-center justify-center sm:justify-start gap-1">
+                              <AlertCircle className="w-3 h-3 text-amber-600" />
+                              Deudas
+                            </span>
+                            <p className="text-xl sm:text-2xl font-bold text-amber-700 mt-1">
+                              {formatCurrency(deudas)}
                             </p>
                           </div>
                         </div>
 
-                        {/* Lista Detallada */}
+                        {/* Lista de Transacciones */}
                         <div className="divide-y divide-border bg-card">
-                          {party.financing_records.map((record) => {
-                            // Diccionario simple
+                          {report.transactions.map((transaction) => {
                             const labelMap: Record<string, string> = {
                               i_fpd: "Financiamiento Público Directo",
                               i_f_privado: "Financiamiento Privado",
@@ -711,29 +720,28 @@ export default function DetailParty({
                             };
 
                             const label =
-                              labelMap[record.flow_type || ""] ||
-                              record.flow_type?.replace(/_/g, " ") ||
+                              labelMap[transaction.flow_type || ""] ||
+                              transaction.flow_type?.replace(/_/g, " ") ||
                               "Concepto Vario";
 
-                            // Lógica de colores según categoría
-                            const isIngreso = record.category === "ingreso";
-                            const isDeuda = record.category === "deuda";
+                            const isIngreso =
+                              transaction.category === "ingreso";
+                            const isDeuda = transaction.category === "deuda";
 
                             const amountColor = isIngreso
                               ? "text-emerald-700"
                               : isDeuda
                                 ? "text-amber-700"
-                                : "text-foreground";
+                                : "text-rose-700";
 
                             const amountSign =
-                              record.category === "gasto" ? "- " : "";
+                              transaction.category === "gasto" ? "- " : "";
 
                             return (
                               <div
-                                key={record.id}
+                                key={transaction.id}
                                 className="p-4 hover:bg-muted/10 transition-colors"
                               >
-                                {/* Fila superior: Concepto y Monto */}
                                 <div className="flex flex-row justify-between sm:items-start gap-1 sm:gap-4 mb-2">
                                   <div>
                                     <p className="text-sm font-semibold text-foreground">
@@ -741,7 +749,7 @@ export default function DetailParty({
                                     </p>
                                     <div className="flex items-center gap-2">
                                       <span className="text-xs text-muted-foreground capitalize bg-muted px-1.5 py-0.5 rounded">
-                                        {record.category}
+                                        {transaction.category}
                                       </span>
                                     </div>
                                   </div>
@@ -753,13 +761,12 @@ export default function DetailParty({
                                       )}
                                     >
                                       {amountSign}
-                                      {formatCurrency(record.amount ?? 0)}
+                                      {formatCurrency(transaction.amount ?? 0)}
                                     </p>
                                   </div>
                                 </div>
 
-                                {/* Sección de Notas (Contexto) */}
-                                {record.notes && (
+                                {transaction.notes && (
                                   <div className="mt-2 bg-muted/50 p-3 rounded-lg border border-border/50 text-sm animate-in fade-in duration-300">
                                     <div className="flex items-start gap-2">
                                       <Info className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
@@ -768,7 +775,7 @@ export default function DetailParty({
                                           Observación:
                                         </span>
                                         <p className="text-muted-foreground leading-relaxed text-xs sm:text-sm">
-                                          {record.notes}
+                                          {transaction.notes}
                                         </p>
                                       </div>
                                     </div>
@@ -782,18 +789,18 @@ export default function DetailParty({
                         {/* Footer con Link */}
                         <div className="bg-muted/20 p-3 border-t border-border text-center">
                           <Link
-                            href="https://claridad.onpe.gob.pe/financiamiento-privado/informacion-financiera-anual"
+                            href={report.source_url || "#"}
                             target="_blank"
                             rel="noreferrer"
                             className="text-xs text-primary hover:underline inline-flex items-center gap-1"
                           >
-                            Ver documentos originales en Claridad ONPE{" "}
+                            Ver documento original en ONPE
                             <ExternalLink className="w-3 h-3" />
                           </Link>
                         </div>
                       </div>
                     );
-                  })()}
+                  })}
                 </CardContent>
               </Card>
             )}

@@ -121,8 +121,8 @@ export function LegislatorsTable({ promises }: LegislatorsTableProps) {
           open={true}
           onOpenChange={() => setRowAction(null)}
           legislator_id={rowAction.row.original.id}
-          legislatorName={rowAction.row.original.person.fullname}
-          memberships={rowAction.row.original.parliamentary_memberships}
+          legislatorName={rowAction.row.original.person?.fullname ?? ""}
+          memberships={rowAction.row.original.parliamentary_memberships ?? []}
         />
       )}
     </>

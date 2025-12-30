@@ -20,22 +20,24 @@ import {
   getAuthorizedNavGroups,
 } from "./navbar-config";
 import { User } from "@supabase/supabase-js";
+import { UserProfile } from "@/lib/auth-actions"; // Importar tipo
 import { LogoutButton } from "@/components/auth/logout-button";
+import Link from "next/link";
 
 interface NavbarMobileProps {
   user?: User | null;
+  profile?: UserProfile | null;
 }
 
-export const NavbarMobile = ({ user }: NavbarMobileProps) => {
+export const NavbarMobile = ({ user, profile }: NavbarMobileProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, setTheme } = useTheme();
 
-  const name =
-    user?.user_metadata?.full_name || user?.user_metadata?.name || "Usuario";
+  // DATOS REALES DEL PERFIL
+  const name = profile?.full_name || user?.email?.split("@")[0] || "Usuario";
   const email = user?.email || "";
-  const role = user?.user_metadata?.role || "user";
-  const image =
-    user?.user_metadata?.avatar_url || user?.user_metadata?.picture || "";
+  const role = profile?.role || "user";
+  const image = profile?.avatar_url || "";
 
   const getInitials = (nameStr: string) => {
     if (!nameStr) return "U";
@@ -60,9 +62,12 @@ export const NavbarMobile = ({ user }: NavbarMobileProps) => {
     }
   };
 
-  const authorizedAdminGroups = user
-    ? getAuthorizedNavGroups(adminNavGroups, role)
-    : [];
+  // FILTRADO DE RUTAS SEGÚN EL ROL DE LA BD
+  const authorizedAdminGroups =
+    user && profile
+      ? getAuthorizedNavGroups(adminNavGroups, role) // Usamos el role del profile
+      : [];
+
   const allGroups = [...publicNavGroups, ...authorizedAdminGroups];
 
   return (
@@ -85,7 +90,11 @@ export const NavbarMobile = ({ user }: NavbarMobileProps) => {
               {user ? (
                 <div className="flex items-center space-x-4">
                   <Avatar className="w-14 h-14 ring-4 ring-[var(--brand)]/10">
-                    <AvatarImage src={image} alt={name} />
+                    <AvatarImage
+                      src={image}
+                      alt={name}
+                      className="object-cover"
+                    />
                     <AvatarFallback className="bg-gradient-to-br from-[var(--brand)] to-[var(--brand)]/80 text-white text-lg font-bold">
                       {getInitials(name)}
                     </AvatarFallback>
@@ -127,10 +136,10 @@ export const NavbarMobile = ({ user }: NavbarMobileProps) => {
             </div>
 
             <div className="px-4 py-4 border-t border-border bg-card/50 backdrop-blur-sm">
-              {user && (
+              {user ? (
                 <LogoutButton>
                   <Button
-                    className=" w-full shadow-lg"
+                    className="w-full shadow-lg"
                     variant="outline"
                     size="lg"
                   >
@@ -138,6 +147,13 @@ export const NavbarMobile = ({ user }: NavbarMobileProps) => {
                     Cerrar Sesión
                   </Button>
                 </LogoutButton>
+              ) : (
+                // Botón para login en móvil si no está logueado
+                <Button asChild className="w-full" size="lg">
+                  <Link href="/auth/login" onClick={() => setIsOpen(false)}>
+                    Iniciar Sesión
+                  </Link>
+                </Button>
               )}
             </div>
           </div>

@@ -1,7 +1,7 @@
 // ============= ENUMS =============
 
 import { LegislatorInSeat } from "./legislator";
-import { PartyFinancingBasic } from "./party-financing";
+import { FinancingReport } from "./party-financing";
 import { PersonBasicInfo } from "./person";
 
 export enum ChamberType {
@@ -162,7 +162,7 @@ export interface PoliticalPartyDetail extends PoliticalPartyBase {
   party_timeline: PartyHistory[];
   legal_cases: PartyLegalCase[];
   seats_by_district: SeatsByDistrict[];
-  financing_records: PartyFinancingBasic[];
+  financing_reports: FinancingReport[];
   elected_legislators: ElectedLegislatorBasic[];
 }
 

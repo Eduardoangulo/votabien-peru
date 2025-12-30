@@ -4,14 +4,13 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Plus, User } from "lucide-react";
-import { PersonQuickCreateDialog } from "./person-quick-create-dialog";
-import { publicApi } from "@/lib/public-api";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { PersonWithActivePeriod } from "@/interfaces/person";
+import { PersonBasicInfo } from "@/interfaces/person";
+import { getPersonas } from "@/queries/public/person";
 interface PersonSelectorProps {
-  onSelect: (person: PersonWithActivePeriod | null) => void;
-  selectedPerson: PersonWithActivePeriod | null;
+  onSelect: (person: PersonBasicInfo | null) => void;
+  selectedPerson: PersonBasicInfo | null;
 }
 
 export function PersonSelector({
@@ -19,9 +18,7 @@ export function PersonSelector({
   selectedPerson,
 }: PersonSelectorProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<PersonWithActivePeriod[]>(
-    [],
-  );
+  const [searchResults, setSearchResults] = useState<PersonBasicInfo[]>([]);
   const [searching, setSearching] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -30,10 +27,10 @@ export function PersonSelector({
 
     setSearching(true);
     try {
-      const response = await publicApi.getPersonas({
+      const response = await getPersonas({
         search: searchTerm,
         skip: 0,
-        limit: 10,
+        limit: 5,
       });
 
       setSearchResults(response);
@@ -45,14 +42,14 @@ export function PersonSelector({
     }
   };
 
-  const handlePersonCreated = (person: PersonWithActivePeriod) => {
+  const handlePersonCreated = (person: PersonBasicInfo) => {
     onSelect(person);
     setShowCreateDialog(false);
     setSearchResults([]);
     setSearchTerm("");
   };
 
-  const handleSelectPerson = (person: PersonWithActivePeriod) => {
+  const handleSelectPerson = (person: PersonBasicInfo) => {
     onSelect(person);
     setSearchResults([]);
     setSearchTerm("");
@@ -173,13 +170,6 @@ export function PersonSelector({
           )}
         </div>
       )}
-
-      {/* Dialog para crear persona rápida */}
-      <PersonQuickCreateDialog
-        open={showCreateDialog}
-        onOpenChange={setShowCreateDialog}
-        onPersonCreated={handlePersonCreated}
-      />
     </div>
   );
 }

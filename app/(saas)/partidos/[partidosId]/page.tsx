@@ -11,7 +11,7 @@ export default async function PartidoDetailPage({ params }: PageProps) {
 
   try {
     const party = await getPartidoById(partidosId);
-    // console.log("party",party)
+    // console.log("party",party.financing_reports)
     if (!party) notFound();
     return <DetailParty party={party} />;
   } catch (error) {

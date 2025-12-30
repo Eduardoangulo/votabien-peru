@@ -12,6 +12,7 @@ import {
 } from "@/interfaces/politics";
 import {
   FinancingCategory,
+  FinancingReport,
   FinancingStatus,
   FlowType,
   PartyFinancingBasic,
@@ -119,8 +120,13 @@ interface LegislatorQueryResponse {
   } | null;
 }
 
-type FinancingRow = Tables<"partyfinancing">;
+type FinancingReportRow = Tables<"financingreports">;
+type FinancingTransactionRow = Tables<"partyfinancing">;
 type SeatsViewRow = Views<"party_seats_by_district">;
+
+interface FinancingReportQueryResponse extends FinancingReportRow {
+  transactions: FinancingTransactionRow[];
+}
 
 export async function getPartidoById(
   partidoId: string,
@@ -150,11 +156,17 @@ export async function getPartidoById(
       .eq("condition", "EN_EJERCICIO")
       .order("person(fullname)", { ascending: true }),
 
+    // ✅ NUEVO QUERY: Obtener reportes con sus transacciones
     supabase
-      .from("partyfinancing")
-      .select("*")
+      .from("financingreports")
+      .select(
+        `
+        *,
+        transactions:partyfinancing(*)
+      `,
+      )
       .eq("party_id", partidoId)
-      .order("date", { ascending: false }),
+      .order("report_date", { ascending: false }),
   ]);
 
   if (partidoRes.error || !partidoRes.data) {
@@ -165,34 +177,42 @@ export async function getPartidoById(
   const partido = partidoRes.data;
   return {
     ...partido,
-
-    // Casteos
     party_timeline: (partido.party_timeline as unknown as PartyHistory[]) || [],
     legal_cases: (partido.legal_cases as unknown as PartyLegalCase[]) || [],
     government_plan_summary:
       (partido.government_plan_summary as unknown as GovernmentPlanSummary[]) ||
       [],
-    // Mapeo directo
     seats_by_district: seatsRes.data || [],
-
     elected_legislators: electosRes.data?.map(mapLegislator) || [],
-    financing_records: financingRes.data?.map(mapFinancingRecord) || [],
+
+    // ✅ NUEVO: Mapear reportes con sus transacciones
+    financing_reports: financingRes.data?.map(mapFinancingReport) || [],
   };
 }
 
-const mapFinancingRecord = (f: FinancingRow): PartyFinancingBasic => ({
-  id: f.id,
-  date: f.date,
-  period: f.period,
-  status: (f.status?.toLowerCase().replace(/_/g, "_") ||
-    "unknown") as FinancingStatus,
-  category: (f.category?.toLowerCase() || null) as FinancingCategory | null,
-  flow_type: (f.flow_type?.toLowerCase() || null) as FlowType | null,
-  amount: f.amount,
-  currency: f.currency,
-  source_name: f.source_name,
-  source_url: f.source_url,
-  notes: f.notes,
+// ✅ NUEVO MAPPER: Convierte el reporte con sus transacciones
+const mapFinancingReport = (
+  report: FinancingReportQueryResponse,
+): FinancingReport => ({
+  id: report.id,
+  report_name: report.report_name,
+  filing_status: report.filing_status as FinancingStatus,
+  source_name: report.source_name,
+  source_url: report.source_url,
+  report_date: report.report_date,
+  period_start: report.period_start,
+  period_end: report.period_end,
+  transactions: (report.transactions || []).map(mapTransaction),
+});
+
+// ✅ NUEVO MAPPER: Convierte las transacciones
+const mapTransaction = (t: FinancingTransactionRow): PartyFinancingBasic => ({
+  id: t.id,
+  category: (t.category?.toLowerCase() || null) as FinancingCategory | null,
+  flow_type: (t.flow_type?.toLowerCase() || null) as FlowType | null,
+  amount: t.amount,
+  currency: t.currency,
+  notes: t.notes,
 });
 
 const mapLegislator = (
