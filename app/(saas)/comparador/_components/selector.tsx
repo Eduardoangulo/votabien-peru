@@ -53,10 +53,6 @@ import {
 import { ChamberType } from "@/interfaces/politics";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// ============================================
-// CONFIGURACIÓN DE LABELS POR TIPO
-// ============================================
-
 const LEGISLATOR_CONFIG: Record<
   ChamberType,
   {
@@ -146,9 +142,6 @@ const getEntityConfig = (
   // Fallback por defecto
   return LEGISLATOR_CONFIG.CONGRESO;
 };
-// ============================================
-// PROPS DEL COMPONENTE
-// ============================================
 
 interface AsyncSelectorProps {
   mode: EntityType;
@@ -156,7 +149,6 @@ interface AsyncSelectorProps {
   onSearch: (query: string) => Promise<SearchableEntity[]>;
   maxSlots?: number;
   showMetricsWarning?: boolean;
-  // ✅ NUEVOS PROPS: Filtros desde URL
   chamber?: ChamberType;
   type?: CandidateConfigKeys;
   district?: string;
@@ -180,33 +172,27 @@ export default function AsyncEntitySelector({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // --- Config basada en el modo ---
-  // const config = ENTITY_CONFIG[mode] || ENTITY_CONFIG["legislator"];
   const config = getEntityConfig(mode, chamber, type);
   const IconComponent = config.icon;
-  // DETERMINAR SI ESTÁ DESHABILITADO (FALTA CHAMBER O TYPE)
   const isDisabled = useMemo(() => {
     if (mode === "legislator") {
-      return !chamber; // Necesita chamber
+      return !chamber;
     }
     if (mode === "candidate") {
-      return !type; // Necesita type
+      return !type;
     }
     return false;
   }, [mode, chamber, type]);
-  // --- State ---
   const [isOpen, setIsOpen] = useState(false);
   const [selectedItems, setSelectedItems] =
     useState<SearchableEntity[]>(initialSelected);
 
-  // Search State
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchableEntity[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  // ✅ MOSTRAR FILTROS ACTIVOS
   const activeFilters = useMemo(() => {
     const filters: Array<{
       label: string;
@@ -268,14 +254,12 @@ export default function AsyncEntitySelector({
     }
   }, [initialSelectedIds, initialSelected, selectedItems]);
 
-  // 🔥 LIMPIAR SELECCIÓN CUANDO CAMBIAN FILTROS CRÍTICOS
   useEffect(() => {
     setSelectedItems([]);
     setResults([]);
     setQuery("");
-  }, [mode, chamber, type, district, party]); // ✅ Incluye filtros
+  }, [mode, chamber, type, district, party]);
 
-  // --- Derived State ---
   const stats = useMemo(() => {
     const withMetrics = selectedItems.filter((i) => i.has_metrics);
     const withoutMetrics = selectedItems.filter((i) => !i.has_metrics);
@@ -443,7 +427,6 @@ export default function AsyncEntitySelector({
             {config.subtitle}
           </p>
 
-          {/* ✅ MOSTRAR FILTROS ACTIVOS */}
           {activeFilters.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {activeFilters.map((filter, idx) => (
@@ -633,9 +616,6 @@ export default function AsyncEntitySelector({
   );
 }
 
-// ============================================
-// SUB-COMPONENTES
-// ============================================
 function SelectedSlot({
   item,
   onRemove,
@@ -659,13 +639,13 @@ function SelectedSlot({
           !item.has_metrics
             ? "border-amber-200 bg-amber-50/30 dark:bg-amber-950/20"
             : "hover:border-primary/40 hover:shadow-md",
-          disabled && "opacity-50 cursor-not-allowed", // Estilo cuando está deshabilitado
+          disabled && "opacity-50 cursor-not-allowed",
         )}
       >
         {/* Remove Button */}
         <button
           onClick={onRemove}
-          disabled={disabled} // Deshabilitar botón
+          disabled={disabled}
           className={cn(
             "absolute top-2 right-2 z-20 h-7 w-7 rounded-full bg-background/80 flex items-center justify-center transition-colors shadow-sm border",
             disabled
@@ -711,7 +691,7 @@ function SelectedSlot({
             className={cn(
               "h-24 w-24 border-4 shadow-md",
               !item.has_metrics && "grayscale opacity-70",
-              disabled && "grayscale opacity-50", // Avatar deshabilitado
+              disabled && "grayscale opacity-50",
             )}
           >
             <AvatarImage src={item.image_url || ""} alt={item.fullname} />

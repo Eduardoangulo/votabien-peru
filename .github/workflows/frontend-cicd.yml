@@ -198,6 +198,8 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=https://api.votabienperu.com
             NEXT_PUBLIC_ENVIRONMENT=production
+            NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/votabien_frontend:latest
           cache-to: type=inline
 
@@ -263,6 +265,8 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=https://api.votabienperu.com
             NEXT_PUBLIC_ENVIRONMENT=production
+            NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/votabien_frontend:latest
           cache-to: type=inline
 

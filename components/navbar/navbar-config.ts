@@ -22,7 +22,7 @@ export const publicNavGroups: NavGroup[] = [
       { href: "/partidos?active=true", label: "Partidos", icon: Flag },
       // { href: "/candidatos", label: "Candidatos 2026", icon: UserCheck },
       {
-        href: "/comparador?mode=legislator&chamber=Congreso",
+        href: "/comparador?mode=legislator&chamber=CONGRESO",
         label: "Comparador",
         icon: GitCompare,
       },

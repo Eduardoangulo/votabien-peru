@@ -64,10 +64,6 @@ export interface FilterState {
   // active_only: boolean | null;
 }
 
-// ============================================
-// CONFIGURACIÓN
-// ============================================
-
 const ENTITY_CATEGORIES: EntityCategory[] = [
   {
     id: "legislator",

@@ -10,7 +10,7 @@ import {
   Trash2,
   X,
   ArrowRight,
-  ArrowLeft, // Agregamos ArrowLeft para navegar atrás
+  ArrowLeft,
   Loader2,
 } from "lucide-react";
 import {
@@ -59,7 +59,6 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 
-// ... (Mantenemos REASON_CONFIG y membershipSchema igual que antes)
 const REASON_CONFIG = {
   [GroupChangeReason.INICIAL]: {
     label: "Inicial",
@@ -165,7 +164,7 @@ export function ParliamentaryMembershipDialog({
 
   useEffect(() => {
     if (!open) {
-      handleCancel(); // Reset completo al cerrar el dialog principal
+      handleCancel();
     }
   }, [open]);
 
@@ -191,7 +190,6 @@ export function ParliamentaryMembershipDialog({
     setShowForm(false);
   }, [form]);
 
-  // ... (Mantenemos handleDelete y onSubmit igual, funcionan bien)
   const handleDelete = async (membershipId: string) => {
     if (
       !confirm("¿Estás seguro de que deseas eliminar este cambio de bancada?")
@@ -283,7 +281,6 @@ export function ParliamentaryMembershipDialog({
   return (
     <Credenza open={open} onOpenChange={onOpenChange}>
       <CredenzaContent className="p-4 sm:max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
-        {/* CABECERA DINÁMICA: Cambia según si estamos en modo lista o formulario */}
         <CredenzaHeader className="text-left">
           <div className="flex items-center gap-2">
             {showForm && (
@@ -314,10 +311,8 @@ export function ParliamentaryMembershipDialog({
           </div>
         </CredenzaHeader>
 
-        {/* CUERPO: Scrollable */}
         <CredenzaBody className="sm:p-4 overflow-y-auto min-h-[300px]">
           {!showForm ? (
-            // VISTA LISTA
             <div className="space-y-4">
               <div className="flex justify-end">
                 <Button
@@ -461,7 +456,6 @@ export function ParliamentaryMembershipDialog({
               )}
             </div>
           ) : (
-            // VISTA FORMULARIO (Integrada, sin bordes extra)
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
