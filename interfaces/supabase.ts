@@ -14,17 +14,51 @@ export type Database = {
   };
   public: {
     Tables: {
-      alembic_version: {
+      alliancecomposition: {
         Row: {
-          version_num: string;
+          child_org_id: string | null;
+          created_at: string;
+          id: string;
+          parent_org_id: string | null;
+          process_id: string | null;
         };
         Insert: {
-          version_num: string;
+          child_org_id?: string | null;
+          created_at?: string;
+          id: string;
+          parent_org_id?: string | null;
+          process_id?: string | null;
         };
         Update: {
-          version_num?: string;
+          child_org_id?: string | null;
+          created_at?: string;
+          id?: string;
+          parent_org_id?: string | null;
+          process_id?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "alliance_composition_child_org_id_fkey";
+            columns: ["child_org_id"];
+            isOneToOne: false;
+            referencedRelation: "politicalparty";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "alliance_composition_parent_org_id_fkey";
+            columns: ["parent_org_id"];
+            isOneToOne: false;
+            referencedRelation: "politicalparty";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "alliance_composition_process_id_fkey";
+            columns: ["process_id"];
+            isOneToOne: false;
+            referencedRelation: "electoralprocess";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       attendance: {
         Row: {
@@ -896,6 +930,7 @@ export type Database = {
           tiktok_url: string | null;
           total_afiliates: number | null;
           twitter_url: string | null;
+          type: Database["public"]["Enums"]["organizationtype"] | null;
           updated_at: string;
           website: string | null;
           youtube_url: string | null;
@@ -927,6 +962,7 @@ export type Database = {
           tiktok_url?: string | null;
           total_afiliates?: number | null;
           twitter_url?: string | null;
+          type?: Database["public"]["Enums"]["organizationtype"] | null;
           updated_at: string;
           website?: string | null;
           youtube_url?: string | null;
@@ -958,6 +994,7 @@ export type Database = {
           tiktok_url?: string | null;
           total_afiliates?: number | null;
           twitter_url?: string | null;
+          type?: Database["public"]["Enums"]["organizationtype"] | null;
           updated_at?: string;
           website?: string | null;
           youtube_url?: string | null;
@@ -1046,110 +1083,6 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
-      };
-      user: {
-        Row: {
-          created_at: string;
-          email: string;
-          email_verified: string | null;
-          id: string;
-          image: string | null;
-          name: string | null;
-          password: string | null;
-          role: Database["public"]["Enums"]["userrole"];
-          updated_at: string | null;
-        };
-        Insert: {
-          created_at: string;
-          email: string;
-          email_verified?: string | null;
-          id: string;
-          image?: string | null;
-          name?: string | null;
-          password?: string | null;
-          role: Database["public"]["Enums"]["userrole"];
-          updated_at?: string | null;
-        };
-        Update: {
-          created_at?: string;
-          email?: string;
-          email_verified?: string | null;
-          id?: string;
-          image?: string | null;
-          name?: string | null;
-          password?: string | null;
-          role?: Database["public"]["Enums"]["userrole"];
-          updated_at?: string | null;
-        };
-        Relationships: [];
-      };
-      usertoken: {
-        Row: {
-          access_key: string | null;
-          created_at: string;
-          expires_at: string;
-          id: number;
-          ip_address: string | null;
-          last_used_at: string | null;
-          refresh_key: string | null;
-          user_agent: string | null;
-          user_id: string;
-        };
-        Insert: {
-          access_key?: string | null;
-          created_at: string;
-          expires_at: string;
-          id?: number;
-          ip_address?: string | null;
-          last_used_at?: string | null;
-          refresh_key?: string | null;
-          user_agent?: string | null;
-          user_id: string;
-        };
-        Update: {
-          access_key?: string | null;
-          created_at?: string;
-          expires_at?: string;
-          id?: number;
-          ip_address?: string | null;
-          last_used_at?: string | null;
-          refresh_key?: string | null;
-          user_agent?: string | null;
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "usertoken_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "user";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      verificationtoken: {
-        Row: {
-          created_at: string;
-          email: string;
-          expires_at: string;
-          id: string;
-          token: string;
-        };
-        Insert: {
-          created_at: string;
-          email: string;
-          expires_at: string;
-          id: string;
-          token: string;
-        };
-        Update: {
-          created_at?: string;
-          email?: string;
-          expires_at?: string;
-          id?: string;
-          token?: string;
-        };
-        Relationships: [];
       };
     };
     Views: {
@@ -1268,6 +1201,7 @@ export type Database = {
         | "SUSPENDIDO"
         | "LICENCIA"
         | "DESTITUIDO";
+      organizationtype: "PARTIDO" | "ALIANZA";
       sessiontype:
         | "PLENO"
         | "COMISION_PERMANENTE"
@@ -1494,6 +1428,7 @@ export const Constants = {
         "LICENCIA",
         "DESTITUIDO",
       ],
+      organizationtype: ["PARTIDO", "ALIANZA"],
       sessiontype: [
         "PLENO",
         "COMISION_PERMANENTE",

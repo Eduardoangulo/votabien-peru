@@ -9,6 +9,7 @@ import {
   PartyLegalCase,
   PoliticalPartyBase,
   GovernmentPlanSummary,
+  OrganizationType,
 } from "@/interfaces/politics";
 import {
   FinancingCategory,
@@ -55,24 +56,50 @@ interface GetPartidosParams {
   limit?: number;
   offset?: number;
 }
-
 export async function getPartidosList(
   params: GetPartidosParams = {},
 ): Promise<PoliticalPartyListPaginated> {
   const supabase = await createClient();
-
   const { active, search, limit = 30, offset = 0 } = params;
 
   try {
+    const { data: activeProcess } = await supabase
+      .from("electoralprocess")
+      .select("id")
+      .eq("active", true)
+      .single();
+
+    let hiddenPartyIds: string[] = [];
+
+    if (activeProcess) {
+      const { data: allianceMembers } = await supabase
+        .from("alliancecomposition")
+        .select("child_org_id")
+        .eq("process_id", activeProcess.id);
+
+      if (allianceMembers && allianceMembers.length > 0) {
+        hiddenPartyIds = allianceMembers
+          .map((m) => m.child_org_id)
+          .filter((id): id is string => id !== null);
+      }
+    }
+
     let query = supabase
       .from("politicalparty")
       .select("*", { count: "exact" })
       .order("name", { ascending: true });
 
+    // Filtro original
     if (active !== undefined) {
       query = query.eq("active", active);
     }
 
+    if (hiddenPartyIds.length > 0) {
+      const idsString = `(${hiddenPartyIds.join(",")})`;
+      query = query.filter("id", "not.in", idsString);
+    }
+
+    // Búsqueda por texto
     if (search && search.trim() !== "") {
       const searchTerm = search.trim();
       query = query.or(
@@ -80,7 +107,6 @@ export async function getPartidosList(
       );
     }
 
-    // paginación
     query = query.range(offset, offset + limit - 1);
 
     const { data, error, count } = await query;
@@ -107,6 +133,7 @@ type Tables<T extends keyof Database["public"]["Tables"]> =
 type Views<T extends keyof Database["public"]["Views"]> =
   Database["public"]["Views"][T]["Row"];
 
+// Interfaces internas para mapeo
 interface LegislatorQueryResponse {
   id: string;
   person_id: string;
@@ -128,13 +155,44 @@ interface FinancingReportQueryResponse extends FinancingReportRow {
   transactions: FinancingTransactionRow[];
 }
 
+// Interfaz auxiliar para el join de composición de alianza
+interface AllianceMemberJoin {
+  child_party: {
+    id: string; // Ajusta según tu DB (int o uuid)
+    name: string;
+    logo_url: string | null;
+    active: boolean;
+  };
+}
+
 export async function getPartidoById(
   partidoId: string,
 ): Promise<PoliticalPartyDetail> {
   const supabase = await createClient();
 
   const [partidoRes, seatsRes, electosRes, financingRes] = await Promise.all([
-    supabase.from("politicalparty").select("*").eq("id", partidoId).single(),
+    supabase
+      .from("politicalparty")
+      .select(
+        `
+        *,
+        alliancecomposition!parent_org_id (
+          child_party:child_org_id (*)
+        ),
+        parent_alliance_membership:alliancecomposition!child_org_id (
+           alliance:parent_org_id (
+              id,
+              name,
+              logo_url,
+              government_plan_summary,
+              government_plan_url,
+              government_audio_url
+           )
+        )
+      `,
+      )
+      .eq("id", partidoId)
+      .single(),
 
     supabase
       .from("party_seats_by_district")
@@ -156,7 +214,6 @@ export async function getPartidoById(
       .eq("condition", "EN_EJERCICIO")
       .order("person(fullname)", { ascending: true }),
 
-    // ✅ NUEVO QUERY: Obtener reportes con sus transacciones
     supabase
       .from("financingreports")
       .select(
@@ -168,29 +225,44 @@ export async function getPartidoById(
       .eq("party_id", partidoId)
       .order("report_date", { ascending: false }),
   ]);
-
   if (partidoRes.error || !partidoRes.data) {
     console.error("Error fetching party:", partidoRes.error);
     throw new Error("Partido no encontrado");
   }
 
   const partido = partidoRes.data;
+
+  const rawComposition = partido.alliancecomposition as unknown as
+    | AllianceMemberJoin[]
+    | null;
+
+  const parentAllianceRaw = partido.parent_alliance_membership?.[0]?.alliance;
+  const parentAlliance = parentAllianceRaw;
+
   return {
     ...partido,
+    composition:
+      rawComposition?.map((item) => ({
+        party: item.child_party,
+      })) || [],
+    parent_alliance:
+      (parentAlliance as unknown as PoliticalPartyDetail["parent_alliance"]) ||
+      null,
     party_timeline: (partido.party_timeline as unknown as PartyHistory[]) || [],
     legal_cases: (partido.legal_cases as unknown as PartyLegalCase[]) || [],
+    type: partido.type as OrganizationType,
     government_plan_summary:
       (partido.government_plan_summary as unknown as GovernmentPlanSummary[]) ||
       [],
+    government_plan_url: partido.government_plan_url || null,
+    government_audio_url: partido.government_audio_url || null,
     seats_by_district: seatsRes.data || [],
     elected_legislators: electosRes.data?.map(mapLegislator) || [],
-
-    // ✅ NUEVO: Mapear reportes con sus transacciones
     financing_reports: financingRes.data?.map(mapFinancingReport) || [],
   };
 }
 
-// ✅ NUEVO MAPPER: Convierte el reporte con sus transacciones
+// MAPPER
 const mapFinancingReport = (
   report: FinancingReportQueryResponse,
 ): FinancingReport => ({
@@ -205,7 +277,6 @@ const mapFinancingReport = (
   transactions: (report.transactions || []).map(mapTransaction),
 });
 
-// ✅ NUEVO MAPPER: Convierte las transacciones
 const mapTransaction = (t: FinancingTransactionRow): PartyFinancingBasic => ({
   id: t.id,
   category: (t.category?.toLowerCase() || null) as FinancingCategory | null,
