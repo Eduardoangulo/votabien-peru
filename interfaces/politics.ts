@@ -50,6 +50,11 @@ export enum GroupChangeReason {
   OTRO = "OTRO",
 }
 
+export enum OrganizationType {
+  PARTIDO = "PARTIDO",
+  ALIANZA = "ALIANZA",
+}
+
 export interface PartyLegalCase {
   case_type: string;
   date: string;
@@ -126,6 +131,7 @@ export interface ElectoralProcess {
   election_date: string;
   active: boolean;
 }
+
 // ============= PARTIDO ==========================
 export interface SeatsByDistrict {
   district_code: string | null;
@@ -141,6 +147,7 @@ export interface ElectedLegislatorBasic {
   condition: string | null;
   person_id: string;
 }
+
 export interface PoliticalPartyDetail extends PoliticalPartyBase {
   founder: string | null;
   ideology: string | null;
@@ -163,7 +170,23 @@ export interface PoliticalPartyDetail extends PoliticalPartyBase {
   legal_cases: PartyLegalCase[];
   seats_by_district: SeatsByDistrict[];
   financing_reports: FinancingReport[];
+  type: OrganizationType;
   elected_legislators: ElectedLegislatorBasic[];
+  composition: {
+    party: {
+      id: string | null;
+      name: string;
+      logo_url: string | null;
+      active: boolean;
+    };
+  }[];
+  parent_alliance: {
+    government_plan_summary: GovernmentPlanSummary[];
+    government_plan_url: string | null;
+    government_audio_url: string | null;
+    name: string;
+    id: string;
+  } | null;
 }
 
 export interface PoliticalPartyListPaginated {

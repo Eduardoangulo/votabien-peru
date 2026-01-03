@@ -114,6 +114,19 @@ export default function DetailParty({
   const hasOverlay = needsOverlay(partidoColor);
   const textColor = getTextColor(partidoColor);
 
+  const parentAlliance = party.parent_alliance;
+
+  const displayPlan = {
+    summary:
+      parentAlliance?.government_plan_summary || party.government_plan_summary,
+    url: parentAlliance?.government_plan_url || party.government_plan_url,
+    audio: parentAlliance?.government_audio_url || party.government_audio_url,
+    isInherited: !!parentAlliance, // Flag para saber si mostrar el aviso
+    sourceName: parentAlliance?.name,
+    sourceId: parentAlliance?.id,
+  };
+  const hasPlanData = displayPlan.summary && displayPlan.summary.length > 0;
+
   const formatNumber = (num: number | null | undefined) => {
     if (!num) return "No disponible";
     return new Intl.NumberFormat("es-PE").format(num);
@@ -205,27 +218,41 @@ export default function DetailParty({
   return (
     <div className="min-h-screen bg-background">
       {/* Breadcrumb */}
-      <div className="border-b border-border bg-muted/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+      <div className="border-b border-border bg-background/95 backdrop-brightness-0 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <nav className="flex items-center gap-1.5 text-xs text-foreground">
             <Link
               href="/"
-              className="hover:text-foreground transition-colors flex items-center gap-1"
+              className="hover:text-foreground transition-colors p-1"
             >
-              <Home className="w-4 h-4" />
+              <Home className="w-3.5 h-3.5" />
             </Link>
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3 h-3 text-foreground" />
             <Link
               href="/partidos?active=true"
               className="hover:text-foreground transition-colors"
             >
               Partidos
             </Link>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-foreground font-medium truncate max-w-[200px] sm:max-w-none">
+            <ChevronRight className="w-3 h-3 text-foreground" />
+            <span className="font-medium text-foreground max-w-[150px]">
               {party.name}
             </span>
           </nav>
+
+          {/* Badge de Estado en el Nav */}
+          {party.active && (
+            <Badge
+              variant="outline"
+              className="hidden sm:flex border-success text-muted bg-success text-[10px] h-5 px-2 gap-1.5"
+            >
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-muted opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-muted"></span>
+              </span>
+              Activo
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -277,16 +304,7 @@ export default function DetailParty({
                     {party.acronym}
                   </Badge>
                 )}
-                {party.active ? (
-                  <Badge
-                    className={cn("bg-success/70 border-success/30", textColor)}
-                  >
-                    <CheckCircle2 className="w-3 h-3 mr-1" />
-                    Activo
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary">Inactivo</Badge>
-                )}
+
                 {party.ideology &&
                   party.ideology.split("\n").map((ide, i) => (
                     <Badge
@@ -519,13 +537,33 @@ export default function DetailParty({
 
           {/* COLUMNA DERECHA (Timeline, Finanzas, Casos, Mapa) */}
           <div className="lg:col-span-2 order-2 flex flex-col space-y-6">
-            {party.government_plan_summary && (
-              <PlanGobiernoFlashcards
-                audio_url={party.government_audio_url}
-                planes={party.government_plan_summary}
-                government_plan_url={party.government_plan_url}
-              />
+            {hasPlanData && (
+              <div className="space-y-3">
+                {/* Aviso si es heredado */}
+                {displayPlan.isInherited && (
+                  <div className="border border-primary rounded-lg p-3 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+                    <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 text-sm text-primary">
+                      <p className="font-semibold">
+                        Plan de Gobierno Unificado
+                      </p>
+                      <p className="opacity-90">
+                        Este partido participa en las elecciones como parte de{" "}
+                        <strong>{displayPlan.sourceName}</strong>. A
+                        continuación se muestra el plan de gobierno de la
+                        alianza.
+                      </p>
+                    </div>
+                  </div>
+                )}
+                <PlanGobiernoFlashcards
+                  audio_url={displayPlan.audio}
+                  planes={displayPlan.summary}
+                  government_plan_url={displayPlan.url}
+                />
+              </div>
             )}
+
             {/* 1. TIMELINE HISTÓRICO */}
             {timelineItems.length > 0 && (
               <Card>
