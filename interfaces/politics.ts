@@ -112,6 +112,11 @@ export interface PoliticalPartyBase {
 export interface ElectoralDistrictBasic {
   id: string;
   name: string;
+  code?: string;
+  is_national?: boolean;
+  num_senators?: number;
+  num_deputies?: number;
+  active?: boolean;
 }
 
 export interface ElectoralDistrictBase {
