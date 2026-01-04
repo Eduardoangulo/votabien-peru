@@ -4,12 +4,17 @@ import { ElectoralDistrictBase, ElectoralProcess } from "@/interfaces/politics";
 import Link from "next/link";
 import StickyElectoralBanner from "@/components/sticky-banner";
 import { CandidateCard } from "@/interfaces/candidate";
+import {
+  getCandidatesCards,
+  getAllCandidates,
+} from "@/queries/public/candidacies";
+import getDistritos from "@/queries/public/electoral-districts";
 
 interface PageProps {
   searchParams: {
     search?: string;
     type?: string;
-    districts?: string | string[];
+    districts?: string[];
   };
 }
 
@@ -28,6 +33,8 @@ const CandidatosPage = async ({ searchParams }: PageProps) => {
     const procesosActivos = (await publicApi.getProcesosElectorales(
       true,
     )) as ElectoralProcess[];
+
+    console.log("Procesos activos:", procesosActivos);
 
     if (!procesosActivos || procesosActivos.length === 0) {
       return (
@@ -74,16 +81,19 @@ const CandidatosPage = async ({ searchParams }: PageProps) => {
       electoral_process_id: procesoActivo.id,
       type: params.type && params.type !== "all" ? params.type : undefined,
       districts:
-        params.districts && params.districts !== "all"
+        params.districts && params.districts.length > 0
           ? params.districts
           : undefined,
       skip: 0,
       limit: limit,
     };
-    const [candidaturas, distritos] = await Promise.all([
-      publicApi.getCandidaturas(apiParams) as Promise<CandidateCard[]>,
-      publicApi.getDistritos() as Promise<ElectoralDistrictBase[]>,
+    const [candidaturas, distritos, allCandidatos] = await Promise.all([
+      getCandidatesCards(apiParams),
+      getDistritos(),
+      getAllCandidates(),
     ]);
+
+    console.log("todos los candidatos obtenidos:", allCandidatos);
 
     const fechaElecciones = new Date(procesoActivo.election_date);
     const fechaFormateada = fechaElecciones.toLocaleDateString("es-PE", {
