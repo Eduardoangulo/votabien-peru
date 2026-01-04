@@ -74,7 +74,7 @@ export async function getCandidatesCards({
   }
 
   if (type) {
-    query = query.eq("type", type);
+    query = query.eq("type", type as CandidacyType);
   }
 
   if (districts && districts.length > 0) {
