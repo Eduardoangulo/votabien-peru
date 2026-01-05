@@ -6,12 +6,12 @@ import { getParliamentaryGroups } from "@/queries/public/parliamentary-groups";
 import { ChamberType } from "@/interfaces/politics";
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     chamber?: string;
     search?: string;
     groups?: string[];
     districts?: string[];
-  };
+  }>;
 }
 
 export default async function LegisladoresPage({ searchParams }: PageProps) {

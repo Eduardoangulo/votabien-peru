@@ -1,6 +1,15 @@
 import type { NextConfig } from "next";
+import withSerwistInit from "@serwist/next";
 
 const isProduction = process.env.NEXT_PUBLIC_ENVIRONMENT === "production";
+
+const withSerwist = withSerwistInit({
+  swSrc: "sw.ts",
+  swDest: "public/sw.js",
+  cacheOnNavigation: true,
+  reloadOnOnline: true,
+  disable: process.env.NODE_ENV === "development",
+});
 
 const nextConfig: NextConfig = {
   // Para Docker/Dokploy
@@ -64,4 +73,4 @@ const nextConfig: NextConfig = {
   /* config options here */
 };
 
-export default nextConfig;
+export default withSerwist(nextConfig);

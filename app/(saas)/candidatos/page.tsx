@@ -11,11 +11,11 @@ import {
 import getDistritos from "@/queries/public/electoral-districts";
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     search?: string;
     type?: string;
     districts?: string[];
-  };
+  }>;
 }
 
 const CandidatosPage = async ({ searchParams }: PageProps) => {
