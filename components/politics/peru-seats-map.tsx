@@ -280,7 +280,7 @@ export default function PeruSeatsMapSimple({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
-            <MapPin className="w-6 h-6 text-primary" />
+            <MapPin className="w-6 h-6" />
             Representación Electoral por Departamento
           </h3>
           <p className="text-sm text-muted-foreground mt-1">

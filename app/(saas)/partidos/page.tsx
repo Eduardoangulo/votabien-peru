@@ -3,12 +3,12 @@ import PartidosListPaginated from "@/components/politics/partidos-list-paginated
 import { getPartidosList } from "@/queries/public/parties";
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     search?: string;
     active?: string;
     limit?: string;
     offset?: string;
-  };
+  }>;
 }
 
 export default async function PartidosPage({ searchParams }: PageProps) {

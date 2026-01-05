@@ -4,7 +4,7 @@ import { getPartidoById } from "@/queries/public/parties";
 import DetailAlliance from "./_components/detail-alliance";
 
 interface PageProps {
-  params: { partidosId: string };
+  params: Promise<{ partidosId: string }>;
 }
 
 export default async function PartidoDetailPage({ params }: PageProps) {

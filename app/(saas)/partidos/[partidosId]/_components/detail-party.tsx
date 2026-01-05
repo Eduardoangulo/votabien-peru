@@ -218,7 +218,12 @@ export default function DetailParty({
   return (
     <div className="min-h-screen bg-background">
       {/* Breadcrumb */}
-      <div className="border-b border-border bg-background/95 backdrop-brightness-0 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <div
+        className="border-b border-border bg-background backdrop-brightness-0 supports-[backdrop-filter]:bg-background sticky top-0 z-50"
+        style={{
+          background: `linear-gradient(135deg, ${partidoColor} 0%, ${partidoColor}dd 100%)`,
+        }}
+      >
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <nav className="flex items-center gap-1.5 text-xs text-foreground">
             <Link
@@ -401,7 +406,7 @@ export default function DetailParty({
                   <CardContent className="space-y-4">
                     {" "}
                     {party.party_president && (
-                      <div className="bg-muted/30 rounded-lg border border-border/50">
+                      <div>
                         <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">
                           Presidente del Partido
                         </p>
@@ -451,7 +456,7 @@ export default function DetailParty({
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-primary" />
+                    <Building2 className="w-5 h-5" />
                     Sede Central
                   </CardTitle>
                 </CardHeader>

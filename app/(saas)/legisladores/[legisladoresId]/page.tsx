@@ -4,7 +4,7 @@ import { PersonDetail } from "@/interfaces/person";
 import { getPersonaById } from "@/queries/public/person";
 
 interface PageProps {
-  params: { legisladoresId: string };
+  params: Promise<{ legisladoresId: string }>;
 }
 
 export default async function LegisladorDetailPage({ params }: PageProps) {
