@@ -5,9 +5,9 @@ export enum FinancingStatus {
 }
 
 export enum FinancingCategory {
-  INGRESO = "ingreso",
-  GASTO = "gasto",
-  DEUDA = "deuda",
+  INGRESO = "INGRESO",
+  GASTO = "GASTO",
+  DEUDA = "DEUDA",
 }
 
 export enum FlowType {
@@ -22,16 +22,17 @@ export enum FlowType {
 
 export interface PartyFinancingBasic {
   id: string;
-  category: FinancingCategory | null;
-  flow_type: FlowType | null;
-  amount: number | null;
-  currency: string | null;
+  financing_report_id: string;
+  category: FinancingCategory;
+  flow_type: FlowType;
+  amount: number;
+  currency: string;
   notes: string | null;
 }
 
 export interface FinancingReport {
   id: string;
-  // party_id: string;
+  party_id: string;
   report_name: string; // "IFA 2024"
   filing_status: FinancingStatus;
   source_name: string;
@@ -39,5 +40,6 @@ export interface FinancingReport {
   report_date: string;
   period_start: string;
   period_end: string;
+  created_at: string;
   transactions: PartyFinancingBasic[];
 }

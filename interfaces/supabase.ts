@@ -486,7 +486,7 @@ export type Database = {
       };
       financingreports: {
         Row: {
-          created_at: string | null;
+          created_at: string;
           filing_status: Database["public"]["Enums"]["financingstatus"];
           id: string;
           party_id: string;
@@ -496,10 +496,10 @@ export type Database = {
           report_name: string;
           source_name: string;
           source_url: string | null;
-          updated_at: string | null;
+          updated_at: string;
         };
         Insert: {
-          created_at?: string | null;
+          created_at?: string;
           filing_status: Database["public"]["Enums"]["financingstatus"];
           id: string;
           party_id: string;
@@ -509,10 +509,10 @@ export type Database = {
           report_name: string;
           source_name: string;
           source_url?: string | null;
-          updated_at?: string | null;
+          updated_at?: string;
         };
         Update: {
-          created_at?: string | null;
+          created_at?: string;
           filing_status?: Database["public"]["Enums"]["financingstatus"];
           id?: string;
           party_id?: string;
@@ -522,7 +522,7 @@ export type Database = {
           report_name?: string;
           source_name?: string;
           source_url?: string | null;
-          updated_at?: string | null;
+          updated_at?: string;
         };
         Relationships: [
           {
@@ -790,35 +790,35 @@ export type Database = {
         Row: {
           amount: number;
           category: Database["public"]["Enums"]["financingcategory"];
-          created_at: string | null;
-          currency: string | null;
+          created_at: string;
+          currency: string;
           financing_report_id: string;
           flow_type: Database["public"]["Enums"]["flowtype"];
           id: string;
           notes: string | null;
-          updated_at: string | null;
+          updated_at: string;
         };
         Insert: {
           amount: number;
-          category: Database["public"]["Enums"]["financingcategory"];
-          created_at?: string | null;
-          currency?: string | null;
+          category?: Database["public"]["Enums"]["financingcategory"];
+          created_at?: string;
+          currency?: string;
           financing_report_id: string;
-          flow_type: Database["public"]["Enums"]["flowtype"];
+          flow_type?: Database["public"]["Enums"]["flowtype"];
           id: string;
           notes?: string | null;
-          updated_at?: string | null;
+          updated_at?: string;
         };
         Update: {
           amount?: number;
           category?: Database["public"]["Enums"]["financingcategory"];
-          created_at?: string | null;
-          currency?: string | null;
+          created_at?: string;
+          currency?: string;
           financing_report_id?: string;
           flow_type?: Database["public"]["Enums"]["flowtype"];
           id?: string;
           notes?: string | null;
-          updated_at?: string | null;
+          updated_at?: string;
         };
         Relationships: [
           {
@@ -940,7 +940,7 @@ export type Database = {
           active: boolean;
           color_hex?: string | null;
           core_values?: string | null;
-          created_at: string;
+          created_at?: string;
           email?: string | null;
           facebook_url?: string | null;
           foundation_date?: string | null;
@@ -963,7 +963,7 @@ export type Database = {
           total_afiliates?: number | null;
           twitter_url?: string | null;
           type?: Database["public"]["Enums"]["organizationtype"] | null;
-          updated_at: string;
+          updated_at?: string;
           website?: string | null;
           youtube_url?: string | null;
         };
