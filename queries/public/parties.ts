@@ -267,6 +267,7 @@ const mapFinancingReport = (
   report: FinancingReportQueryResponse,
 ): FinancingReport => ({
   id: report.id,
+  party_id: report.party_id,
   report_name: report.report_name,
   filing_status: report.filing_status as FinancingStatus,
   source_name: report.source_name,
@@ -275,12 +276,14 @@ const mapFinancingReport = (
   period_start: report.period_start,
   period_end: report.period_end,
   transactions: (report.transactions || []).map(mapTransaction),
+  created_at: report.created_at,
 });
 
 const mapTransaction = (t: FinancingTransactionRow): PartyFinancingBasic => ({
   id: t.id,
-  category: (t.category?.toLowerCase() || null) as FinancingCategory | null,
-  flow_type: (t.flow_type?.toLowerCase() || null) as FlowType | null,
+  financing_report_id: t.financing_report_id,
+  category: t.category as FinancingCategory,
+  flow_type: t.flow_type as FlowType,
   amount: t.amount,
   currency: t.currency,
   notes: t.notes,

@@ -3,47 +3,29 @@ import { type SearchParams } from "@/lib/types";
 import { Shell } from "@/components/shell";
 import { Data2TableSkeleton, Skeleton } from "@/components/ui/skeletons";
 import React, { Suspense } from "react";
-import { LegislatorsTable } from "./_components/legislator-table";
+import { PartiesTable } from "./_components/party-table";
 import { searchParamsCache } from "./_lib/validation";
-import {
-  getLegislators,
-  getChamberTypeCounts,
-  getDistrictsCounts,
-  getLegislatorConditionCounts,
-} from "./_lib/data";
-import { CreateLegislator } from "./_components/buttons";
-import { AdminLegislatorProvider } from "@/components/context/admin-legislator";
-import getDistritos from "@/queries/public/electoral-districts";
+import { getActivePartiesCounts, getParties } from "./_lib/data";
+import { CreateParty } from "./_components/buttons";
 import { getPartidosList } from "@/queries/public/parties";
-import { getParliamentaryGroups } from "@/queries/public/parliamentary-groups";
+import { AdminPartyProvider } from "@/components/context/admin-party";
 
 interface IndexPageProps {
   searchParams: Promise<SearchParams>;
 }
-export default async function AdminLegislatorsPage(props: IndexPageProps) {
+export default async function AdminPartiesPage(props: IndexPageProps) {
   const searchParams = await props.searchParams;
   const search = searchParamsCache.parse(searchParams);
-  const promises = Promise.all([
-    getLegislators(search),
-    getChamberTypeCounts(),
-    getLegislatorConditionCounts(),
-    getDistrictsCounts(),
-  ]);
-  const [districts, parties, parliamentaryGroups] = await Promise.all([
-    getDistritos(),
+  const promises = Promise.all([getParties(search), getActivePartiesCounts()]);
+  const [parties] = await Promise.all([
     getPartidosList({
       active: true,
       limit: 100,
     }),
-    getParliamentaryGroups(true),
   ]);
   return (
     <Shell className="gap-2 mx-auto">
-      <AdminLegislatorProvider
-        districts={districts}
-        parties={parties.items}
-        parliamentaryGroups={parliamentaryGroups}
-      >
+      <AdminPartyProvider parties={parties.items}>
         {/* <FeatureFlagsProvider> */}
         <Suspense fallback={<Skeleton className="h-7 w-52" />}>
           <div className="flex flex-row justify-between px-1">
@@ -53,7 +35,7 @@ export default async function AdminLegislatorsPage(props: IndexPageProps) {
           align="end"
           shallow={false}
         /> */}
-            <CreateLegislator />
+            <CreateParty />
           </div>
         </Suspense>
         <Suspense
@@ -67,10 +49,10 @@ export default async function AdminLegislatorsPage(props: IndexPageProps) {
             />
           }
         >
-          <LegislatorsTable promises={promises} />
+          <PartiesTable promises={promises} />
         </Suspense>
         {/* </FeatureFlagsProvider> */}
-      </AdminLegislatorProvider>
+      </AdminPartyProvider>
     </Shell>
   );
 }

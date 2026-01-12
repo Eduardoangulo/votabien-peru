@@ -2,6 +2,7 @@
 # PWA / Service Worker
 # =========================================
 public/sw.js
+public/swe*
 public/sw.js.map
 public/workbox-*.js
 public/workbox-*.js.map

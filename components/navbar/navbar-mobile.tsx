@@ -135,7 +135,7 @@ export const NavbarMobile = ({ user, profile }: NavbarMobileProps) => {
               <MobileThemeToggle theme={theme} setTheme={setTheme} />
             </div>
 
-            <div className="px-4 py-4 border-t border-border bg-card/50 backdrop-blur-sm">
+            {/* <div className="px-4 py-4 border-t border-border bg-card/50 backdrop-blur-sm">
               {user ? (
                 <LogoutButton>
                   <Button
@@ -155,7 +155,7 @@ export const NavbarMobile = ({ user, profile }: NavbarMobileProps) => {
                   </Link>
                 </Button>
               )}
-            </div>
+            </div> */}
           </div>
         </SheetContent>
       </Sheet>

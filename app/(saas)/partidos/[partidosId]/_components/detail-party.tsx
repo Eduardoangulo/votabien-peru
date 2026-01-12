@@ -643,15 +643,15 @@ export default function DetailParty({
                   {party.financing_reports.map((report) => {
                     // Calcular totales por categoría
                     const ingresos = report.transactions
-                      .filter((t) => t.category === "ingreso")
+                      .filter((t) => t.category === "INGRESO")
                       .reduce((acc, t) => acc + (t.amount || 0), 0);
 
                     const gastos = report.transactions
-                      .filter((t) => t.category === "gasto")
+                      .filter((t) => t.category === "GASTO")
                       .reduce((acc, t) => acc + (t.amount || 0), 0);
 
                     const deudas = report.transactions
-                      .filter((t) => t.category === "deuda")
+                      .filter((t) => t.category === "DEUDA")
                       .reduce((acc, t) => acc + (t.amount || 0), 0);
 
                     // Configuración del badge según filing_status
@@ -768,8 +768,8 @@ export default function DetailParty({
                               "Concepto Vario";
 
                             const isIngreso =
-                              transaction.category === "ingreso";
-                            const isDeuda = transaction.category === "deuda";
+                              transaction.category === "INGRESO";
+                            const isDeuda = transaction.category === "DEUDA";
 
                             const amountColor = isIngreso
                               ? "text-emerald-700"
@@ -778,7 +778,7 @@ export default function DetailParty({
                                 : "text-rose-700";
 
                             const amountSign =
-                              transaction.category === "gasto" ? "- " : "";
+                              transaction.category === "GASTO" ? "- " : "";
 
                             return (
                               <div
